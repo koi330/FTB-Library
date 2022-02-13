@@ -1,21 +1,24 @@
-[
 {
-  "modid": "FTBL",
-  "name": "FTBLib",
-  "description": "FTBLib",
-  "version": "${version}",
-  "url": "http://minecraft.curseforge.com/projects/ftblib",
-  "updateUrl": "",
-  "authorList": [
-    "LatvianModder",
-    "Jared"
-  ],
-  "credits": "",
-  "logoFile": "assets/ftbl/textures/logo.png",
-  "screenshots": [
-  ],
-  "parent":"",
-  "dependencies": [
-  ]
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "The libraries for FTB mods",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://feed-the-beast.com",
+    "updateUrl": "",
+    "authorList": [
+      "LatvianModder",
+      "Jared"
+    ],
+    "credits": "",
+    "logoFile": "assets/ftbl/textures/logo.png",
+    "screenshots": [],
+    "parent": "",
+    "requiredMods": ["Forge"],
+    "dependencies": ["Forge", "Baubles", "NotEnoughItems", "Waila", "MineTweaker3"],
+    "dependants": [],
+    "useDependencyInformation": true
+  }]
 }
-]
