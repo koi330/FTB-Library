@@ -11,6 +11,7 @@ import ftb.lib.api.gui.*;
 import ftb.lib.api.notification.ClientNotifications;
 import ftb.lib.mod.FTBLibMod;
 import ftb.lib.mod.client.gui.*;
+import ftb.lib.mod.config.FTBLibConfigCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
@@ -73,6 +74,7 @@ public class FTBLibActions
 		{ FTBLibClient.openGui(new GuiEditConfig(FTBLibClient.mc.currentScreen, ClientConfigRegistry.provider())); }
 	};
 	
+	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public void guiInitEvent(final GuiScreenEvent.InitGuiEvent.Post e)
 	{
@@ -101,7 +103,9 @@ public class FTBLibActions
 					ySize = 136;
 					buttonY = 6;
 				}
-				boolean hasPotions = !e.gui.mc.thePlayer.getActivePotionEffects().isEmpty();
+				boolean hasPotions = !e.gui.mc.thePlayer.getActivePotionEffects().isEmpty()
+						&& !FTBLibConfigCompat.compat_statusEffectHUD.getAsBoolean();
+				
 				if(hasPotions)
 				{
 					buttonX -= 64;
