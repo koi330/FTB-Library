@@ -1,6 +1,7 @@
 package ftb.lib.mod.client;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.*;
 import ftb.lib.EventBusHelper;
 import ftb.lib.api.PlayerAction;
@@ -110,6 +111,14 @@ public class FTBLibActions
 				{
 					buttonX -= 64;
 					buttonY -= 26;
+				}
+
+				boolean isTFCLoaded = Loader.isModLoaded("terrafirmacraftplus");
+
+				if(isTFCLoaded)
+				{
+					xSize = 230;
+					ySize = 185;
 				}
 				
 				int guiLeft = (e.gui.width - xSize) / 2;
