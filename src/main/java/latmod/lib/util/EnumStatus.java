@@ -1,9 +1,8 @@
 package latmod.lib.util;
 
-public enum EnumStatus
-{
-	NOT_STARTED,
-	WAITING,
-	SUCCESS,
-	FAILED
+public enum EnumStatus {
+    NOT_STARTED,
+    WAITING,
+    SUCCESS,
+    FAILED
 }

@@ -1,7 +1,6 @@
 package latmod.lib.util;
 
-public enum Phase
-{
-	PRE,
-	POST;
+public enum Phase {
+    PRE,
+    POST;
 }
