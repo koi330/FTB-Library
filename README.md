@@ -1,27 +1,13 @@
-# FTB Library [![](http://cf.way2muchnoise.eu/ftb-library-legacy-forge.svg) ![](https://cf.way2muchnoise.eu/packs/ftb-library-legacy-forge.svg) ![](http://cf.way2muchnoise.eu/versions/ftb-library-legacy-forge.svg)](https://www.curseforge.com/minecraft/mc-mods/ftb-library-legacy-forge)
+# FTB Library for 1.7.10
 
-Use https://github.com/FTBTeam/FTB-Mods-Issues for any mod issues
+### License
 
-### Building the mod
+GTNH Modifications Copyright (C) 2021-2022 The GTNH Team
 
-- Make sure you have Java JDK 1.8+ installed
-- Downloading it as zip or clone with Git
-- Open console / Command Prompt in downloaded folder's location
-- Run "gradlew build"
+GTNH Changes are Dual Licensed:<br>
+For LatvianModder - Original MIT License<br>
+For everyone else, this code is licensed LGPL v3.0 or later. Feel free to use our changes, just give back any changes you make to the community as well!
 
-### Adding as dependency
-
-```groovy
-repositories {
-	maven { url "https://maven.latmod.com/" }
-}
-
-dependencies {
-	deobfCompile "com.feed_the_beast.mods:FTBLib:${ftblib_version}"
-}
-```
-
-And `ftblib_version=5.+` line in your `gradle.properties` file. You can also specify exact version, e.g. `5.0.0`.
-
-You probably also want to add "required-after:ftblib" or "after:ftblib" in your @Mod's dependencies.
-Most of the APIs don't need hard dependency, but things like GUIs won't work without FTBLib loaded
+Original code Copyright (c) 2016 LatvianModder and licensed MIT (Based on LatMod Discord and the original https://latmod.com/)
+ 
+![MIT License](license-support.png)
