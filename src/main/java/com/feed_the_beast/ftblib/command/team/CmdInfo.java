@@ -1,78 +1,70 @@
 package com.feed_the_beast.ftblib.command.team;
 
+import java.util.List;
+
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.lib.command.CmdBase;
 import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
 import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 import com.feed_the_beast.ftblib.lib.data.Universe;
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
-
-import javax.annotation.Nullable;
-import java.util.List;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 
 /**
  * @author LatvianModder
  */
-public class CmdInfo extends CmdBase
-{
-	public CmdInfo()
-	{
+public class CmdInfo extends CmdBase {
+	public CmdInfo() {
 		super("info", Level.ALL);
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos)
-	{
-		if (args.length == 1)
-		{
-			return getListOfStringsMatchingLastWord(args, Universe.get().getTeams());
+	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+		if (args.length == 1) {
+			return getListOfStringsFromIterableMatchingLastWord(args, Universe.get().getTeams());
 		}
 
-		return super.getTabCompletions(server, sender, args, pos);
+		return super.addTabCompletionOptions(sender, args);
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		checkArgs(sender, args, 1);
 		ForgeTeam team = Universe.get().getTeam(args[0]);
 
-		if (!team.isValid())
-		{
+		if (!team.isValid()) {
 			throw FTBLib.error(sender, "ftblib.lang.team.error.not_found", args[0]);
 		}
 
-		sender.sendMessage(FTBLib.lang(sender, "commands.team.info.id", StringUtils.color(new TextComponentString(team.getId()), TextFormatting.BLUE)));
-		sender.sendMessage(FTBLib.lang(sender, "commands.team.info.uid", StringUtils.color(new TextComponentString(team.getUID() + " / " + String.format("%04x", team.getUID())), TextFormatting.BLUE)));
-		sender.sendMessage(FTBLib.lang(sender, "commands.team.info.owner", team.getOwner() == null ? "-" : StringUtils.color(team.getOwner().getDisplayName(), TextFormatting.BLUE)));
+		sender.addChatMessage(FTBLib.lang(sender, "commands.team.info.id",
+				StringUtils.color(new ChatComponentText(team.getId()), EnumChatFormatting.BLUE)));
+		sender.addChatMessage(FTBLib.lang(sender, "commands.team.info.uid",
+				StringUtils.color(new ChatComponentText(team.getUID() + " / " + String.format("%04x", team.getUID())),
+						EnumChatFormatting.BLUE)));
+		sender.addChatMessage(FTBLib.lang(sender, "commands.team.info.owner", team.getOwner() == null ? "-"
+				: StringUtils.color(team.getOwner().getDisplayName(), EnumChatFormatting.BLUE)));
 
-		ITextComponent component = new TextComponentString("");
-		component.getStyle().setColor(TextFormatting.GOLD);
+		IChatComponent component = new ChatComponentText("");
+		component.getChatStyle().setColor(EnumChatFormatting.GOLD);
 		boolean first = true;
 
-		for (ForgePlayer player : team.getMembers())
-		{
-			if (first)
-			{
+		for (ForgePlayer player : team.getMembers()) {
+			if (first) {
 				first = false;
-			}
-			else
-			{
+			} else {
 				component.appendText(", ");
 			}
 
-			ITextComponent n = player.getDisplayName();
-			n.getStyle().setColor(TextFormatting.BLUE);
+			IChatComponent n = player.getDisplayName();
+			n.getChatStyle().setColor(EnumChatFormatting.BLUE);
 			component.appendSibling(n);
 		}
 
-		sender.sendMessage(FTBLib.lang(sender, "commands.team.info.members", component));
+		sender.addChatMessage(FTBLib.lang(sender, "commands.team.info.members", component));
 	}
 }

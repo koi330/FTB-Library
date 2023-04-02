@@ -2,8 +2,9 @@ package com.feed_the_beast.ftblib.lib.net;
 
 import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
+
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public abstract class MessageBase implements IMessage
 {

@@ -4,11 +4,12 @@ import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
 import com.feed_the_beast.ftblib.lib.gui.misc.GuiSelectFluid;
 import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
+import com.feed_the_beast.ftblib.lib.util.BlockUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -18,92 +19,81 @@ import javax.annotation.Nullable;
 /**
  * @author LatvianModder
  */
-public class ConfigFluid extends ConfigValue
-{
+public class ConfigFluid extends ConfigValue {
 	public static final String ID = "fluid";
 
 	private Fluid value;
 	private Fluid defaultFluid;
 
-	public ConfigFluid(@Nullable Fluid fluid, @Nullable Fluid def)
-	{
+	public ConfigFluid(@Nullable Fluid fluid, @Nullable Fluid def) {
 		defaultFluid = def;
 		value = fluid == null ? getDefaultFluid() : fluid;
 	}
 
 	@Override
-	public String getId()
-	{
+	public String getId() {
 		return ID;
 	}
 
 	@Override
-	public String getString()
-	{
+	public String getString() {
 		value = getFluid();
 		return value == null ? "null" : value.getName();
 	}
 
 	@Nullable
-	public Fluid getFluid()
-	{
+	public Fluid getFluid() {
 		return value;
 	}
 
-	public void setFluid(@Nullable Fluid fluid)
-	{
+	public void setFluid(@Nullable Fluid fluid) {
 		value = fluid == null ? getDefaultFluid() : fluid;
 	}
 
 	@Nullable
-	public Fluid getDefaultFluid()
-	{
+	public Fluid getDefaultFluid() {
 		return defaultFluid;
 	}
 
-	public void setDefaultFluid(@Nullable Fluid fluid)
-	{
+	public void setDefaultFluid(@Nullable Fluid fluid) {
 		defaultFluid = fluid;
 	}
 
 	@Override
-	public boolean getBoolean()
-	{
+	public boolean getBoolean() {
 		return value != null;
 	}
 
 	@Override
-	public int getInt()
-	{
+	public int getInt() {
 		return 0;
 	}
 
 	@Override
-	public ConfigFluid copy()
-	{
+	public ConfigFluid copy() {
 		return new ConfigFluid(getFluid(), getDefaultFluid());
 	}
 
 	@Override
-	public ITextComponent getStringForGUI()
-	{
+	public IChatComponent getStringForGUI() {
 		value = getFluid();
 
-		if (value == null)
-		{
-			return new TextComponentString("null");
+		if (value == null) {
+			return new ChatComponentText("null");
 		}
 
-		return new TextComponentString(value.getLocalizedName(new FluidStack(value, Fluid.BUCKET_VOLUME)));  //TODO: PR Forge to fix this for WATER and LAVA
+		return new ChatComponentText(value.getLocalizedName(new FluidStack(value, 1000))); 
+		// return new ChatComponentText(value.getLocalizedName(new FluidStack(value, Fluid.BUCKET_VOLUME))); // TODO: PR
+																											// Forge to
+																											// fix this
+																											// for WATER
+																											// and LAVA
 	}
 
 	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate)
-	{
-		if (string.equals("null"))
-		{
-			if (!simulate)
-			{
+	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+		if (string.equals("null")) {
+			if (!simulate) {
 				setFluid(null);
 			}
 
@@ -112,10 +102,8 @@ public class ConfigFluid extends ConfigValue
 
 		value = FluidRegistry.getFluid(string);
 
-		if (value != null)
-		{
-			if (!simulate)
-			{
+		if (value != null) {
+			if (!simulate) {
 				setFluid(value);
 			}
 
@@ -126,8 +114,7 @@ public class ConfigFluid extends ConfigValue
 	}
 
 	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback)
-	{
+	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
 		new GuiSelectFluid(gui, this::getDefaultFluid, fluid -> {
 			setFluid(fluid);
 			callback.run();
@@ -135,22 +122,19 @@ public class ConfigFluid extends ConfigValue
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key)
-	{
+	public void writeToNBT(NBTTagCompound nbt, String key) {
 		value = getFluid();
 		nbt.setString(key, value == null ? "" : value.getName());
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key)
-	{
+	public void readFromNBT(NBTTagCompound nbt, String key) {
 		String s = nbt.getString(key);
 		setFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
 	}
 
 	@Override
-	public void writeData(DataOut data)
-	{
+	public void writeData(DataOut data) {
 		defaultFluid = getDefaultFluid();
 		data.writeString(defaultFluid == null ? "" : defaultFluid.getName());
 		value = getFluid();
@@ -158,8 +142,7 @@ public class ConfigFluid extends ConfigValue
 	}
 
 	@Override
-	public void readData(DataIn data)
-	{
+	public void readData(DataIn data) {
 		String s = data.readString();
 		setDefaultFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
 		s = data.readString();
@@ -167,8 +150,7 @@ public class ConfigFluid extends ConfigValue
 	}
 
 	@Override
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return getFluid() == null;
 	}
 }

@@ -1,39 +1,38 @@
 package com.feed_the_beast.ftblib.lib.util.text_components;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.feed_the_beast.ftblib.lib.math.Ticks;
 import com.feed_the_beast.ftblib.lib.util.ServerUtils;
 import com.feed_the_beast.ftblib.lib.util.StringJoiner;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
-
-import javax.annotation.Nullable;
 
 /**
  * @author LatvianModder
  */
-public class Notification extends TextComponentString
-{
+public class Notification extends ChatComponentText {
 	public static final ResourceLocation VANILLA_STATUS = new ResourceLocation("minecraft", "status");
 
-	public static Notification of(ResourceLocation id, String text, ITextComponent... lines)
-	{
+	public static Notification of(ResourceLocation id, String text, IChatComponent... lines) {
 		Notification n = new Notification(id, text);
 
-		for (ITextComponent line : lines)
-		{
+		for (IChatComponent line : lines) {
 			n.addLine(line);
 		}
 
 		return n;
 	}
 
-	public static Notification of(ResourceLocation id, ITextComponent... lines)
-	{
+	public static Notification of(ResourceLocation id, IChatComponent... lines) {
 		return of(id, "", lines);
 	}
 
@@ -41,22 +40,19 @@ public class Notification extends TextComponentString
 	private Ticks timer;
 	private boolean important;
 
-	private Notification(ResourceLocation i, String text)
-	{
+	private Notification(ResourceLocation i, String text) {
 		super(text);
 		id = i;
 		timer = Ticks.SECOND.x(3);
 		important = false;
 	}
 
-	public Notification(Notification n)
-	{
-		this(n.getId(), n.getUnformattedComponentText());
+	public Notification(Notification n) {
+		this(n.getId(), n.getUnformattedTextForChat());
 
-		setStyle(n.getStyle().createShallowCopy());
+		setChatStyle(n.getChatStyle().createShallowCopy());
 
-		for (ITextComponent line : n.getSiblings())
-		{
+		for (IChatComponent line : (List<IChatComponent>) n.getSiblings()) {
 			getSiblings().add(line.createCopy());
 		}
 
@@ -64,10 +60,8 @@ public class Notification extends TextComponentString
 		setImportant(n.isImportant());
 	}
 
-	public Notification addLine(ITextComponent line)
-	{
-		if (!getSiblings().isEmpty())
-		{
+	public Notification addLine(IChatComponent line) {
+		if (!getSiblings().isEmpty()) {
 			appendText("\n");
 		}
 
@@ -75,92 +69,74 @@ public class Notification extends TextComponentString
 		return this;
 	}
 
-	public Notification setError()
-	{
-		getStyle().setColor(TextFormatting.DARK_RED);
+	public Notification setError() {
+		getChatStyle().setColor(EnumChatFormatting.DARK_RED);
 		important = true;
 		return this;
 	}
 
 	@Override
-	public Notification appendText(String text)
-	{
-		return appendSibling(new TextComponentString(text));
+	public Notification appendText(String text) {
+		return appendSibling(new ChatComponentText(text));
 	}
 
 	@Override
-	public Notification appendSibling(ITextComponent component)
-	{
+	public Notification appendSibling(IChatComponent component) {
 		super.appendSibling(component);
 		return this;
 	}
 
-	public int hashCode()
-	{
+	public int hashCode() {
 		return id.hashCode();
 	}
 
-	public boolean equals(Object o)
-	{
+	public boolean equals(Object o) {
 		return o == this || (o instanceof Notification && ((Notification) o).getId().equals(getId()));
 	}
 
-	public String toString()
-	{
-		return "Notification{" + StringJoiner.with(", ").joinObjects("id=" + id, "siblings=" + siblings, "style=" + getStyle(), "timer=" + timer, "important=" + important) + '}';
+	public String toString() {
+		return "Notification{" + StringJoiner.with(", ").joinObjects("id=" + id, "siblings=" + siblings,
+				"style=" + getChatStyle(), "timer=" + timer, "important=" + important) + '}';
 	}
 
-	public ResourceLocation getId()
-	{
+	public ResourceLocation getId() {
 		return id;
 	}
 
-	public Ticks getTimer()
-	{
+	public Ticks getTimer() {
 		return timer;
 	}
 
-	public Notification setTimer(Ticks t)
-	{
+	public Notification setTimer(Ticks t) {
 		timer = t;
 		return this;
 	}
 
-	public boolean isImportant()
-	{
+	public boolean isImportant() {
 		return important;
 	}
 
-	public Notification setImportant(boolean v)
-	{
+	public Notification setImportant(boolean v) {
 		important = v;
 		return this;
 	}
 
 	@Override
-	public Notification createCopy()
-	{
+	public Notification createCopy() {
 		return new Notification(this);
 	}
 
-	public void send(MinecraftServer server, @Nullable EntityPlayer player)
-	{
+	public void send(MinecraftServer server, @Nullable EntityPlayer player) {
 		ServerUtils.notify(server, player, this);
 	}
 
-	public void send(MinecraftServer server, @Nullable ICommandSender sender)
-	{
-		if (sender == null)
-		{
+	public void send(MinecraftServer server, @Nullable ICommandSender sender) {
+		if (sender == null) {
 			ServerUtils.notify(server, null, this);
-		}
-		else if (sender instanceof EntityPlayer)
-		{
+		} else if (sender instanceof EntityPlayer) {
 			ServerUtils.notify(server, (EntityPlayer) sender, this);
-		}
-		else
-		{
-			sender.sendMessage(this);
+		} else {
+			sender.addChatMessage(this);
 		}
 	}
 }

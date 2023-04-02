@@ -22,14 +22,14 @@ public class MessageMyTeamGui extends MessageToServer
 	@Override
 	public void onMessage(EntityPlayerMP player)
 	{
-		if (!FTBLibGameRules.canCreateTeam(player.world) && !FTBLibGameRules.canJoinTeam(player.world))
+		if (!FTBLibGameRules.canCreateTeam(player.worldObj) && !FTBLibGameRules.canJoinTeam(player.worldObj))
 		{
 			FTBLibAPI.sendCloseGuiPacket(player);
 		}
 		else
 		{
 			ForgePlayer p = Universe.get().getPlayer(player);
-			(p.hasTeam() ? new MessageMyTeamGuiResponse(p) : new MessageSelectTeamGui(p, FTBLibGameRules.canCreateTeam(player.world))).sendTo(player);
+			(p.hasTeam() ? new MessageMyTeamGuiResponse(p) : new MessageSelectTeamGui(p, FTBLibGameRules.canCreateTeam(player.worldObj))).sendTo(player);
 		}
 	}
 }

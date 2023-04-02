@@ -11,29 +11,23 @@ import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
 import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 import com.feed_the_beast.ftblib.lib.data.TeamType;
 import com.feed_the_beast.ftblib.net.MessageMyTeamGuiResponse;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 
 /**
  * @author LatvianModder
  */
-public class CmdCreate extends CmdBase
-{
-	public CmdCreate()
-	{
+public class CmdCreate extends CmdBase {
+	public CmdCreate() {
 		super("create", Level.ALL);
 	}
 
-	public static boolean isValidTeamID(String s)
-	{
-		if (!s.isEmpty())
-		{
-			for (int i = 0; i < s.length(); i++)
-			{
-				if (!isValidChar(s.charAt(i)))
-				{
+	public static boolean isValidTeamID(String s) {
+		if (!s.isEmpty()) {
+			for (int i = 0; i < s.length(); i++) {
+				if (!isValidChar(s.charAt(i))) {
 					return false;
 				}
 			}
@@ -44,49 +38,41 @@ public class CmdCreate extends CmdBase
 		return false;
 	}
 
-	private static boolean isValidChar(char c)
-	{
+	private static boolean isValidChar(char c) {
 		return c == '_' || c == '|' || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
-		if (!FTBLibGameRules.canCreateTeam(server.getWorld(0)))
-		{
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+		if (!FTBLibGameRules.canCreateTeam(sender.getEntityWorld())) {
 			throw FTBLib.error(sender, "feature_disabled_server");
 		}
 
 		EntityPlayerMP player = getCommandSenderAsPlayer(sender);
 		ForgePlayer p = CommandUtils.getForgePlayer(player);
 
-		if (p.hasTeam())
-		{
+		if (p.hasTeam()) {
 			throw FTBLib.error(sender, "ftblib.lang.team.error.must_leave");
 		}
 
 		checkArgs(sender, args, 1);
 
-		if (!isValidTeamID(args[0]))
-		{
+		if (!isValidTeamID(args[0])) {
 			throw FTBLib.error(sender, "ftblib.lang.team.id_invalid");
 		}
 
-		if (p.team.universe.getTeam(args[0]).isValid())
-		{
+		if (p.team.universe.getTeam(args[0]).isValid()) {
 			throw FTBLib.error(sender, "ftblib.lang.team.id_already_exists");
 		}
 
 		p.team.universe.clearCache();
 
-		ForgeTeam team = new ForgeTeam(p.team.universe, p.team.universe.generateTeamUID((short) 0), args[0], TeamType.PLAYER);
+		ForgeTeam team = new ForgeTeam(p.team.universe, p.team.universe.generateTeamUID((short) 0), args[0],
+				TeamType.PLAYER);
 
-		if (args.length > 1)
-		{
+		if (args.length > 1) {
 			team.setColor(EnumTeamColor.NAME_MAP.get(args[1]));
-		}
-		else
-		{
+		} else {
 			team.setColor(EnumTeamColor.NAME_MAP.getRandom(sender.getEntityWorld().rand));
 		}
 
@@ -96,14 +82,11 @@ public class CmdCreate extends CmdBase
 		new ForgeTeamCreatedEvent(team).post();
 		ForgeTeamPlayerJoinedEvent event = new ForgeTeamPlayerJoinedEvent(p);
 		event.post();
-		sender.sendMessage(FTBLib.lang(sender, "ftblib.lang.team.created", team.getId()));
+		sender.addChatMessage(FTBLib.lang(sender, "ftblib.lang.team.created", team.getId()));
 
-		if (event.getDisplayGui() != null)
-		{
+		if (event.getDisplayGui() != null) {
 			event.getDisplayGui().run();
-		}
-		else
-		{
+		} else {
 			new MessageMyTeamGuiResponse(p).sendTo(player);
 		}
 

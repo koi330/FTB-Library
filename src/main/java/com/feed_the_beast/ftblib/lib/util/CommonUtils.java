@@ -2,10 +2,11 @@ package com.feed_the_beast.ftblib.lib.util;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+
+import cpw.mods.fml.common.LoadController;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 
 import javax.annotation.Nullable;
 

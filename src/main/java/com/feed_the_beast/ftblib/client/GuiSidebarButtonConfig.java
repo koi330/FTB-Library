@@ -29,11 +29,7 @@ public class GuiSidebarButtonConfig extends GuiButtonListBase
 		{
 			super(panel, I18n.format(s.getLangKey()), s.getIcon());
 			sidebarButton = s;
-
-			if (I18n.hasKey(s.getTooltipLangKey()))
-			{
-				tooltip = I18n.format(s.getTooltipLangKey());
-			}
+			tooltip = I18n.format(s.getTooltipLangKey());
 		}
 
 		@Override

@@ -1,6 +1,6 @@
 package com.feed_the_beast.ftblib.client;
 
-import net.minecraftforge.client.resource.IResourceType;
+import com.feed_the_beast.ftblib.client.resource.IResourceType;
 
 /**
  * @author LatvianModder

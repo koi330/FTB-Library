@@ -1,52 +1,49 @@
 package com.feed_the_beast.ftblib.command.client;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import com.feed_the_beast.ftblib.lib.command.CmdBase;
 import com.feed_the_beast.ftblib.lib.util.NBTUtils;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
-public class CommandPrintItem extends CmdBase
-{
-	public CommandPrintItem()
-	{
+public class CommandPrintItem extends CmdBase {
+	public CommandPrintItem() {
 		super("print_item", Level.ALL);
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, final String[] args) throws CommandException
-	{
-		if (!(sender instanceof EntityPlayer))
-		{
+	public void processCommand(ICommandSender sender, final String[] args)
+			throws CommandException {
+		if (!(sender instanceof EntityPlayer)) {
 			return;
 		}
 
-		ItemStack stack = ((EntityPlayer) sender).getHeldItem(EnumHand.MAIN_HAND);
+		ItemStack stack = ((EntityPlayer) sender).getHeldItem();
 
-		if (stack.isEmpty())
-		{
+		if (stack == null) {
 			return;
 		}
 
 		HashSet<String> argsSet = new HashSet<>(Arrays.asList(args));
 
-		ITextComponent component = new TextComponentString(stack.getDisplayName() + " :: " + NBTUtils.getColoredNBTString(stack.serializeNBT()));
-		component.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, stack.serializeNBT().toString()));
-		sender.sendMessage(component);
+		IChatComponent component = new ChatComponentText(
+				stack.getDisplayName() + " :: " + NBTUtils.getColoredNBTString(stack.writeToNBT(new NBTTagCompound())));
+		component.getChatStyle()
+				.setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, stack.writeToNBT(new NBTTagCompound()).toString()));
+		sender.addChatMessage(component);
 
-		if (argsSet.contains("copy"))
-		{
-			GuiScreen.setClipboardString(stack.serializeNBT().toString());
+		if (argsSet.contains("copy")) {
+			GuiScreen.setClipboardString(stack.writeToNBT(new NBTTagCompound()).toString());
 		}
 	}
 }

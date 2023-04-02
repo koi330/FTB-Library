@@ -1,5 +1,8 @@
 package com.feed_the_beast.ftblib.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.lib.client.ClientUtils;
 import com.feed_the_beast.ftblib.lib.gui.Button;
@@ -13,128 +16,106 @@ import com.feed_the_beast.ftblib.lib.gui.misc.GuiLoading;
 import com.feed_the_beast.ftblib.lib.icon.Icon;
 import com.feed_the_beast.ftblib.lib.util.SidedUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+
+import cpw.mods.fml.client.config.GuiConfig;
+import cpw.mods.fml.client.config.GuiMessageDialog;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.eventhandler.Event;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.config.GuiConfig;
-import net.minecraftforge.fml.client.config.GuiMessageDialog;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.common.eventhandler.Event;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
-public class GuiClientConfig extends GuiButtonListBase
-{
-	private class GuiCustomConfig extends GuiConfig
-	{
-		public GuiCustomConfig(String modid, String title)
-		{
-			super(Minecraft.getMinecraft().currentScreen, modid, title);
+public class GuiClientConfig extends GuiButtonListBase {
+	private class GuiCustomConfig extends GuiConfig {
+		public GuiCustomConfig(String modid, String title) {
+			super(Minecraft.getMinecraft().currentScreen, new ArrayList<>(), modid, false, false, title);
 		}
 
 		@Override
-		protected void actionPerformed(GuiButton button)
-		{
-			if (button.id == 2000)
-			{
+		protected void actionPerformed(GuiButton button) {
+			if (button.id == 2000) {
 				boolean flag = true;
-				try
-				{
-					if ((configID != null || !(parentScreen instanceof GuiConfig)) && entryList.hasChangedEntry(true))
-					{
+				try {
+					if ((configID != null || !(parentScreen instanceof GuiConfig)) && entryList.hasChangedEntry(true)) {
 						boolean requiresMcRestart = entryList.saveConfigElements();
 
-						ConfigChangedEvent event = new ConfigChangedEvent.OnConfigChangedEvent(modID, configID, isWorldRunning, requiresMcRestart);
+						ConfigChangedEvent event = new ConfigChangedEvent.OnConfigChangedEvent(modID, configID,
+								isWorldRunning, requiresMcRestart);
 						MinecraftForge.EVENT_BUS.post(event);
-						if (!event.getResult().equals(Event.Result.DENY))
-						{
-							MinecraftForge.EVENT_BUS.post(new ConfigChangedEvent.PostConfigChangedEvent(modID, configID, isWorldRunning, requiresMcRestart));
+						if (!event.getResult().equals(Event.Result.DENY)) {
+							MinecraftForge.EVENT_BUS.post(new ConfigChangedEvent.PostConfigChangedEvent(modID, configID,
+									isWorldRunning, requiresMcRestart));
 						}
 
-						if (requiresMcRestart)
-						{
+						if (requiresMcRestart) {
 							flag = false;
-							mc.displayGuiScreen(new GuiMessageDialog(parentScreen, "fml.configgui.gameRestartTitle", new TextComponentString(I18n.format("fml.configgui.gameRestartRequired")), "fml.configgui.confirmRestartMessage"));
+							mc.displayGuiScreen(new GuiMessageDialog(parentScreen, "fml.configgui.gameRestartTitle",
+									new ChatComponentText(I18n.format("fml.configgui.gameRestartRequired")),
+									"fml.configgui.confirmRestartMessage"));
 						}
 
-						if (parentScreen instanceof GuiConfig)
-						{
+						if (parentScreen instanceof GuiConfig) {
 							((GuiConfig) parentScreen).needsRefresh = true;
 						}
 					}
-				}
-				catch (Throwable e)
-				{
-					FMLLog.log.error("Error performing GuiConfig action:", e);
+				} catch (Throwable e) {
+					FMLLog.severe("Error performing GuiConfig action:", e);
 				}
 
-				if (flag)
-				{
+				if (flag) {
 					mc.displayGuiScreen(parentScreen);
 				}
-			}
-			else
-			{
+			} else {
 				super.actionPerformed(button);
 			}
 		}
 	}
 
-	private class ButtonClientConfig extends SimpleTextButton
-	{
+	private class ButtonClientConfig extends SimpleTextButton {
 		private final String modId;
 
-		public ButtonClientConfig(Panel panel, ClientConfig config)
-		{
+		public ButtonClientConfig(Panel panel, ClientConfig config) {
 			super(panel, config.name.getFormattedText(), config.icon);
 			modId = config.id;
 		}
 
 		@Override
-		public void onClicked(MouseButton button)
-		{
+		public void onClicked(MouseButton button) {
 			GuiHelper.playClickSound();
 			Minecraft.getMinecraft().displayGuiScreen(new GuiCustomConfig(modId, getTitle()));
 		}
 	}
 
-	public GuiClientConfig()
-	{
+	public GuiClientConfig() {
 		setTitle(I18n.format("sidebar_button.ftblib.settings"));
 	}
 
 	@Override
-	public void addButtons(Panel panel)
-	{
-		panel.add(new SimpleTextButton(panel, I18n.format("player_config"), GuiIcons.SETTINGS_RED)
-		{
+	public void addButtons(Panel panel) {
+		panel.add(new SimpleTextButton(panel, I18n.format("player_config"), GuiIcons.SETTINGS_RED) {
 			@Override
-			public void onClicked(MouseButton button)
-			{
+			public void onClicked(MouseButton button) {
 				GuiHelper.playClickSound();
 				new GuiLoading().openGui();
 				ClientUtils.execClientCommand("/my_settings");
 			}
 
 			@Override
-			public WidgetType getWidgetType()
-			{
+			public WidgetType getWidgetType() {
 				return SidedUtils.isModLoadedOnServer(FTBLib.MOD_ID) ? super.getWidgetType() : WidgetType.DISABLED;
 			}
 		});
 
-		panel.add(new SimpleTextButton(panel, I18n.format("sidebar_button"), Icon.getIcon("ftblib:textures/gui/teams.png"))
-		{
+		panel.add(new SimpleTextButton(panel, I18n.format("sidebar_button"),
+				Icon.getIcon("ftblib:textures/gui/teams.png")) {
 			@Override
-			public void onClicked(MouseButton button)
-			{
+			public void onClicked(MouseButton button) {
 				GuiHelper.playClickSound();
 				new GuiSidebarButtonConfig().openGui();
 			}
@@ -142,8 +123,7 @@ public class GuiClientConfig extends GuiButtonListBase
 
 		List<Button> buttons = new ArrayList<>();
 
-		for (ClientConfig config : FTBLibClient.CLIENT_CONFIG_MAP.values())
-		{
+		for (ClientConfig config : FTBLibClient.CLIENT_CONFIG_MAP.values()) {
 			buttons.add(new ButtonClientConfig(panel, config));
 		}
 
@@ -152,8 +132,7 @@ public class GuiClientConfig extends GuiButtonListBase
 	}
 
 	@Override
-	public void onClosed()
-	{
+	public void onClosed() {
 		super.onClosed();
 		SidebarButtonManager.INSTANCE.saveConfig();
 	}

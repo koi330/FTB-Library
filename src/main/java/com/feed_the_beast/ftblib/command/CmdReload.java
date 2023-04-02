@@ -1,5 +1,10 @@
 package com.feed_the_beast.ftblib.command;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import com.feed_the_beast.ftblib.FTBLibCommon;
 import com.feed_the_beast.ftblib.FTBLibConfig;
 import com.feed_the_beast.ftblib.events.ServerReloadEvent;
@@ -7,71 +12,53 @@ import com.feed_the_beast.ftblib.lib.EnumReloadType;
 import com.feed_the_beast.ftblib.lib.command.CmdBase;
 import com.feed_the_beast.ftblib.lib.data.FTBLibAPI;
 import com.feed_the_beast.ftblib.lib.data.Universe;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
-public class CmdReload extends CmdBase
-{
+public class CmdReload extends CmdBase {
 	private Collection<String> tab;
 
-	public CmdReload(String id, Level l)
-	{
+	public CmdReload(String id, Level l) {
 		super(id, l);
 
 		tab = new HashSet<>();
 		tab.add("*");
 
-		for (ResourceLocation r : FTBLibCommon.RELOAD_IDS.keySet())
-		{
+		for (ResourceLocation r : FTBLibCommon.RELOAD_IDS.keySet()) {
 			tab.add(r.toString());
-			tab.add(r.getNamespace() + ":*");
+			tab.add(r.getResourceDomain() + ":*");
 		}
 
 		tab = new ArrayList<>(tab);
 		((ArrayList<String>) tab).sort(null);
 	}
 
-	public CmdReload()
-	{
+	public CmdReload() {
 		this(FTBLibConfig.general.replace_reload_command ? "reload" : "ftb_reload", Level.OP_OR_SP);
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos)
-	{
-		if (args.length == 1)
-		{
-			return getListOfStringsMatchingLastWord(args, tab);
+	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+		if (args.length == 1) {
+			return getListOfStringsFromIterableMatchingLastWord(args, tab);
 		}
 
-		return super.getTabCompletions(server, sender, args, pos);
+		return super.addTabCompletionOptions(sender, args);
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		ResourceLocation id = ServerReloadEvent.ALL;
 
-		if (args.length >= 1)
-		{
-			if (args[0].indexOf(':') != -1)
-			{
+		if (args.length >= 1) {
+			if (args[0].indexOf(':') != -1) {
 				id = new ResourceLocation(args[0]);
-			}
-			else if (!args[0].equals("*"))
-			{
+			} else if (!args[0].equals("*")) {
 				id = new ResourceLocation(args[0] + ":*");
 			}
 		}

@@ -1,77 +1,69 @@
 package com.feed_the_beast.ftblib.lib.util.text_components;
 
+import java.util.List;
+
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.lib.math.Ticks;
 import com.feed_the_beast.ftblib.lib.util.StringJoiner;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 
 /**
  * @author LatvianModder
  */
-public class TextComponentCountdown extends TextComponentString
-{
+public class TextComponentCountdown extends ChatComponentText {
 	public final long countdown;
 
-	public TextComponentCountdown(String s, long t)
-	{
+	public TextComponentCountdown(String s, long t) {
 		super(s);
 		countdown = t;
 	}
 
-	public TextComponentCountdown(long t)
-	{
+	public TextComponentCountdown(long t) {
 		this("", t);
 	}
 
 	@Override
-	public String getText()
-	{
+	public String getChatComponentText_TextValue() {
 		return Ticks.get(countdown - FTBLib.PROXY.getWorldTime() - (countdown % 20L)).toTimeString();
 	}
 
 	@Override
-	public String getUnformattedComponentText()
-	{
-		return getText();
+	public String getUnformattedTextForChat() {
+		return getChatComponentText_TextValue();
 	}
 
 	@Override
-	public TextComponentCountdown createCopy()
-	{
+	public TextComponentCountdown createCopy() {
 		TextComponentCountdown component = new TextComponentCountdown(countdown);
-		component.setStyle(getStyle().createShallowCopy());
+		component.setChatStyle(getChatStyle().createShallowCopy());
 
-		for (ITextComponent itextcomponent : getSiblings())
-		{
-			component.appendSibling(itextcomponent.createCopy());
+		for (IChatComponent IChatComponent : (List<IChatComponent>) getSiblings()) {
+			component.appendSibling(IChatComponent.createCopy());
 		}
 
 		return component;
 	}
 
-	public boolean equals(Object o)
-	{
-		if (this == o)
-		{
+	public boolean equals(Object o) {
+		if (this == o) {
 			return true;
-		}
-		else if (o instanceof TextComponentCountdown)
-		{
+		} else if (o instanceof TextComponentCountdown) {
 			TextComponentCountdown t = (TextComponentCountdown) o;
-			return countdown == t.countdown && getStyle().equals(t.getStyle()) && getSiblings().equals(t.getSiblings());
-		}
-		else if (o instanceof TextComponentString)
-		{
-			TextComponentString t = (TextComponentString) o;
-			return getText().equals(t.getText()) && getStyle().equals(t.getStyle()) && getSiblings().equals(t.getSiblings());
+			return countdown == t.countdown && getChatStyle().equals(t.getChatStyle())
+					&& getSiblings().equals(t.getSiblings());
+		} else if (o instanceof ChatComponentText) {
+			ChatComponentText t = (ChatComponentText) o;
+			return getChatComponentText_TextValue().equals(t.getChatComponentText_TextValue()) && getChatStyle().equals(t.getChatStyle())
+					&& getSiblings().equals(t.getSiblings());
 		}
 
 		return false;
 	}
 
-	public String toString()
-	{
-		return "CountdownComponent{" + StringJoiner.with(", ").joinObjects("countdown=" + countdown, "text=" + getText(), "siblings=" + siblings, "style=" + getStyle()) + '}';
+	public String toString() {
+		return "CountdownComponent{" + StringJoiner.with(", ").joinObjects("countdown=" + countdown,
+				"text=" + getChatComponentText_TextValue(), "siblings=" + siblings, "style=" + getChatStyle()) + '}';
 	}
 }

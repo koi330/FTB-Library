@@ -2,29 +2,26 @@ package com.feed_the_beast.ftblib.lib.data;
 
 import com.feed_the_beast.ftblib.lib.icon.Icon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ChatComponentTranslation;
 
 /**
  * @author LatvianModder
  */
-public abstract class TeamAction extends Action
-{
-	public TeamAction(String mod, String id, Icon icon, int order)
-	{
-		super(new ResourceLocation(mod, id), new TextComponentTranslation("team_action." + mod + "." + id), icon, order);
+public abstract class TeamAction extends Action {
+	public TeamAction(String mod, String id, Icon icon, int order) {
+		super(new ResourceLocation(mod, id), new ChatComponentTranslation("team_action." + mod + "." + id), icon,
+				order);
 	}
 
 	@Override
-	public TeamAction setTitle(ITextComponent t)
-	{
+	public TeamAction setTitle(IChatComponent t) {
 		super.setTitle(t);
 		return this;
 	}
 
 	@Override
-	public TeamAction setRequiresConfirm()
-	{
+	public TeamAction setRequiresConfirm() {
 		super.setRequiresConfirm();
 		return this;
 	}

@@ -1,9 +1,9 @@
 package com.feed_the_beast.ftblib.lib.data;
 
 import com.feed_the_beast.ftblib.lib.util.CommonUtils;
+import com.feed_the_beast.ftblib.lib.util.INBTSerializable;
 import com.feed_the_beast.ftblib.lib.util.IWithID;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -98,7 +98,7 @@ public class NBTDataStorage implements INBTSerializable<NBTTagCompound>, Consume
 		{
 			NBTTagCompound nbt1 = data.serializeNBT();
 
-			if (!nbt1.isEmpty())
+			if (!nbt1.hasNoTags())
 			{
 				nbt.setTag(data.getId(), nbt1);
 			}

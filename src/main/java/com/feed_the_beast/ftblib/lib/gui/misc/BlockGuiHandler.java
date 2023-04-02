@@ -1,21 +1,22 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.IGuiHandler;
+
+import java.util.HashMap;
 
 import javax.annotation.Nullable;
+
+import cpw.mods.fml.common.network.IGuiHandler;
 
 /**
  * @author LatvianModder
  */
 public class BlockGuiHandler implements IGuiHandler
 {
-	private final Int2ObjectOpenHashMap<BlockGuiSupplier> map = new Int2ObjectOpenHashMap<>();
+	private final HashMap<Integer, BlockGuiSupplier> map = new HashMap<>();
 
 	public void add(BlockGuiSupplier h)
 	{
@@ -30,7 +31,7 @@ public class BlockGuiHandler implements IGuiHandler
 
 		if (supplier != null)
 		{
-			TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+			TileEntity tileEntity = world.getTileEntity(x, y, z);
 
 			if (tileEntity != null)
 			{
@@ -49,7 +50,7 @@ public class BlockGuiHandler implements IGuiHandler
 
 		if (supplier != null)
 		{
-			TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+			TileEntity tileEntity = world.getTileEntity(x, y, z);
 
 			if (tileEntity != null)
 			{

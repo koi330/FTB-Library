@@ -3,11 +3,10 @@ package com.feed_the_beast.ftblib.lib.client;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.icon.MutableColor4I;
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.shader.TesselatorVertexState;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,25 +18,36 @@ import java.util.List;
  */
 public class CachedVertexData
 {
+
+	public static final TesselatorVertexState POSITION_COLOR;
+
+	static {
+		Tessellator tessellator = new Tessellator();
+		tessellator.setColorRGBA(0, 0, 0, 0);
+		tessellator.addVertex(0, 0, 0);
+		POSITION_COLOR = tessellator.getVertexState(0, 0, 0);
+		//TODO: This might break horribly
+	}
+
 	private final int mode;
-	private final VertexFormat format;
+	private final TesselatorVertexState format;
 	private final List<CachedVertex> list;
 	private final boolean hasTex, hasColor, hasNormal;
 	public final MutableColor4I color;
 	public double minU = 0D, minV = 0D, maxU = 1D, maxV = 1D;
 
-	private CachedVertexData(int m, VertexFormat f, Collection<CachedVertex> oldList)
+	private CachedVertexData(int m, TesselatorVertexState f, Collection<CachedVertex> oldList)
 	{
 		mode = m;
-		format = f;
 		list = new ArrayList<>(oldList);
-		hasTex = f.hasUvOffset(0);
-		hasColor = f.hasColor();
-		hasNormal = f.hasNormal();
+		format = f;
+		hasTex = f.getHasTexture();
+		hasColor = f.getHasColor();
+		hasNormal = f.getHasNormals();
 		color = Color4I.WHITE.mutable();
 	}
 
-	public CachedVertexData(int m, VertexFormat f)
+	public CachedVertexData(int m, TesselatorVertexState f)
 	{
 		this(m, f, Collections.emptyList());
 	}
@@ -64,17 +74,19 @@ public class CachedVertexData
 		return pos(x, y, 0D);
 	}
 
-	public void draw(Tessellator tessellator, BufferBuilder buffer)
+	public void draw(Tessellator tessellator)
 	{
 		if (list.isEmpty())
 		{
 			return;
 		}
 
-		buffer.begin(mode, format);
+		tessellator.startDrawing(mode);
+		tessellator.setVertexState(format);
 		for (CachedVertex v : list)
 		{
-			v.appendTo(buffer);
+			
+			v.appendTo(tessellator);
 		}
 		tessellator.draw();
 	}
@@ -117,26 +129,25 @@ public class CachedVertexData
 			return this;
 		}
 
-		private void appendTo(BufferBuilder buffer)
+		private void appendTo(Tessellator tessellator)
 		{
-			buffer.pos(x, y, z);
-
+			
 			if (hasTex)
 			{
-				buffer.tex(u, v);
+				tessellator.setTextureUV(u, v);
 			}
 
 			if (hasColor)
 			{
-				buffer.color(r, g, b, a);
+				tessellator.setColorRGBA(r, g, b, a);;
 			}
 
 			if (hasNormal)
 			{
-				buffer.normal(nx, ny, nz);
+				tessellator.setNormal(nx, ny, nz);
 			}
 
-			buffer.endVertex();
+			tessellator.addVertex(x, y, z);
 		}
 	}
 
@@ -150,9 +161,9 @@ public class CachedVertexData
 
 	public void cubeFace(EnumFacing facing, double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
 	{
-		float normalX = MathUtils.NORMALS_X[facing.getIndex()];
-		float normalY = MathUtils.NORMALS_Y[facing.getIndex()];
-		float normalZ = MathUtils.NORMALS_Z[facing.getIndex()];
+		float normalX = MathUtils.NORMALS_X[facing.order_a];
+		float normalY = MathUtils.NORMALS_Y[facing.order_a];
+		float normalZ = MathUtils.NORMALS_Z[facing.order_a];
 
 		switch (facing)
 		{
@@ -197,18 +208,16 @@ public class CachedVertexData
 
 	public void cube(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
 	{
-		for (EnumFacing facing : EnumFacing.VALUES)
-		{
+		for (EnumFacing facing : EnumFacing.faceList) {
 			cubeFace(facing, minX, minY, minZ, maxX, maxY, maxZ);
 		}
 	}
 
 	public void cubeSides(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
 	{
-		for (EnumFacing facing : EnumFacing.VALUES)
+		for (EnumFacing facing : EnumFacing.faceList)
 		{
-			if (facing.getAxis() != EnumFacing.Axis.Y)
-			{
+			if (facing.order_a != 0 && facing.order_a != 1) {
 				cubeFace(facing, minX, minY, minZ, maxX, maxY, maxZ);
 			}
 		}
@@ -247,7 +256,7 @@ public class CachedVertexData
         pos(x + rx, y + ry, z + rz);
         pos(x + rx, y - ry, z + rz);
         pos(x + rx, y - ry, z - rz);
-        */
+        //*/
 	}
 
 	public void centeredCube(double x, double y, double z, double r)

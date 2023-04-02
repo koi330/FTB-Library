@@ -265,27 +265,27 @@ public class Widget implements IGuiWrapper
 
 	public static boolean isAltKeyDown()
 	{
-		return GuiScreen.isAltKeyDown();
+		return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
 	}
 
 	public static boolean isKeyComboCtrlX(int key)
 	{
-		return GuiScreen.isKeyComboCtrlX(key);
+		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_X);
 	}
 
 	public static boolean isKeyComboCtrlV(int key)
 	{
-		return GuiScreen.isKeyComboCtrlV(key);
+		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V);
 	}
 
 	public static boolean isKeyComboCtrlC(int key)
 	{
-		return GuiScreen.isKeyComboCtrlC(key);
+		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_C);
 	}
 
 	public static boolean isKeyComboCtrlA(int key)
 	{
-		return GuiScreen.isKeyComboCtrlA(key);
+		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_A);
 	}
 
 	public void tick()

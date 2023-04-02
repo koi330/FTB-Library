@@ -9,12 +9,12 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author LatvianModder
  */
-public class ServerReloadEvent extends UniverseEvent
-{
+public class ServerReloadEvent extends UniverseEvent {
 	public static final ResourceLocation ALL = new ResourceLocation("*:*");
 
 	private final ICommandSender sender;
@@ -24,51 +24,48 @@ public class ServerReloadEvent extends UniverseEvent
 	private boolean clientReloadRequired;
 	private final Collection<EntityPlayerMP> onlinePlayers;
 
-	public ServerReloadEvent(Universe u, ICommandSender c, EnumReloadType t, ResourceLocation id, Collection<ResourceLocation> f)
-	{
+	@SuppressWarnings("unchecked")
+	public ServerReloadEvent(Universe u, ICommandSender c, EnumReloadType t, ResourceLocation id,
+			Collection<ResourceLocation> f) {
 		super(u);
 		sender = c;
 		type = t;
 		reloadId = id;
 		failed = f;
 		clientReloadRequired = false;
-		onlinePlayers = u.server.getPlayerList() != null ? u.server.getPlayerList().getPlayers() : Collections.emptyList();
+		onlinePlayers = u.server.getConfigurationManager() != null
+				? (List<EntityPlayerMP>) u.server.getConfigurationManager().playerEntityList
+				: Collections.emptyList();
 	}
 
-	public ICommandSender getSender()
-	{
+	public ICommandSender getSender() {
 		return sender;
 	}
 
-	public EnumReloadType getType()
-	{
+	public EnumReloadType getType() {
 		return type;
 	}
 
-	public void setClientReloadRequired()
-	{
+	public void setClientReloadRequired() {
 		clientReloadRequired = true;
 	}
 
-	public boolean isClientReloadRequired()
-	{
+	public boolean isClientReloadRequired() {
 		return clientReloadRequired;
 	}
 
-	public Collection<EntityPlayerMP> getOnlinePlayers()
-	{
+	public Collection<EntityPlayerMP> getOnlinePlayers() {
 		return onlinePlayers;
 	}
 
-	public boolean reload(ResourceLocation id)
-	{
-		String ridd = reloadId.getNamespace();
-		String ridp = reloadId.getPath();
-		return ridd.equals("*") || ridd.equals(reloadId.getNamespace()) && (ridp.equals("*") || ridp.equals(id.getPath()));
+	public boolean reload(ResourceLocation id) {
+		String ridd = reloadId.getResourceDomain();
+		String ridp = reloadId.getResourcePath();
+		return ridd.equals("*")
+				|| ridd.equals(reloadId.getResourceDomain()) && (ridp.equals("*") || ridp.equals(id.getResourcePath()));
 	}
 
-	public void failedToReload(ResourceLocation id)
-	{
+	public void failedToReload(ResourceLocation id) {
 		failed.add(id);
 	}
 }

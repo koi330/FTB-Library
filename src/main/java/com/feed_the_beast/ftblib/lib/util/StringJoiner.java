@@ -173,16 +173,12 @@ public abstract class StringJoiner
 
 	public <T> String join(Iterable<T> objects, Function<T, String> stringGetter)
 	{
-		if (objects instanceof Collection)
-		{
+		if (objects instanceof Collection) {
 			Collection<T> c = (Collection<T>) objects;
 
-			if (c.isEmpty())
-			{
+			if (c.isEmpty()) {
 				return "";
-			}
-			else if (c.size() == 1)
-			{
+			} else if (c.size() == 1) {
 				return stringGetter.apply(c.iterator().next());
 			}
 		}
@@ -190,14 +186,10 @@ public abstract class StringJoiner
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 
-		for (T object : objects)
-		{
-			if (first)
-			{
+		for (T object : objects) {
+			if (first) {
 				first = false;
-			}
-			else
-			{
+			} else {
 				append(builder);
 			}
 
@@ -207,6 +199,7 @@ public abstract class StringJoiner
 		return builder.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	public String join(Iterable iterable)
 	{
 		return join(iterable, DEFAULT_STRING_GETTER);

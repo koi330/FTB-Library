@@ -1,153 +1,134 @@
 package com.feed_the_beast.ftblib.lib.util;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import com.mojang.authlib.GameProfile;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.UUID;
 
 /**
  * @author LatvianModder
  */
-public class ServerUtils
-{
-	public static final GameProfile FAKE_PLAYER_PROFILE = new GameProfile(StringUtils.fromString("069be1413c1b45c3b3b160d3f9fcd236"), "FakeForgePlayer");
+public class ServerUtils {
+	public static final GameProfile FAKE_PLAYER_PROFILE = new GameProfile(
+			StringUtils.fromString("069be1413c1b45c3b3b160d3f9fcd236"), "FakeForgePlayer");
 
-	public enum SpawnType
-	{
+	public enum SpawnType {
 		CANT_SPAWN,
 		ALWAYS_SPAWNS,
 		ONLY_AT_NIGHT
 	}
 
-	public static double getMovementFactor(int dim)
-	{
-		switch (dim)
-		{
+	public static double getMovementFactor(int dim) {
+		switch (dim) {
 			case 0:
 			case 1:
 				return 1D;
 			case -1:
 				return 8D;
-			default:
-			{
+			default: {
 				WorldServer w = DimensionManager.getWorld(dim);
 				return (w == null) ? 1D : w.provider.getMovementFactor();
 			}
 		}
 	}
 
-	public static ITextComponent getDimensionName(int dim)
-	{
-		switch (dim)
-		{
+	public static IChatComponent getDimensionName(int dim) {
+		switch (dim) {
 			case 0:
-				return new TextComponentTranslation("createWorld.customize.preset.overworld");
+				return new ChatComponentTranslation("createWorld.customize.preset.overworld");
 			case -1:
-				return new TextComponentTranslation("advancements.nether.root.title");
+				return new ChatComponentTranslation("advancements.nether.root.title");
 			case 1:
-				return new TextComponentTranslation("advancements.end.root.title");
+				return new ChatComponentTranslation("advancements.end.root.title");
 			default:
-				for (DimensionType type : DimensionType.values())
-				{
-					if (type.getId() == dim)
-					{
-						return new TextComponentString(type.getName());
-					}
-				}
+				// for (DimensionType type : DimensionType.values()) {
+				// 	if (type.getId() == dim) {
+				// 		return new ChatComponentText(type.getName());
+				// 	}
+				// }
 
-				return new TextComponentString("dim_" + dim);
+				return new ChatComponentText("dim_" + dim);
 		}
 	}
 
-	public static ITextComponent getDimensionName(DimensionType type)
-	{
-		switch (type)
-		{
-			case OVERWORLD:
-				return new TextComponentTranslation("createWorld.customize.preset.overworld");
-			case NETHER:
-				return new TextComponentTranslation("advancements.nether.root.title");
-			case THE_END:
-				return new TextComponentTranslation("advancements.end.root.title");
-			default:
-				return new TextComponentString(type.getName());
-		}
-	}
+	// public static IChatComponent getDimensionName(DimensionType type) {
+	// 	switch (type) {
+	// 		case OVERWORLD:
+	// 			return new ChatComponentTranslation("createWorld.customize.preset.overworld");
+	// 		case NETHER:
+	// 			return new ChatComponentTranslation("advancements.nether.root.title");
+	// 		case THE_END:
+	// 			return new ChatComponentTranslation("advancements.end.root.title");
+	// 		default:
+	// 			return new ChatComponentText(type.getName());
+	// 	}
+	// }
 
-	public static boolean isVanillaClient(ICommandSender sender)
-	{
-		if (sender instanceof EntityPlayerMP)
-		{
-			NetHandlerPlayServer connection = ((EntityPlayerMP) sender).connection;
-			return connection != null && !connection.netManager.channel().attr(NetworkRegistry.FML_MARKER).get();
+	public static boolean isVanillaClient(ICommandSender sender) {
+		if (sender instanceof EntityPlayerMP) {
+			NetHandlerPlayServer connection = ((EntityPlayerMP) sender).playerNetServerHandler;
+			return connection != null && connection.netManager.channel().attr(NetworkRegistry.MOD_CONTAINER) != null;
+			// return connection != null; //&& !connection.netManager.channel().attr(NetworkRegistry.FML_MARKER).get();
 		}
 
 		return false;
 	}
 
-	public static boolean isFake(EntityPlayerMP player)
-	{
-		return player.connection == null || player instanceof FakePlayer;
+	public static boolean isFake(EntityPlayerMP player) {
+		return player.playerNetServerHandler == null || player instanceof FakePlayer;
 	}
 
-	public static boolean isOP(@Nullable MinecraftServer server, @Nullable GameProfile profile)
-	{
-		if (profile == null || profile.getId() == null || profile.getName() == null)
-		{
+	public static boolean isOP(@Nullable MinecraftServer server, @Nullable GameProfile profile) {
+		if (profile == null || profile.getId() == null || profile.getName() == null) {
 			return false;
 		}
 
-		if (server == null)
-		{
+		if (server == null) {
 			server = FMLCommonHandler.instance().getMinecraftServerInstance();
 
-			if (server == null)
-			{
+			if (server == null) {
 				return false;
 			}
 		}
 
-		return server.getPlayerList().canSendCommands(profile);
+		return server.getConfigurationManager().func_152596_g(profile);
 	}
 
-	public static boolean isOP(EntityPlayerMP player)
-	{
-		return isOP(player.server, player.getGameProfile());
+	public static boolean isOP(EntityPlayerMP player) {
+		return isOP(player.mcServer, player.getGameProfile());
 	}
 
-	public static Collection<ICommand> getAllCommands(MinecraftServer server, ICommandSender sender)
-	{
+	public static Collection<ICommand> getAllCommands(MinecraftServer server, ICommandSender sender) {
 		Collection<ICommand> commands = new HashSet<>();
 
-		for (ICommand c : server.getCommandManager().getCommands().values())
-		{
-			if (c.checkPermission(server, sender))
-			{
+		for (ICommand c : (Collection<ICommand>) server.getCommandManager().getCommands().values()) {
+			if (c.canCommandSenderUseCommand(sender)) {
 				commands.add(c);
 			}
 		}
@@ -155,36 +136,33 @@ public class ServerUtils
 		return commands;
 	}
 
-	public static SpawnType canMobSpawn(World world, BlockPos pos)
-	{
-		if (pos.getY() < 0 || pos.getY() >= 256)
-		{
+	public static SpawnType canMobSpawn(World world, int x, int y, int z) {
+		if (y < 0 || y >= 256) {
 			return SpawnType.CANT_SPAWN;
 		}
 
-		Chunk chunk = world.getChunk(pos);
+		Chunk chunk = world.getChunkFromBlockCoords(x, z);
 
-		if (!WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, world, pos) || chunk.getLightFor(EnumSkyBlock.BLOCK, pos) >= 8)
-		{
+		boolean grounded_mob_spawn = SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.ambient, world, x, y, z) ||
+				SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.creature, world, x, y, z) ||
+		  SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.monster, world, x, y, z);
+
+		if (!grounded_mob_spawn || chunk.getSavedLightValue(EnumSkyBlock.Block, x, y, z) >= 8) {
 			return SpawnType.CANT_SPAWN;
 		}
 
-		AxisAlignedBB aabb = new AxisAlignedBB(pos.getX() + 0.2, pos.getY() + 0.01, pos.getZ() + 0.2, pos.getX() + 0.8, pos.getY() + 1.8, pos.getZ() + 0.8);
-		if (!world.checkNoEntityCollision(aabb) || world.containsAnyLiquid(aabb))
-		{
+		AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(x + 0.2, y + 0.01, z + 0.2, x + 0.8, y + 1.8, z + 0.8);
+		if (!world.checkNoEntityCollision(aabb) || world.isAnyLiquid(aabb)) {
 			return SpawnType.CANT_SPAWN;
 		}
 
-		return chunk.getLightFor(EnumSkyBlock.SKY, pos) >= 8 ? SpawnType.ONLY_AT_NIGHT : SpawnType.ALWAYS_SPAWNS;
+		return chunk.getSavedLightValue(EnumSkyBlock.Sky, x, y, z) >= 8 ? SpawnType.ONLY_AT_NIGHT : SpawnType.ALWAYS_SPAWNS;
 	}
 
 	@Nullable
-	public static Entity getEntityByUUID(World world, UUID uuid)
-	{
-		for (Entity e : world.loadedEntityList)
-		{
-			if (e.getUniqueID().equals(uuid))
-			{
+	public static Entity getEntityByUUID(World world, UUID uuid) {
+		for (Entity e : (List<Entity>) world.loadedEntityList) {
+			if (e.getUniqueID().equals(uuid)) {
 				return e;
 			}
 		}
@@ -192,25 +170,19 @@ public class ServerUtils
 		return null;
 	}
 
-	public static void notify(MinecraftServer server, @Nullable EntityPlayer player, ITextComponent component)
-	{
-		if (player == null)
-		{
-			for (EntityPlayer player1 : server.getPlayerList().getPlayers())
-			{
-				player1.sendStatusMessage(component, true);
+	public static void notify(MinecraftServer server, @Nullable EntityPlayer player, IChatComponent component) {
+		if (player == null) {
+			for (EntityPlayer player1 : (List<EntityPlayer>) server.getConfigurationManager().playerEntityList) {
+				player1.addChatComponentMessage(component);
 			}
 		}
-		else
-		{
-			player.sendStatusMessage(component, true);
+		else {
+			player.addChatComponentMessage(component);
 		}
 	}
 
-	public static boolean isFirstLogin(EntityPlayer player, String key)
-	{
-		if (!NBTUtils.getPersistedData(player, false).getBoolean(key))
-		{
+	public static boolean isFirstLogin(EntityPlayer player, String key) {
+		if (!NBTUtils.getPersistedData(player, false).getBoolean(key)) {
 			NBTUtils.getPersistedData(player, true).setBoolean(key, true);
 			return true;
 		}

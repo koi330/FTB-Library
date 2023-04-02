@@ -13,11 +13,12 @@ import com.feed_the_beast.ftblib.lib.client.ParticleColoredDust;
 import com.feed_the_beast.ftblib.lib.gui.misc.ChunkSelectorMap;
 import com.feed_the_beast.ftblib.lib.icon.PlayerHeadIcon;
 import com.feed_the_beast.ftblib.lib.net.MessageToClient;
+
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.lwjgl.opengl.Display;
 
 import java.util.HashMap;
@@ -35,14 +36,14 @@ public class FTBLibClient extends FTBLibCommon
 	{
 		super.preInit(event);
 		FTBLibClientConfig.sync();
-		ClientUtils.localPlayerHead = new PlayerHeadIcon(Minecraft.getMinecraft().getSession().getProfile().getId());
+		ClientUtils.localPlayerHead = new PlayerHeadIcon(Minecraft.getMinecraft().getSession().func_148256_e().getId());
 		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(FTBLibClientConfigManager.INSTANCE);
 		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(SidebarButtonManager.INSTANCE);
 		ChunkSelectorMap.setMap(new BuiltinChunkMap());
 
 		if (System.getProperty("ftbdevenvironment", "0").equals("1"))
 		{
-			Display.setTitle(Minecraft.getMinecraft().getVersion() + " Dev :: " + Minecraft.getMinecraft().getSession().getUsername());
+			Display.setTitle("Minecraft 1.7.10 Dev :: " + Minecraft.getMinecraft().getSession().getUsername());
 		}
 	}
 
@@ -78,6 +79,6 @@ public class FTBLibClient extends FTBLibCommon
 	@Override
 	public long getWorldTime()
 	{
-		return Minecraft.getMinecraft().world == null ? super.getWorldTime() : Minecraft.getMinecraft().world.getTotalWorldTime();
+		return Minecraft.getMinecraft().theWorld == null ? super.getWorldTime() : Minecraft.getMinecraft().theWorld.getTotalWorldTime();
 	}
 }

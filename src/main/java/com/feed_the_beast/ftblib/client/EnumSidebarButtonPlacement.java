@@ -1,7 +1,8 @@
 package com.feed_the_beast.ftblib.client;
 
 import com.feed_the_beast.ftblib.lib.OtherMods;
-import net.minecraftforge.fml.common.Loader;
+
+import cpw.mods.fml.common.Loader;
 
 /**
  * @author LatvianModder

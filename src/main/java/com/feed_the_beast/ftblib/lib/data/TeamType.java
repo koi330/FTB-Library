@@ -1,7 +1,7 @@
 package com.feed_the_beast.ftblib.lib.data;
 
+import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
-import net.minecraft.util.IStringSerializable;
 
 /**
  * @author LatvianModder

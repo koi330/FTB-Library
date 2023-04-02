@@ -1,20 +1,18 @@
 package com.feed_the_beast.ftblib.client;
 
 import com.feed_the_beast.ftblib.FTBLib;
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.ConfigManager;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
+
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
 
 /**
  * @author LatvianModder
  */
-@Mod.EventBusSubscriber(modid = FTBLib.MOD_ID, value = Side.CLIENT)
+// @Mod.EventBusSubscriber(modid = FTBLib.MOD_ID, value = Side.CLIENT)
 @Config(modid = "ftblib_client", name = "../local/client/ftblib")
-public class FTBLibClientConfig
-{
+public class FTBLibClientConfig {
 	@Config.Comment("Show item Ore Dictionary names in inventory.")
 	public static boolean item_ore_names = false;
 
@@ -36,16 +34,13 @@ public class FTBLibClientConfig
 	@Config.Comment("Show help text while holding F3.")
 	public static boolean debug_helper = true;
 
-	public static void sync()
-	{
+	public static void sync() {
 		ConfigManager.sync("ftblib_client", Config.Type.INSTANCE);
 	}
 
 	@SubscribeEvent
-	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
-	{
-		if (event.getModID().equals("ftblib_client"))
-		{
+	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+		if (event.modID.equals("ftblib_client")) {
 			sync();
 		}
 	}

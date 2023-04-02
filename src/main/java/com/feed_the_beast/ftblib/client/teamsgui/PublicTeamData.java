@@ -6,23 +6,21 @@ import com.feed_the_beast.ftblib.lib.icon.Icon;
 import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.FinalIDObject;
-import net.minecraft.util.text.ITextComponent;
+
+import net.minecraft.util.IChatComponent;
 
 /**
  * @author LatvianModder
  */
-public class PublicTeamData extends FinalIDObject implements Comparable<PublicTeamData>
-{
-	public enum Type
-	{
+public class PublicTeamData extends FinalIDObject implements Comparable<PublicTeamData> {
+	public enum Type {
 		CAN_JOIN,
 		REQUESTING_INVITE,
 		NEEDS_INVITE,
 		ENEMY
 	}
 
-	public static final DataOut.Serializer<PublicTeamData> SERIALIZER = (data, d) ->
-	{
+	public static final DataOut.Serializer<PublicTeamData> SERIALIZER = (data, d) -> {
 		data.writeString(d.getId());
 		data.writeTextComponent(d.displayName);
 		data.writeString(d.description);
@@ -33,14 +31,13 @@ public class PublicTeamData extends FinalIDObject implements Comparable<PublicTe
 
 	public static final DataIn.Deserializer<PublicTeamData> DESERIALIZER = PublicTeamData::new;
 
-	public final ITextComponent displayName;
+	public final IChatComponent displayName;
 	public final String description;
 	public final EnumTeamColor color;
 	public final Icon icon;
 	public Type type;
 
-	public PublicTeamData(DataIn data)
-	{
+	public PublicTeamData(DataIn data) {
 		super(data.readString());
 		displayName = data.readTextComponent();
 		description = data.readString();
@@ -49,8 +46,7 @@ public class PublicTeamData extends FinalIDObject implements Comparable<PublicTe
 		type = Type.values()[data.readUnsignedByte()];
 	}
 
-	public PublicTeamData(ForgeTeam team, Type c)
-	{
+	public PublicTeamData(ForgeTeam team, Type c) {
 		super(team.getId());
 		displayName = team.getTitle();
 		description = team.getDesc();
@@ -60,12 +56,10 @@ public class PublicTeamData extends FinalIDObject implements Comparable<PublicTe
 	}
 
 	@Override
-	public int compareTo(PublicTeamData o)
-	{
+	public int compareTo(PublicTeamData o) {
 		int i = type.compareTo(o.type);
 
-		if (i == 0)
-		{
+		if (i == 0) {
 			i = displayName.getUnformattedText().compareToIgnoreCase(o.displayName.getUnformattedText());
 		}
 

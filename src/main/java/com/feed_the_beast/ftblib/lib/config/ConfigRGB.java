@@ -1,7 +1,6 @@
 package com.feed_the_beast.ftblib.lib.config;
 
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
-import net.minecraftforge.common.config.Config;
 
 /**
  * @author LatvianModder

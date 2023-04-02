@@ -1,123 +1,111 @@
 package com.feed_the_beast.ftblib.lib.util.text_components;
 
-import com.feed_the_beast.ftblib.lib.util.StringUtils;
-import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import java.util.HashMap;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
-import java.util.function.Function;
+
+import com.feed_the_beast.ftblib.lib.util.StringUtils;
+import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 
 /**
  * @author LatvianModder
  */
-public class TextComponentParser
-{
-	public static final NameMap.ObjectProperties<TextFormatting> TEXT_FORMATTING_OBJECT_PROPERTIES = new NameMap.ObjectProperties<TextFormatting>()
-	{
+public class TextComponentParser {
+	public static final NameMap.ObjectProperties<EnumChatFormatting> TEXT_FORMATTING_OBJECT_PROPERTIES = new NameMap.ObjectProperties<EnumChatFormatting>() {
 		@Override
-		public String getName(TextFormatting value)
-		{
+		public String getName(EnumChatFormatting value) {
 			return value.getFriendlyName();
 		}
 
 		@Override
-		public ITextComponent getDisplayName(@Nullable ICommandSender sender, TextFormatting value)
-		{
-			return StringUtils.color(new TextComponentString(getName(value)), value);
+		public IChatComponent getDisplayName(@Nullable ICommandSender sender, EnumChatFormatting value) {
+			return StringUtils.color(new ChatComponentText(getName(value)), value);
 		}
 	};
 
-	public static final NameMap<TextFormatting> TEXT_FORMATTING_NAME_MAP = NameMap.create(TextFormatting.RESET, TEXT_FORMATTING_OBJECT_PROPERTIES, TextFormatting.values());
-	public static final NameMap<TextFormatting> TEXT_FORMATTING_COLORS_NAME_MAP = NameMap.create(TextFormatting.WHITE, TEXT_FORMATTING_OBJECT_PROPERTIES,
-			TextFormatting.BLACK,
-			TextFormatting.DARK_BLUE,
-			TextFormatting.DARK_GREEN,
-			TextFormatting.DARK_AQUA,
-			TextFormatting.DARK_RED,
-			TextFormatting.DARK_PURPLE,
-			TextFormatting.GOLD,
-			TextFormatting.GRAY,
-			TextFormatting.DARK_GRAY,
-			TextFormatting.BLUE,
-			TextFormatting.GREEN,
-			TextFormatting.AQUA,
-			TextFormatting.RED,
-			TextFormatting.LIGHT_PURPLE,
-			TextFormatting.YELLOW,
-			TextFormatting.WHITE
-	);
+	public static final NameMap<EnumChatFormatting> TEXT_FORMATTING_NAME_MAP = NameMap.create(EnumChatFormatting.RESET,
+			TEXT_FORMATTING_OBJECT_PROPERTIES, EnumChatFormatting.values());
+	public static final NameMap<EnumChatFormatting> TEXT_FORMATTING_COLORS_NAME_MAP = NameMap.create(
+			EnumChatFormatting.WHITE,
+			TEXT_FORMATTING_OBJECT_PROPERTIES,
+			EnumChatFormatting.BLACK,
+			EnumChatFormatting.DARK_BLUE,
+			EnumChatFormatting.DARK_GREEN,
+			EnumChatFormatting.DARK_AQUA,
+			EnumChatFormatting.DARK_RED,
+			EnumChatFormatting.DARK_PURPLE,
+			EnumChatFormatting.GOLD,
+			EnumChatFormatting.GRAY,
+			EnumChatFormatting.DARK_GRAY,
+			EnumChatFormatting.BLUE,
+			EnumChatFormatting.GREEN,
+			EnumChatFormatting.AQUA,
+			EnumChatFormatting.RED,
+			EnumChatFormatting.LIGHT_PURPLE,
+			EnumChatFormatting.YELLOW,
+			EnumChatFormatting.WHITE);
 
-	public static final Char2ObjectOpenHashMap<TextFormatting> CODE_TO_FORMATTING = new Char2ObjectOpenHashMap<>();
+	public static final HashMap<Character, EnumChatFormatting> CODE_TO_FORMATTING = new HashMap<>();
 
-	static
-	{
-		for (TextFormatting formatting : TEXT_FORMATTING_NAME_MAP.values)
-		{
-			CODE_TO_FORMATTING.put(formatting.formattingCode, formatting);
+	static {
+		for (EnumChatFormatting formatting : TEXT_FORMATTING_NAME_MAP.values) {
+			CODE_TO_FORMATTING.put(formatting.formattingCode, formatting);//TODO: at
 		}
 	}
 
-	public static ITextComponent parse(String text, @Nullable Function<String, ITextComponent> substitutes)
-	{
+	public static IChatComponent parse(String text, @Nullable Function<String, IChatComponent> substitutes) {
 		return new TextComponentParser(text, substitutes).parse();
 	}
 
 	private String text;
-	private Function<String, ITextComponent> substitutes;
+	private Function<String, IChatComponent> substitutes;
 
-	private ITextComponent component;
+	private IChatComponent component;
 	private StringBuilder builder;
-	private Style style;
+	private ChatStyle style;
 
-	private TextComponentParser(String txt, @Nullable Function<String, ITextComponent> sub)
-	{
+	private TextComponentParser(String txt, @Nullable Function<String, IChatComponent> sub) {
 		text = txt;
 		substitutes = sub;
 	}
 
-	private ITextComponent parse()
-	{
-		if (text.isEmpty())
-		{
-			return new TextComponentString("");
+	private IChatComponent parse() {
+		if (text.isEmpty()) {
+			return new ChatComponentText("");
 		}
 
 		char[] c = text.toCharArray();
 		boolean hasSpecialCodes = false;
 
-		for (char c1 : c)
-		{
-			if (c1 == '{' || c1 == '&' || c1 == StringUtils.FORMATTING_CHAR)
-			{
+		for (char c1 : c) {
+			if (c1 == '{' || c1 == '&' || c1 == StringUtils.FORMATTING_CHAR) {
 				hasSpecialCodes = true;
 				break;
 			}
 		}
 
-		if (!hasSpecialCodes)
-		{
-			return new TextComponentString(text);
+		if (!hasSpecialCodes) {
+			return new ChatComponentText(text);
 		}
 
-		component = new TextComponentString("");
-		style = new Style();
+		component = new ChatComponentText("");
+		style = new ChatStyle();
 		builder = new StringBuilder();
 		boolean sub = false;
 
-		for (int i = 0; i < c.length; i++)
-		{
+		for (int i = 0; i < c.length; i++) {
 			boolean escape = i > 0 && c[i - 1] == '\\';
 			boolean end = i == c.length - 1;
 
-			if (sub && (end || c[i] == '{' || c[i] == '}'))
-			{
-				if (c[i] == '{')
-				{
+			if (sub && (end || c[i] == '{' || c[i] == '}')) {
+				if (c[i] == '{') {
 					throw new IllegalArgumentException("Invalid formatting! Can't nest multiple substitutes!");
 				}
 
@@ -126,33 +114,29 @@ public class TextComponentParser
 				continue;
 			}
 
-			if (!escape)
-			{
-				if (c[i] == '&')
-				{
+			if (!escape) {
+				if (c[i] == '&') {
 					c[i] = StringUtils.FORMATTING_CHAR;
 				}
 
-				if (c[i] == StringUtils.FORMATTING_CHAR)
-				{
+				if (c[i] == StringUtils.FORMATTING_CHAR) {
 					finishPart();
 
-					if (end)
-					{
-						throw new IllegalArgumentException("Invalid formatting! Can't end string with & or " + StringUtils.FORMATTING_CHAR + "!");
+					if (end) {
+						throw new IllegalArgumentException(
+								"Invalid formatting! Can't end string with & or " + StringUtils.FORMATTING_CHAR + "!");
 					}
 
 					i++;
 
-					TextFormatting formatting = CODE_TO_FORMATTING.get(c[i]);
+					EnumChatFormatting formatting = CODE_TO_FORMATTING.get(c[i]);
 
-					if (formatting == null)
-					{
-						throw new IllegalArgumentException("Illegal formatting! Unknown color code character: " + c[i] + "!");
+					if (formatting == null) {
+						throw new IllegalArgumentException(
+								"Illegal formatting! Unknown color code character: " + c[i] + "!");
 					}
 
-					switch (formatting)
-					{
+					switch (formatting) {
 						case OBFUSCATED:
 							style.setObfuscated(!style.getObfuscated());
 							break;
@@ -169,20 +153,17 @@ public class TextComponentParser
 							style.setItalic(!style.getItalic());
 							break;
 						case RESET:
-							style = new Style();
+							style = new ChatStyle();
 							break;
 						default:
 							style.setColor(formatting);
 					}
 
 					continue;
-				}
-				else if (c[i] == '{')
-				{
+				} else if (c[i] == '{') {
 					finishPart();
 
-					if (end)
-					{
+					if (end) {
 						throw new IllegalArgumentException("Invalid formatting! Can't end string with {!");
 					}
 
@@ -190,8 +171,7 @@ public class TextComponentParser
 				}
 			}
 
-			if (c[i] != '\\' || escape)
-			{
+			if (c[i] != '\\' || escape) {
 				builder.append(c[i]);
 			}
 		}
@@ -200,36 +180,30 @@ public class TextComponentParser
 		return component;
 	}
 
-	private void finishPart()
-	{
+	private void finishPart() {
 		String string = builder.toString();
 		builder.setLength(0);
 
-		if (string.isEmpty())
-		{
+		if (string.isEmpty()) {
 			return;
-		}
-		else if (string.length() < 2 || string.charAt(0) != '{')
-		{
-			ITextComponent component1 = new TextComponentString(string);
-			component1.setStyle(style.createShallowCopy());
+		} else if (string.length() < 2 || string.charAt(0) != '{') {
+			IChatComponent component1 = new ChatComponentText(string);
+			component1.setChatStyle(style.createShallowCopy());
 			component.appendSibling(component1);
 			return;
 		}
 
-		ITextComponent component1 = substitutes.apply(string.substring(1));
+		IChatComponent component1 = substitutes.apply(string.substring(1));
 
-		if (component1 != null)
-		{
-			Style style0 = component1.getStyle().createShallowCopy();
-			Style style1 = style.createShallowCopy();
-			style1.setHoverEvent(style0.getHoverEvent());
-			style1.setClickEvent(style0.getClickEvent());
-			style1.setInsertion(style0.getInsertion());
-			component1.setStyle(style1);
-		}
-		else
-		{
+		if (component1 != null) {
+			// ChatStyle style0 = component1.getChatStyle().createShallowCopy();
+			// ChatStyle style1 = style.createShallowCopy();
+			// style1.setChatHoverEvent(style0.getChatHoverEvent());
+			// style1.setChatClickEvent(style0.getChatClickEvent());
+			// style1.setInsertion(style0.getFormattingCode());
+			// component1.setChatStyle(style1);
+			// is this pointless?
+		} else {
 			throw new IllegalArgumentException("Invalid formatting! Unknown substitute " + string);
 		}
 

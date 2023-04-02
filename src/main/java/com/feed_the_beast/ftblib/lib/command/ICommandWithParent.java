@@ -16,13 +16,13 @@ public interface ICommandWithParent extends ICommand
 	void setParent(@Nullable ICommand p);
 
 	@Override
-	default String getUsage(ICommandSender sender)
+	default String getCommandUsage(ICommandSender sender)
 	{
 		return "commands." + getCommandPath(this) + ".usage";
 	}
 
 	static String getCommandPath(ICommand command)
 	{
-		return (command instanceof ICommandWithParent && ((ICommandWithParent) command).getParent() != null ? (getCommandPath(((ICommandWithParent) command).getParent()) + ".") : "") + command.getName();
+		return (command instanceof ICommandWithParent && ((ICommandWithParent) command).getParent() != null ? (getCommandPath(((ICommandWithParent) command).getParent()) + ".") : "") + command.getCommandName();
 	}
 }

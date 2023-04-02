@@ -6,55 +6,46 @@ import com.feed_the_beast.ftblib.lib.io.DataReader;
 import com.feed_the_beast.ftblib.lib.util.JsonUtils;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.IChatComponent;
 
 import javax.annotation.Nullable;
 
 /**
  * @author LatvianModder
  */
-public class ConfigTextComponent extends ConfigValue
-{
+public class ConfigTextComponent extends ConfigValue {
 	public static final String ID = "text_component";
 
-	private ITextComponent value;
+	private IChatComponent value;
 
-	public ConfigTextComponent(ITextComponent c)
-	{
+	public ConfigTextComponent(IChatComponent c) {
 		value = c;
 	}
 
 	@Override
-	public String getId()
-	{
+	public String getId() {
 		return ID;
 	}
 
-	public ITextComponent getText()
-	{
+	public IChatComponent getText() {
 		return value;
 	}
 
-	public void setText(ITextComponent c)
-	{
+	public void setText(IChatComponent c) {
 		value = c;
 	}
 
 	@Override
-	public String getString()
-	{
+	public String getString() {
 		return JsonUtils.serializeTextComponent(getText()).toString();
 	}
 
 	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate)
-	{
-		ITextComponent component = JsonUtils.deserializeTextComponent(DataReader.get(string).safeJson());
+	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+		IChatComponent component = JsonUtils.deserializeTextComponent(DataReader.get(string).safeJson());
 
-		if (component != null)
-		{
-			if (!simulate)
-			{
+		if (component != null) {
+			if (!simulate) {
 				setText(component);
 			}
 
@@ -65,69 +56,56 @@ public class ConfigTextComponent extends ConfigValue
 	}
 
 	@Override
-	public boolean getBoolean()
-	{
+	public boolean getBoolean() {
 		return !getString().isEmpty();
 	}
 
 	@Override
-	public int getInt()
-	{
+	public int getInt() {
 		return getString().length();
 	}
 
 	@Override
-	public ConfigTextComponent copy()
-	{
+	public ConfigTextComponent copy() {
 		return new ConfigTextComponent(getText());
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key)
-	{
+	public void writeToNBT(NBTTagCompound nbt, String key) {
 		nbt.setTag(key, JsonUtils.toNBT(JsonUtils.serializeTextComponent(getText())));
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key)
-	{
+	public void readFromNBT(NBTTagCompound nbt, String key) {
 		setText(JsonUtils.deserializeTextComponent(JsonUtils.toJson(nbt.getTag(key))));
 	}
 
 	@Override
-	public void writeData(DataOut data)
-	{
+	public void writeData(DataOut data) {
 		data.writeTextComponent(getText());
 	}
 
 	@Override
-	public void readData(DataIn data)
-	{
+	public void readData(DataIn data) {
 		setText(data.readTextComponent());
 	}
 
 	@Override
-	public ITextComponent getStringForGUI()
-	{
+	public IChatComponent getStringForGUI() {
 		return getText().createCopy();
 	}
 
 	@Override
-	public void setValueFromOtherValue(ConfigValue value)
-	{
-		if (value instanceof ConfigTextComponent)
-		{
+	public void setValueFromOtherValue(ConfigValue value) {
+		if (value instanceof ConfigTextComponent) {
 			setText(((ConfigTextComponent) value).getText().createCopy());
-		}
-		else
-		{
+		} else {
 			super.setValueFromOtherValue(value);
 		}
 	}
 
 	@Override
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return getText().getUnformattedText().isEmpty();
 	}
 }

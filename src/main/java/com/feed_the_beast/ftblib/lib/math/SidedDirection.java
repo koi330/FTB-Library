@@ -18,9 +18,10 @@ public enum SidedDirection
 
 	static
 	{
-		for (EnumFacing side : EnumFacing.VALUES)
+		//TODO: at
+		for (EnumFacing side : EnumFacing.faceList)
 		{
-			for (EnumFacing rot : EnumFacing.VALUES)
+			for (EnumFacing rot : EnumFacing.faceList)
 			{
 				for (SidedDirection d : VALUES)
 				{
@@ -52,7 +53,7 @@ public enum SidedDirection
 		{
 			return FRONT;
 		}
-		else if (side == rot3D.getOpposite())
+		else if (side == EnumFacing.faceList[rot3D.order_b])
 		{
 			return BACK;
 		}
@@ -62,7 +63,7 @@ public enum SidedDirection
 			{
 				return TOP;
 			}
-			else if (rot2D == side.getOpposite())
+			else if (rot2D == EnumFacing.faceList[side.order_b])
 			{
 				return BOTTOM;
 			}
@@ -74,8 +75,7 @@ public enum SidedDirection
 			{
 				return BOTTOM;
 			}
-			else if (rot2D == side.getOpposite())
-			{
+			else if (rot2D == EnumFacing.faceList[side.order_b]) {
 				return TOP;
 			}
 			return getSide(side, rot2D);

@@ -1,12 +1,14 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
+import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+
+import cpw.mods.fml.client.config.GuiUtils;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.client.config.GuiUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -53,7 +55,7 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 	}
 
 	@Override
-	protected final void mouseClicked(int mouseX, int mouseY, int button) throws IOException
+	protected final void mouseClicked(int mouseX, int mouseY, int button)
 	{
 		wrappedGui.updateMouseOver(mouseX, mouseY);
 
@@ -68,15 +70,15 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 	}
 
 	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int button)
+	protected void mouseMovedOrUp(int mouseX, int mouseY, int button)
 	{
 		wrappedGui.updateMouseOver(mouseX, mouseY);
 		wrappedGui.mouseReleased(MouseButton.get(button));
-		super.mouseReleased(mouseX, mouseY, button);
+		super.mouseMovedOrUp(mouseX, mouseY, button);
 	}
 
 	@Override
-	protected void keyTyped(char keyChar, int key) throws IOException
+	protected void keyTyped(char keyChar, int key)
 	{
 		if (wrappedGui.keyPressed(key, keyChar))
 		{
@@ -97,7 +99,7 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 	}
 
 	@Override
-	public void handleMouseInput() throws IOException
+	public void handleMouseInput()
 	{
 		super.handleMouseInput();
 		int scroll = Mouse.getEventDWheel();
@@ -109,7 +111,7 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 	}
 
 	@Override
-	public void handleKeyboardInput() throws IOException
+	public void handleKeyboardInput()
 	{
 		if (!(Keyboard.getEventKey() == 0 && Keyboard.getEventCharacter() >= ' ' || Keyboard.getEventKeyState()))
 		{
@@ -139,9 +141,9 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 		{
 			GuiHelper.setupDrawing();
 
-			for (Slot slot : inventorySlots.inventorySlots)
+			for (Slot slot : (List<Slot>) inventorySlots.inventorySlots)
 			{
-				theme.drawContainerSlot(guiLeft + slot.xPos, guiTop + slot.yPos, 16, 16);
+				theme.drawContainerSlot(guiLeft + slot.xDisplayPosition, guiTop + slot.yDisplayPosition, 16, 16);
 			}
 		}
 
@@ -154,8 +156,7 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		if (wrappedGui.fixUnicode)
-		{
+		if (wrappedGui.fixUnicode) {
 			GuiHelper.setFixUnicode(true);
 		}
 
@@ -166,49 +167,39 @@ public class GuiContainerWrapper extends GuiContainer implements IGuiWrapper
 		Theme theme = wrappedGui.getTheme();
 		wrappedGui.drawForeground(theme, guiLeft, guiTop, xSize, ySize);
 
-		if (wrappedGui.contextMenu != null)
-		{
+		if (wrappedGui.contextMenu != null) {
 			wrappedGui.contextMenu.addMouseOverText(tempTextList);
-		}
-		else
-		{
+		} else {
 			wrappedGui.addMouseOverText(tempTextList);
 		}
 
-		if (tempTextList.isEmpty())
-		{
+		if (tempTextList.isEmpty()) {
 			Object object = wrappedGui.getIngredientUnderMouse();
 
-			if (object instanceof WrappedIngredient && ((WrappedIngredient) object).tooltip)
-			{
+			if (object instanceof WrappedIngredient && ((WrappedIngredient) object).tooltip) {
 				Object ingredient = WrappedIngredient.unwrap(object);
 
-				if (ingredient instanceof ItemStack && !((ItemStack) ingredient).isEmpty())
-				{
+				if (ingredient instanceof ItemStack && ((ItemStack) ingredient) != null) {
 					renderToolTip((ItemStack) ingredient, mouseX, mouseY);
 				}
 			}
-		}
-		else
-		{
-			GuiUtils.drawHoveringText(tempTextList, mouseX, Math.max(mouseY, 18), wrappedGui.getScreen().getScaledWidth(), wrappedGui.getScreen().getScaledHeight(), 0, theme.getFont());
+		} else {
+			drawHoveringText(tempTextList, mouseX, Math.max(mouseY, 18), theme.getFont());
 		}
 
 		tempTextList.clear();
 
-		if (wrappedGui.contextMenu == null)
-		{
-			renderHoveredToolTip(mouseX, mouseY);
+		if (wrappedGui.contextMenu == null) {
+			func_146283_a(tempTextList, mouseX, mouseY);
 		}
 
 		GlStateManager.popMatrix();
 
-		if (wrappedGui.fixUnicode)
-		{
+		if (wrappedGui.fixUnicode) {
 			GuiHelper.setFixUnicode(false);
 		}
 	}
-
+	
 	@Override
 	public void drawDefaultBackground()
 	{

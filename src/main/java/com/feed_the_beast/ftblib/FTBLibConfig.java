@@ -1,19 +1,20 @@
 package com.feed_the_beast.ftblib;
 
 import com.feed_the_beast.ftblib.lib.config.EnumTristate;
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.ConfigManager;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import codechicken.lib.config.ConfigFile;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * @author LatvianModder
  */
-@Mod.EventBusSubscriber(modid = FTBLib.MOD_ID)
+// @Mod.EventBusSubscriber(modid = FTBLib.MOD_ID)
 @Config(modid = FTBLib.MOD_ID, category = "")
 public class FTBLibConfig
 {
+
 	@Config.LangKey("stat.generalButton")
 	public static final General general = new General();
 
@@ -89,7 +90,7 @@ public class FTBLibConfig
 	@SubscribeEvent
 	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
 	{
-		if (event.getModID().equals(FTBLib.MOD_ID))
+		if (event.modID.equals(FTBLib.MOD_ID))
 		{
 			sync();
 		}

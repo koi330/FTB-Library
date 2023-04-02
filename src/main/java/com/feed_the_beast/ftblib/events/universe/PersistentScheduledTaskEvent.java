@@ -1,9 +1,10 @@
 package com.feed_the_beast.ftblib.events.universe;
 
 import com.feed_the_beast.ftblib.lib.data.Universe;
+
+import cpw.mods.fml.common.eventhandler.Cancelable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 /**
  * @author LatvianModder

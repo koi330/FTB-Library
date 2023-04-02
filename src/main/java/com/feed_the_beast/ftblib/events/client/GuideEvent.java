@@ -1,7 +1,8 @@
 package com.feed_the_beast.ftblib.events.client;
 
 import com.feed_the_beast.ftblib.events.FTBLibEvent;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
+
+import cpw.mods.fml.common.eventhandler.Cancelable;
 
 /**
  * @author LatvianModder

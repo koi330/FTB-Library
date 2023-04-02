@@ -2,8 +2,8 @@ package com.feed_the_beast.ftblib.lib.util.misc;
 
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
 import com.google.gson.JsonElement;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Facing;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -36,9 +36,9 @@ public class TextureSet
 			}
 		}
 
-		for (EnumFacing facing : EnumFacing.VALUES)
+		for (EnumFacing facing : EnumFacing.faceList)
 		{
-			s = map.get(facing.getName());
+			s = map.get(Facing.facings[facing.order_a]);
 
 			if (s != null)
 			{
@@ -54,7 +54,7 @@ public class TextureSet
 		return of(json.getAsString());
 	}
 
-	public static TextureSet of(IBlockState state)
+	public static TextureSet of(int x, int y, int z)
 	{
 		return DEFAULT; //FIXME
 	}

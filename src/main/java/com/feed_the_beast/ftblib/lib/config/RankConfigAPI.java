@@ -45,7 +45,7 @@ public class RankConfigAPI
 	{
 		Preconditions.checkNotNull(player, "Player can't be null!");
 		Preconditions.checkNotNull(node, "Config node can't be null!");
-		return get(player.server, player.getGameProfile(), node);
+		return get(player.mcServer, player.getGameProfile(), node);
 	}
 
 	public static ConfigValue getConfigValue(String node, boolean op)

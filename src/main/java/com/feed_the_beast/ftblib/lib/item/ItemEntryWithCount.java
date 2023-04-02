@@ -1,11 +1,11 @@
 package com.feed_the_beast.ftblib.lib.item;
 
-import net.minecraft.init.Items;
+import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
@@ -42,20 +42,20 @@ public class ItemEntryWithCount
 		{
 			ItemStack stack = ItemStackSerializer.read(nbtb);
 			entry = ItemEntry.get(stack);
-			count = nbt != null && nbt.hasKey("RealCount") ? nbt.getInteger("RealCount") : stack.getCount();
+			count = nbt != null && nbt.hasKey("RealCount") ? nbt.getInteger("RealCount") : stack.stackSize;
 			return;
 		}
 
 		if (id instanceof NBTTagIntArray)
 		{
 			ItemEntry e = ItemEntry.EMPTY;
-			int[] ai = ((NBTTagIntArray) id).getIntArray();
+			int[] ai = ((NBTTagIntArray) id).func_150302_c();
 
 			if (ai.length > 0)
 			{
-				Item item = Item.REGISTRY.getObjectById(ai[0]);
+				Item item = GameData.getItemRegistry().getObjectById(ai[0]);
 
-				if (item != null && item != Items.AIR)
+				if (item != null && item != null)
 				{
 					count = 1;
 					int meta = 0;
@@ -80,9 +80,10 @@ public class ItemEntryWithCount
 			return;
 		}
 
-		Item item = id instanceof NBTTagString ? Item.REGISTRY.getObject(new ResourceLocation(((NBTTagString) id).getString())) : Item.REGISTRY.getObjectById(((NBTPrimitive) id).getInt());
+		Item item = id instanceof NBTTagString ? (Item) GameData.getItemRegistry().getObject(new ResourceLocation(((NBTTagString) id).func_150285_a_())) : GameData
+				.getItemRegistry().getObjectById(((NBTTagInt) id).func_150287_d());
 
-		if (item != null && item != Items.AIR)
+		if (item != null && item != null)
 		{
 			int meta = nbt.getShort("M");
 			NBTTagCompound tag = (NBTTagCompound) nbt.getTag("N");
@@ -115,7 +116,7 @@ public class ItemEntryWithCount
 		if (count > 1 || entry.metadata > 0)
 		{
 			int[] ai = new int[entry.metadata > 0 ? 3 : 2];
-			ai[0] = Item.REGISTRY.getIDForObject(entry.item);
+			ai[0] = GameData.getItemRegistry().getIDForObject(entry.item);
 			ai[1] = count;
 
 			if (entry.metadata > 0)
@@ -127,7 +128,7 @@ public class ItemEntryWithCount
 		}
 		else
 		{
-			nbt.setInteger("I", Item.REGISTRY.getIDForObject(entry.item));
+			nbt.setInteger("I", GameData.getItemRegistry().getIDForObject(entry.item));
 		}
 
 		if (entry.nbt != null)

@@ -1,39 +1,36 @@
 package com.feed_the_beast.ftblib.lib.icon;
 
+import javax.annotation.Nullable;
+
 import com.feed_the_beast.ftblib.FTBLib;
+import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.client.IPixelBuffer;
 import com.feed_the_beast.ftblib.lib.client.PixelBuffer;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.google.common.base.Objects;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
-
-import javax.annotation.Nullable;
 
 /**
  * @author LatvianModder
  */
-public class ImageIcon extends Icon
-{
-	public static final ResourceLocation MISSING_IMAGE = new ResourceLocation(FTBLib.MOD_ID, "textures/gui/missing_image.png");
+public class ImageIcon extends Icon {
+	public static final ResourceLocation MISSING_IMAGE = new ResourceLocation(FTBLib.MOD_ID,
+			"textures/gui/missing_image.png");
 
 	public final ResourceLocation texture;
 	public double minU, minV, maxU, maxV;
 	public double tileSize;
 	public Color4I color;
 
-	public ImageIcon(ResourceLocation tex)
-	{
+	public ImageIcon(ResourceLocation tex) {
 		texture = tex;
 		minU = 0;
 		minV = 0;
@@ -44,8 +41,7 @@ public class ImageIcon extends Icon
 	}
 
 	@Override
-	public ImageIcon copy()
-	{
+	public ImageIcon copy() {
 		ImageIcon icon = new ImageIcon(texture);
 		icon.minU = minU;
 		icon.minV = minV;
@@ -56,8 +52,7 @@ public class ImageIcon extends Icon
 	}
 
 	@Override
-	protected void setProperties(IconProperties properties)
-	{
+	protected void setProperties(IconProperties properties) {
 		super.setProperties(properties);
 		minU = properties.getDouble("u0", minU);
 		minV = properties.getDouble("v0", minV);
@@ -68,13 +63,11 @@ public class ImageIcon extends Icon
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void bindTexture()
-	{
+	public void bindTexture() {
 		TextureManager manager = Minecraft.getMinecraft().getTextureManager();
 		ITextureObject tex = manager.getTexture(texture);
 
-		if (tex == null)
-		{
+		if (tex == null) {
 			tex = new SimpleTexture(texture);
 			manager.loadTexture(texture, tex);
 		}
@@ -84,76 +77,71 @@ public class ImageIcon extends Icon
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void draw(int x, int y, int w, int h)
-	{
+	public void draw(int x, int y, int w, int h) {
 		bindTexture();
 
-		if (tileSize <= 0D)
-		{
+		if (tileSize <= 0D) {
 			GuiHelper.drawTexturedRect(x, y, w, h, color, minU, minV, maxU, maxV);
-		}
-		else
-		{
+		} else {
 			int r = color.redi();
 			int g = color.greeni();
 			int b = color.bluei();
 			int a = color.alphai();
 
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder buffer = tessellator.getBuffer();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			buffer.pos(x, y + h, 0).tex(x / tileSize, (y + h) / tileSize).color(r, g, b, a).endVertex();
-			buffer.pos(x + w, y + h, 0).tex((x + w) / tileSize, (y + h) / tileSize).color(r, g, b, a).endVertex();
-			buffer.pos(x + w, y, 0).tex((x + w) / tileSize, y / tileSize).color(r, g, b, a).endVertex();
-			buffer.pos(x, y, 0).tex(x / tileSize, y / tileSize).color(r, g, b, a).endVertex();
+			Tessellator tessellator = Tessellator.instance;
+			tessellator.startDrawingQuads();
+			tessellator.setColorRGBA(r, g, b, a);
+			tessellator.setTextureUV(x / tileSize, (y + h) / tileSize);
+			tessellator.addVertex(x, y + h, 0);
+			tessellator.setColorRGBA(r, g, b, a);
+			tessellator.setTextureUV((x + w) / tileSize, (y + h) / tileSize);
+			tessellator.addVertex(x + w, y + h, 0);
+			tessellator.setColorRGBA(r, g, b, a);
+			tessellator.setTextureUV((x + w) / tileSize, y / tileSize);
+			tessellator.addVertex(x + w, y, 0);
+			tessellator.setColorRGBA(r, g, b, a);
+			tessellator.setTextureUV(x / tileSize, y / tileSize);
+			tessellator.addVertex(x, y, 0);
 			tessellator.draw();
 		}
 	}
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		return Objects.hashCode(texture, minU, minV, maxU, maxV);
 	}
 
 	@Override
-	public boolean equals(Object o)
-	{
-		if (o == this)
-		{
+	public boolean equals(Object o) {
+		if (o == this) {
 			return true;
-		}
-		else if (o instanceof ImageIcon)
-		{
+		} else if (o instanceof ImageIcon) {
 			ImageIcon img = (ImageIcon) o;
-			return texture.equals(img.texture) && minU == img.minU && minV == img.minV && maxU == img.maxU && maxV == img.maxV;
+			return texture.equals(img.texture) && minU == img.minU && minV == img.minV && maxU == img.maxU
+					&& maxV == img.maxV;
 		}
 		return false;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return texture.toString();
 	}
 
 	@Override
-	public ImageIcon withColor(Color4I color)
-	{
+	public ImageIcon withColor(Color4I color) {
 		ImageIcon icon = copy();
 		icon.color = color;
 		return icon;
 	}
 
 	@Override
-	public ImageIcon withTint(Color4I c)
-	{
+	public ImageIcon withTint(Color4I c) {
 		return withColor(color.withTint(c));
 	}
 
 	@Override
-	public ImageIcon withUV(double u0, double v0, double u1, double v1)
-	{
+	public ImageIcon withUV(double u0, double v0, double u1, double v1) {
 		ImageIcon icon = copy();
 		icon.minU = u0;
 		icon.minV = v0;
@@ -163,21 +151,17 @@ public class ImageIcon extends Icon
 	}
 
 	@Override
-	public boolean hasPixelBuffer()
-	{
+	public boolean hasPixelBuffer() {
 		return true;
 	}
 
 	@Override
 	@Nullable
-	public IPixelBuffer createPixelBuffer()
-	{
-		try
-		{
-			return PixelBuffer.from(Minecraft.getMinecraft().getResourceManager().getResource(texture).getInputStream());
-		}
-		catch (Exception ex)
-		{
+	public IPixelBuffer createPixelBuffer() {
+		try {
+			return PixelBuffer
+					.from(Minecraft.getMinecraft().getResourceManager().getResource(texture).getInputStream());
+		} catch (Exception ex) {
 			return null;
 		}
 	}

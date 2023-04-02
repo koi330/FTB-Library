@@ -10,9 +10,9 @@ import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import com.google.gson.JsonElement;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
@@ -24,19 +24,16 @@ import java.util.function.Function;
 /**
  * @author LatvianModder
  */
-public class ConfigList<T extends ConfigValue> extends ConfigValue implements Iterable<T>
-{
+public class ConfigList<T extends ConfigValue> extends ConfigValue implements Iterable<T> {
 	public static final String ID = "list";
 	public static final Color4I COLOR = Color4I.rgb(0xFFAA49);
 
-	public static class SimpleList<C extends ConfigValue, V> extends ConfigList<C>
-	{
+	public static class SimpleList<C extends ConfigValue, V> extends ConfigList<C> {
 		public final Collection<V> collection;
 		public final Function<V, C> toConfig;
 		public final Function<C, V> fromConfig;
 
-		public SimpleList(Collection<V> c, C type, Function<V, C> to, Function<C, V> from)
-		{
+		public SimpleList(Collection<V> c, C type, Function<V, C> to, Function<C, V> from) {
 			super(type);
 			collection = c;
 			toConfig = to;
@@ -44,12 +41,9 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 		}
 
 		@Override
-		public void readFromList()
-		{
-			if (list.size() == collection.size() && collection instanceof List)
-			{
-				for (int i = 0; i < list.size(); i++)
-				{
+		public void readFromList() {
+			if (list.size() == collection.size() && collection instanceof List) {
+				for (int i = 0; i < list.size(); i++) {
 					((List<V>) collection).set(i, fromConfig.apply(list.get(i)));
 				}
 
@@ -58,19 +52,16 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 
 			collection.clear();
 
-			for (C value : list)
-			{
+			for (C value : list) {
 				collection.add(fromConfig.apply(value));
 			}
 		}
 
 		@Override
-		public void writeToList()
-		{
+		public void writeToList() {
 			list.clear();
 
-			for (V value : collection)
-			{
+			for (V value : collection) {
 				list.add(toConfig.apply(value));
 			}
 		}
@@ -79,27 +70,22 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	public final List<T> list;
 	public T type;
 
-	public ConfigList(T t)
-	{
+	public ConfigList(T t) {
 		list = new ArrayList<>();
 		type = t;
 	}
 
 	@Override
-	public String getId()
-	{
+	public String getId() {
 		return ID;
 	}
 
-	public boolean canAdd(ConfigValue value)
-	{
+	public boolean canAdd(ConfigValue value) {
 		return !value.isNull() && type.getId().equals(value.getId());
 	}
 
-	public ConfigList<T> add(ConfigValue v)
-	{
-		if (canAdd(v))
-		{
+	public ConfigList<T> add(ConfigValue v) {
+		if (canAdd(v)) {
 			writeToList();
 			ConfigValue v1 = type.copy();
 			v1.setValueFromOtherValue(v);
@@ -111,29 +97,25 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public void writeData(DataOut data)
-	{
+	public void writeData(DataOut data) {
 		writeToList();
 		data.writeString(type.getId());
 		type.writeData(data);
 		data.writeVarInt(list.size());
 
-		for (ConfigValue s : list)
-		{
+		for (ConfigValue s : list) {
 			s.writeData(data);
 		}
 	}
 
 	@Override
-	public void readData(DataIn data)
-	{
+	public void readData(DataIn data) {
 		list.clear();
 		type = (T) FTBLibAPI.createConfigValueFromId(data.readString());
 		type.readData(data);
 		int s = data.readVarInt();
 
-		while (--s >= 0)
-		{
+		while (--s >= 0) {
 			ConfigValue v = type.copy();
 			v.readData(data);
 			list.add((T) v);
@@ -143,17 +125,14 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public String getString()
-	{
+	public String getString() {
 		writeToList();
 		StringBuilder builder = new StringBuilder("[");
 
-		for (int i = 0; i < list.size(); i++)
-		{
+		for (int i = 0; i < list.size(); i++) {
 			builder.append(list.get(i).getString());
 
-			if (i != list.size() - 1)
-			{
+			if (i != list.size() - 1) {
 				builder.append(',');
 				builder.append(' ');
 			}
@@ -164,25 +143,21 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public boolean getBoolean()
-	{
+	public boolean getBoolean() {
 		return !list.isEmpty();
 	}
 
 	@Override
-	public int getInt()
-	{
+	public int getInt() {
 		return list.size();
 	}
 
 	@Override
-	public ConfigList<T> copy()
-	{
+	public ConfigList<T> copy() {
 		writeToList();
 		ConfigList<T> l = new ConfigList<>((T) type.copy());
 
-		for (T value : list)
-		{
+		for (T value : list) {
 			l.list.add((T) value.copy());
 		}
 
@@ -190,20 +165,17 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public Color4I getColor()
-	{
+	public Color4I getColor() {
 		return COLOR;
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key)
-	{
+	public void writeToNBT(NBTTagCompound nbt, String key) {
 		writeToList();
 
 		NBTTagList l = new NBTTagList();
 
-		for (T value : list)
-		{
+		for (T value : list) {
 			NBTTagCompound nbt1 = new NBTTagCompound();
 			value.writeToNBT(nbt1, "value");
 			l.appendTag(nbt1);
@@ -213,14 +185,12 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key)
-	{
+	public void readFromNBT(NBTTagCompound nbt, String key) {
 		list.clear();
 
 		NBTTagList l = nbt.getTagList(key, Constants.NBT.TAG_COMPOUND);
 
-		for (int i = 0; i < l.tagCount(); i++)
-		{
+		for (int i = 0; i < l.tagCount(); i++) {
 			ConfigValue v = type.copy();
 			v.readFromNBT(l.getCompoundTagAt(i), "value");
 			list.add((T) v);
@@ -230,81 +200,64 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> l)
-	{
-		l.add(TextFormatting.AQUA + "Type: " + TextFormatting.RESET + type.getId());
+	public void addInfo(ConfigValueInstance inst, List<String> l) {
+		l.add(EnumChatFormatting.AQUA + "Type: " + EnumChatFormatting.RESET + type.getId());
 
-		if (list.isEmpty())
-		{
-			l.add(TextFormatting.AQUA + "Value: []");
-		}
-		else
-		{
-			l.add(TextFormatting.AQUA + "Value: [");
+		if (list.isEmpty()) {
+			l.add(EnumChatFormatting.AQUA + "Value: []");
+		} else {
+			l.add(EnumChatFormatting.AQUA + "Value: [");
 
-			for (T value : list)
-			{
+			for (T value : list) {
 				l.add("  " + value.getStringForGUI().getFormattedText());
 			}
 
-			l.add(TextFormatting.AQUA + "]");
+			l.add(EnumChatFormatting.AQUA + "]");
 		}
 
-		if (inst.getCanEdit() && inst.getDefaultValue() instanceof ConfigList)
-		{
+		if (inst.getCanEdit() && inst.getDefaultValue() instanceof ConfigList) {
 			ConfigList<T> val = (ConfigList<T>) inst.getDefaultValue();
 
-			if (val.list.isEmpty())
-			{
-				l.add(TextFormatting.AQUA + "Default: []");
-			}
-			else
-			{
-				l.add(TextFormatting.AQUA + "Default: [");
+			if (val.list.isEmpty()) {
+				l.add(EnumChatFormatting.AQUA + "Default: []");
+			} else {
+				l.add(EnumChatFormatting.AQUA + "Default: [");
 
-				for (T value : val.list)
-				{
+				for (T value : val.list) {
 					l.add("  " + value.getStringForGUI().getFormattedText());
 				}
 
-				l.add(TextFormatting.AQUA + "]");
+				l.add(EnumChatFormatting.AQUA + "]");
 			}
 		}
 	}
 
 	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback)
-	{
+	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
 		new GuiEditConfigList(inst, callback).openGui();
 	}
 
 	@Override
-	public ITextComponent getStringForGUI()
-	{
-		return new TextComponentString("...");
+	public IChatComponent getStringForGUI() {
+		return new ChatComponentText("...");
 	}
 
 	@Override
-	public Iterator<T> iterator()
-	{
+	public Iterator<T> iterator() {
 		return list.iterator();
 	}
 
 	@Override
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return list.isEmpty();
 	}
 
 	@Override
-	public void setValueFromOtherValue(ConfigValue ovalue)
-	{
+	public void setValueFromOtherValue(ConfigValue ovalue) {
 		list.clear();
 
-		if (ovalue instanceof ConfigList && !ovalue.isEmpty() && type.equals(((ConfigList) ovalue).type))
-		{
-			for (ConfigValue v : (ConfigList<?>) ovalue)
-			{
+		if (ovalue instanceof ConfigList && !ovalue.isEmpty() && type.equals(((ConfigList) ovalue).type)) {
+			for (ConfigValue v : (ConfigList<?>) ovalue) {
 				ConfigValue value = type.copy();
 				value.setValueFromOtherValue(v);
 				list.add((T) value);
@@ -315,14 +268,11 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 	}
 
 	@Override
-	public void setValueFromJson(JsonElement json)
-	{
+	public void setValueFromJson(JsonElement json) {
 		list.clear();
 
-		if (json.isJsonArray())
-		{
-			for (JsonElement e : json.getAsJsonArray())
-			{
+		if (json.isJsonArray()) {
+			for (JsonElement e : json.getAsJsonArray()) {
 				ConfigValue value = type.copy();
 				value.setValueFromJson(e);
 				list.add((T) value);
@@ -332,11 +282,9 @@ public class ConfigList<T extends ConfigValue> extends ConfigValue implements It
 		readFromList();
 	}
 
-	public void readFromList()
-	{
+	public void readFromList() {
 	}
 
-	public void writeToList()
-	{
+	public void writeToList() {
 	}
 }

@@ -1,6 +1,7 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
 import com.feed_the_beast.ftblib.lib.client.CachedVertexData;
+import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.gui.Button;
 import com.feed_the_beast.ftblib.lib.gui.GuiBase;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
@@ -12,11 +13,10 @@ import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.ChunkPosition;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -38,7 +38,7 @@ public class GuiChunkSelectorBase extends GuiBase
 	}
 
 	public static final int TILE_SIZE = 12;
-	private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+	private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, CachedVertexData.POSITION_COLOR);
 
 	static
 	{
@@ -60,7 +60,7 @@ public class GuiChunkSelectorBase extends GuiBase
 	public static class MapButton extends Button
 	{
 		public final GuiChunkSelectorBase gui;
-		public final ChunkPos chunkPos;
+		public final ChunkCoordIntPair chunkPos;
 		public final int index;
 		private boolean isSelected = false;
 
@@ -70,7 +70,7 @@ public class GuiChunkSelectorBase extends GuiBase
 			gui = g;
 			index = i;
 			setPosAndSize((index % ChunkSelectorMap.TILES_GUI) * TILE_SIZE, (index / ChunkSelectorMap.TILES_GUI) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-			chunkPos = new ChunkPos(gui.startX + (i % ChunkSelectorMap.TILES_GUI), gui.startZ + (i / ChunkSelectorMap.TILES_GUI));
+			chunkPos = new ChunkCoordIntPair(gui.startX + (i % ChunkSelectorMap.TILES_GUI), gui.startZ + (i / ChunkSelectorMap.TILES_GUI));
 		}
 
 		@Override
@@ -113,8 +113,8 @@ public class GuiChunkSelectorBase extends GuiBase
 
 	public GuiChunkSelectorBase()
 	{
-		startX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
-		startZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
+		startX = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posX) - ChunkSelectorMap.TILES_GUI2;
+		startZ = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posZ) - ChunkSelectorMap.TILES_GUI2;
 
 		panelButtons = new Panel(this)
 		{
@@ -175,8 +175,8 @@ public class GuiChunkSelectorBase extends GuiBase
 	@Override
 	public void drawBackground(Theme theme, int x, int y, int w, int h)
 	{
-		int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
-		int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
+		int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posX) - ChunkSelectorMap.TILES_GUI2;
+		int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posZ) - ChunkSelectorMap.TILES_GUI2;
 
 		if (currentStartX != startX || currentStartZ != startZ)
 		{
@@ -206,19 +206,18 @@ public class GuiChunkSelectorBase extends GuiBase
 		GlStateManager.disableTexture2D();
 		GlStateManager.glLineWidth(1F);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.setTranslation(mapButtons[0].getX(), mapButtons[0].getY(), 0D);
+		Tessellator tessellator = Tessellator.instance;
+		tessellator.setTranslation(mapButtons[0].getX(), mapButtons[0].getY(), 0D);
 		//GlStateManager.color(1F, 1F, 1F, GuiScreen.isCtrlKeyDown() ? 0.2F : 0.7F);
 		GlStateManager.color(1F, 1F, 1F, 1F);
 
 		if (!isKeyDown(Keyboard.KEY_TAB))
 		{
-			drawArea(tessellator, buffer);
+			drawArea(tessellator);
 		}
 
-		GRID.draw(tessellator, buffer);
-		buffer.setTranslation(0D, 0D, 0D);
+		GRID.draw(tessellator);
+		tessellator.setTranslation(0D, 0D, 0D);
 		GlStateManager.enableTexture2D();
 		GlStateManager.color(1F, 1F, 1F, 1F);
 	}
@@ -230,7 +229,7 @@ public class GuiChunkSelectorBase extends GuiBase
 
 		if (currentSelectionMode != -1)
 		{
-			Collection<ChunkPos> c = new ArrayList<>();
+			Collection<ChunkCoordIntPair> c = new ArrayList<>();
 
 			for (MapButton b : mapButtons)
 			{
@@ -285,11 +284,11 @@ public class GuiChunkSelectorBase extends GuiBase
 		return -1;
 	}
 
-	public void onChunksSelected(Collection<ChunkPos> chunks)
+	public void onChunksSelected(Collection<ChunkCoordIntPair> chunks)
 	{
 	}
 
-	public void drawArea(Tessellator tessellator, BufferBuilder buffer)
+	public void drawArea(Tessellator tessellator)
 	{
 	}
 

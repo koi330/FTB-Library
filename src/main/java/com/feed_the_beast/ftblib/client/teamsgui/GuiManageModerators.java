@@ -10,7 +10,7 @@ import com.feed_the_beast.ftblib.net.MessageMyTeamAction;
 import com.feed_the_beast.ftblib.net.MessageMyTeamPlayerList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,41 +18,36 @@ import java.util.List;
 /**
  * @author LatvianModder
  */
-public class GuiManageModerators extends GuiManagePlayersBase
-{
-	private static class ButtonPlayer extends ButtonPlayerBase
-	{
-		private ButtonPlayer(Panel panel, MessageMyTeamPlayerList.Entry m)
-		{
+public class GuiManageModerators extends GuiManagePlayersBase {
+	private static class ButtonPlayer extends ButtonPlayerBase {
+		private ButtonPlayer(Panel panel, MessageMyTeamPlayerList.Entry m) {
 			super(panel, m);
 		}
 
 		@Override
-		Color4I getPlayerColor()
-		{
-			return entry.status.isEqualOrGreaterThan(EnumTeamStatus.MOD) ? Color4I.getChatFormattingColor(TextFormatting.DARK_GREEN) : getDefaultPlayerColor();
+		Color4I getPlayerColor() {
+			return entry.status.isEqualOrGreaterThan(EnumTeamStatus.MOD)
+					? Color4I.getChatFormattingColor(EnumChatFormatting.DARK_GREEN)
+					: getDefaultPlayerColor();
 		}
 
 		@Override
-		public void addMouseOverText(List<String> list)
-		{
-			list.add(I18n.format((entry.status.isEqualOrGreaterThan(EnumTeamStatus.MOD) ? EnumTeamStatus.MOD : EnumTeamStatus.MEMBER).getLangKey()));
+		public void addMouseOverText(List<String> list) {
+			list.add(I18n.format(
+					(entry.status.isEqualOrGreaterThan(EnumTeamStatus.MOD) ? EnumTeamStatus.MOD : EnumTeamStatus.MEMBER)
+							.getLangKey()));
 		}
 
 		@Override
-		public void onClicked(MouseButton button)
-		{
+		public void onClicked(MouseButton button) {
 			GuiHelper.playClickSound();
 			NBTTagCompound data = new NBTTagCompound();
 			data.setString("player", entry.name);
 
-			if (entry.status.isEqualOrGreaterThan(EnumTeamStatus.MOD))
-			{
+			if (entry.status.isEqualOrGreaterThan(EnumTeamStatus.MOD)) {
 				data.setBoolean("add", false);
 				entry.status = EnumTeamStatus.MEMBER;
-			}
-			else
-			{
+			} else {
 				data.setBoolean("add", true);
 				entry.status = EnumTeamStatus.MOD;
 			}
@@ -62,8 +57,7 @@ public class GuiManageModerators extends GuiManagePlayersBase
 		}
 	}
 
-	public GuiManageModerators(Collection<MessageMyTeamPlayerList.Entry> m)
-	{
+	public GuiManageModerators(Collection<MessageMyTeamPlayerList.Entry> m) {
 		super(I18n.format("team_action.ftblib.moderators"), m, ButtonPlayer::new);
 	}
 }

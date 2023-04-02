@@ -1,7 +1,8 @@
 package com.feed_the_beast.ftblib.lib.util;
 
+import com.feed_the_beast.ftblib.lib.EnumDyeColor;
+
 import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -26,8 +27,8 @@ public class EnumDyeColorHelper // ItemDye
 	private EnumDyeColorHelper(EnumDyeColor col)
 	{
 		dye = col;
-		langKey = "item.fireworksCharge." + col.getTranslationKey();
-		oreName = StringUtils.firstUppercase(col.getTranslationKey());
+		langKey = "item.fireworksCharge." + col.unlocalizedName;
+		oreName = StringUtils.firstUppercase(col.unlocalizedName);
 	}
 
 	public static EnumDyeColorHelper get(EnumDyeColor dye)
@@ -37,13 +38,13 @@ public class EnumDyeColorHelper // ItemDye
 
 	public ItemStack getDye(int s)
 	{
-		return new ItemStack(Items.DYE, s, dye.getDyeDamage());
+		return dye.getDye(s);
 	}
 
 	@Override
 	public String toString()
 	{
-		return dye.getName();
+		return dye.name;
 	}
 
 	@Override
@@ -69,16 +70,16 @@ public class EnumDyeColorHelper // ItemDye
 
 	public String getDyeName()
 	{
-		return "dye" + getOreName();
+		return dye.dyeName;
 	}
 
 	public String getGlassName()
 	{
-		return "blockGlass" + getOreName();
+		return dye.glassName;
 	}
 
 	public String getPaneName()
 	{
-		return "paneGlass" + getOreName();
+		return dye.paneName;
 	}
 }

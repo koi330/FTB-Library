@@ -1,23 +1,28 @@
 package com.feed_the_beast.ftblib.lib.icon;
 
 import com.feed_the_beast.ftblib.client.FTBLibClientEventHandler;
+import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.client.IPixelBuffer;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.WritableImage;
+
+import cpw.mods.fml.common.Loader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.client.renderer.entity.RenderItem;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.PixelFormat;
 
 import javax.annotation.Nullable;
-import java.awt.*;
+import javax.imageio.ImageIO;
+
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,13 +62,19 @@ public class IconRenderer
 	{
 		if (nullImage == null)
 		{
-			if (Loader.isModLoaded("itemfilters"))
-			{
-				nullImage = new Image(IconRenderer.class.getResourceAsStream("/assets/itemfilters/textures/items/missing.png"));
-			}
-			else
-			{
-				nullImage = new Image(IconRenderer.class.getResourceAsStream("/assets/ftblib/textures/icons/cancel.png"));
+			try {
+				if (Loader.isModLoaded("itemfilters"))
+				{
+					nullImage = ImageIO.read(
+							IconRenderer.class.getResourceAsStream("/assets/itemfilters/textures/items/missing.png"));
+				}
+				else
+				{
+					nullImage = ImageIO
+							.read(IconRenderer.class.getResourceAsStream("/assets/ftblib/textures/icons/cancel.png"));
+				}
+			} catch (IOException e) {
+				//nop
 			}
 		}
 
@@ -103,8 +114,9 @@ public class IconRenderer
 			{
 				int w = buffer.getWidth();
 				int h = buffer.getHeight();
-				image = new WritableImage(w, h);
-				((WritableImage) image).getPixelWriter().setPixels(0, 0, w, h, PixelFormat.getIntArgbInstance(), buffer.getPixels(), 0, w);
+				BufferedImage image_ = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+				image_.setRGB(0, 0, w, h, buffer.getPixels(), 0, w);
+				image = image_;
 			}
 
 			imageCache.put(icon, image);
@@ -118,7 +130,7 @@ public class IconRenderer
 		IconCallbackPair pair = new IconCallbackPair();
 		pair.icon = icon;
 		pair.callback = callback;
-		Minecraft.getMinecraft().addScheduledTask(pair);
+		Minecraft.getMinecraft().func_152344_a(pair);
 
 		return false;
 	}
@@ -137,7 +149,7 @@ public class IconRenderer
 		QUEUE.clear();
 
 		Minecraft mc = Minecraft.getMinecraft();
-		ScaledResolution res = new ScaledResolution(mc);
+		ScaledResolution res = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
 		int size = Math.min(Math.min(mc.displayHeight, mc.displayWidth), 64);
 
 		mc.entityRenderer.setupOverlayRendering();
@@ -147,8 +159,9 @@ public class IconRenderer
 
 		GlStateManager.scale(scale, scale, scale);
 
-		float oldZLevel = mc.getRenderItem().zLevel;
-		mc.getRenderItem().zLevel = -50;
+		RenderItem renderItem = RenderItem.getInstance();
+		float oldZLevel = renderItem.zLevel;
+		renderItem.zLevel = -50;
 
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.enableColorMaterial();
@@ -186,8 +199,9 @@ public class IconRenderer
 				g.drawImage(img, 0, 0, null);
 				g.dispose();
 				pixels = flipped.getRGB(0, 0, size, size, pixels, 0, size);
-				WritableImage image = new WritableImage(size, size);
-				image.getPixelWriter().setPixels(0, 0, size, size, PixelFormat.getIntArgbInstance(), pixels, 0, size);
+
+				BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+				image.setRGB(0, 0, size, size, pixels, 0, size);
 				imageCache.put(pair.icon, image);
 				pair.callback.imageLoaded(true, image);
 			}
@@ -201,6 +215,6 @@ public class IconRenderer
 		GlStateManager.disableColorMaterial();
 		GlStateManager.disableDepth();
 		GlStateManager.disableBlend();
-		Minecraft.getMinecraft().getRenderItem().zLevel = oldZLevel;
+		renderItem.zLevel = oldZLevel;
 	}
 }

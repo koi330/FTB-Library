@@ -1,26 +1,29 @@
 package com.feed_the_beast.ftblib.lib.client;
 
-import com.feed_the_beast.ftblib.lib.gui.GuiBase;
-import com.feed_the_beast.ftblib.lib.gui.IGuiWrapper;
-import com.feed_the_beast.ftblib.lib.icon.PlayerHeadIcon;
-import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraftforge.client.ClientCommandHandler;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
+import javax.annotation.Nullable;
+
+import com.feed_the_beast.ftblib.lib.gui.GuiBase;
+import com.feed_the_beast.ftblib.lib.gui.IGuiWrapper;
+import com.feed_the_beast.ftblib.lib.icon.PlayerHeadIcon;
+import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraftforge.client.ClientCommandHandler;
+
 public class ClientUtils
 {
 	public static final NameMap<BlockRenderLayer> BLOCK_RENDER_LAYER_NAME_MAP = NameMap.create(BlockRenderLayer.SOLID, BlockRenderLayer.values());
-	public static final BooleanSupplier IS_CLIENT_OP = () -> Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().player.getPermissionLevel() > 0;
+	public static final BooleanSupplier IS_CLIENT_OP = () -> FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152596_g(Minecraft.getMinecraft().thePlayer.getGameProfile());
 	public static final List<Runnable> RUN_LATER = new ArrayList<>();
+	
 
 	private static float lastBrightnessX, lastBrightnessY;
 	private static Boolean hasJavaFX = null;
@@ -29,10 +32,10 @@ public class ClientUtils
 
 	public static int getDim()
 	{
-		return Minecraft.getMinecraft().world != null ? Minecraft.getMinecraft().world.provider.getDimension() : 0;
+		return Minecraft.getMinecraft().theWorld != null ? Minecraft.getMinecraft().theWorld.provider.dimensionId : 0;
 	}
 
-	public static void spawnParticle(Particle particle)
+	public static void spawnParticle(EntityFX particle)
 	{
 		Minecraft.getMinecraft().effectRenderer.addEffect(particle);
 	}
@@ -61,9 +64,9 @@ public class ClientUtils
 			Minecraft.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(command);
 		}
 
-		if (ClientCommandHandler.instance.executeCommand(Minecraft.getMinecraft().player, command) == 0)
+		if (ClientCommandHandler.instance.executeCommand(Minecraft.getMinecraft().thePlayer, command) == 0)
 		{
-			Minecraft.getMinecraft().player.sendChatMessage(command);
+			Minecraft.getMinecraft().thePlayer.sendChatMessage(command);
 		}
 	}
 

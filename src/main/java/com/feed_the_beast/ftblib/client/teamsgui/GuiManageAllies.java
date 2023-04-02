@@ -10,7 +10,7 @@ import com.feed_the_beast.ftblib.net.MessageMyTeamAction;
 import com.feed_the_beast.ftblib.net.MessageMyTeamPlayerList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,41 +18,35 @@ import java.util.List;
 /**
  * @author LatvianModder
  */
-public class GuiManageAllies extends GuiManagePlayersBase
-{
-	private static class ButtonPlayer extends ButtonPlayerBase
-	{
-		private ButtonPlayer(Panel panel, MessageMyTeamPlayerList.Entry m)
-		{
+public class GuiManageAllies extends GuiManagePlayersBase {
+	private static class ButtonPlayer extends ButtonPlayerBase {
+		private ButtonPlayer(Panel panel, MessageMyTeamPlayerList.Entry m) {
 			super(panel, m);
 		}
 
 		@Override
-		Color4I getPlayerColor()
-		{
-			return entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY) ? Color4I.getChatFormattingColor(TextFormatting.DARK_AQUA) : getDefaultPlayerColor();
+		Color4I getPlayerColor() {
+			return entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY)
+					? Color4I.getChatFormattingColor(EnumChatFormatting.DARK_AQUA)
+					: getDefaultPlayerColor();
 		}
 
 		@Override
-		public void addMouseOverText(List<String> list)
-		{
-			list.add(I18n.format((entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY) ? EnumTeamStatus.ALLY : EnumTeamStatus.MEMBER).getLangKey()));
+		public void addMouseOverText(List<String> list) {
+			list.add(I18n.format((entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY) ? EnumTeamStatus.ALLY
+					: EnumTeamStatus.MEMBER).getLangKey()));
 		}
 
 		@Override
-		public void onClicked(MouseButton button)
-		{
+		public void onClicked(MouseButton button) {
 			GuiHelper.playClickSound();
 			NBTTagCompound data = new NBTTagCompound();
 			data.setString("player", entry.name);
 
-			if (entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY))
-			{
+			if (entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY)) {
 				data.setBoolean("add", false);
 				entry.status = EnumTeamStatus.NONE;
-			}
-			else
-			{
+			} else {
 				data.setBoolean("add", true);
 				entry.status = EnumTeamStatus.ALLY;
 			}
@@ -62,8 +56,7 @@ public class GuiManageAllies extends GuiManagePlayersBase
 		}
 	}
 
-	public GuiManageAllies(Collection<MessageMyTeamPlayerList.Entry> m)
-	{
+	public GuiManageAllies(Collection<MessageMyTeamPlayerList.Entry> m) {
 		super(I18n.format("team_action.ftblib.allies"), m, ButtonPlayer::new);
 	}
 }

@@ -7,22 +7,23 @@ import com.feed_the_beast.ftblib.command.team.CmdTeam;
 import com.feed_the_beast.ftblib.lib.command.CommandUtils;
 import com.feed_the_beast.ftblib.lib.data.Universe;
 import com.feed_the_beast.ftblib.lib.util.SidedUtils;
+
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import cpw.mods.fml.common.network.NetworkCheckHandler;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.item.Item;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
-import net.minecraftforge.fml.common.network.NetworkCheckHandler;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.util.IChatComponent;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -66,7 +67,7 @@ public class FTBLib
 	@GameRegistry.ObjectHolder("ftbquests:custom_icon")
 	public static Item CUSTOM_ICON_ITEM;
 
-	public static ITextComponent lang(@Nullable ICommandSender sender, String key, Object... args)
+	public static IChatComponent lang(@Nullable ICommandSender sender, String key, Object... args)
 	{
 		return SidedUtils.lang(sender, MOD_ID, key, args);
 	}

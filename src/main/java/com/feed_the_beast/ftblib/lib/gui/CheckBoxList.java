@@ -1,7 +1,7 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
+import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;
 import java.util.List;

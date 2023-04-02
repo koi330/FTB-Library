@@ -2,22 +2,19 @@ package com.feed_the_beast.ftblib.lib.gui;
 
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.List;
 
-public class ScrollBar extends Widget
-{
-	public enum Plane
-	{
+public class ScrollBar extends Widget {
+	public enum Plane {
 		HORIZONTAL(false),
 		VERTICAL(true);
 
 		public final boolean isVertical;
 
-		Plane(boolean v)
-		{
+		Plane(boolean v) {
 			isVertical = v;
 		}
 	}
@@ -32,61 +29,51 @@ public class ScrollBar extends Widget
 	private boolean canAlwaysScroll = false;
 	private boolean canAlwaysScrollPlane = true;
 
-	public ScrollBar(Panel parent, Plane p, int ss)
-	{
+	public ScrollBar(Panel parent, Plane p, int ss) {
 		super(parent);
 		plane = p;
 		scrollBarSize = Math.max(ss, 0);
 	}
 
-	public void setCanAlwaysScroll(boolean v)
-	{
+	public void setCanAlwaysScroll(boolean v) {
 		canAlwaysScroll = v;
 	}
 
-	public void setCanAlwaysScrollPlane(boolean v)
-	{
+	public void setCanAlwaysScrollPlane(boolean v) {
 		canAlwaysScrollPlane = v;
 	}
 
-	public void setMinValue(int min)
-	{
+	public void setMinValue(int min) {
 		minValue = min;
 		setValue(getValue());
 	}
 
-	public int getMinValue()
-	{
+	public int getMinValue() {
 		return minValue;
 	}
 
-	public void setMaxValue(int max)
-	{
+	public void setMaxValue(int max) {
 		maxValue = max;
 		setValue(getValue());
 	}
 
-	public int getMaxValue()
-	{
+	public int getMaxValue() {
 		return maxValue;
 	}
 
-	public void setScrollStep(int s)
-	{
+	public void setScrollStep(int s) {
 		scrollStep = Math.max(1, s);
 	}
 
-	public int getScrollBarSize()
-	{
+	public int getScrollBarSize() {
 		return scrollBarSize;
 	}
 
 	@Override
-	public boolean mousePressed(MouseButton button)
-	{
-		if (isMouseOver())
-		{
-			grab = (plane.isVertical ? (getMouseY() - (getY() + getValueI(height - getScrollBarSize()))) : (getMouseX() - (getX() + getValueI(width - getScrollBarSize()))));
+	public boolean mousePressed(MouseButton button) {
+		if (isMouseOver()) {
+			grab = (plane.isVertical ? (getMouseY() - (getY() + getValueI(height - getScrollBarSize())))
+					: (getMouseX() - (getX() + getValueI(width - getScrollBarSize()))));
 			return true;
 		}
 
@@ -94,10 +81,8 @@ public class ScrollBar extends Widget
 	}
 
 	@Override
-	public boolean mouseScrolled(int scroll)
-	{
-		if (scroll != 0 && canMouseScrollPlane() && canMouseScroll())
-		{
+	public boolean mouseScrolled(int scroll) {
+		if (scroll != 0 && canMouseScrollPlane() && canMouseScroll()) {
 			setValue(getValue() - getScrollStep() * scroll);
 			return true;
 		}
@@ -106,51 +91,38 @@ public class ScrollBar extends Widget
 	}
 
 	@Override
-	public void addMouseOverText(List<String> list)
-	{
-		if (showValueOnMouseOver())
-		{
+	public void addMouseOverText(List<String> list) {
+		if (showValueOnMouseOver()) {
 			String t = getTitle();
 			list.add(t.isEmpty() ? Integer.toString(getValue()) : (t + ": " + getValue()));
 		}
 
-		if (Theme.renderDebugBoxes)
-		{
-			list.add(TextFormatting.DARK_GRAY + "Size: " + getScrollBarSize());
-			list.add(TextFormatting.DARK_GRAY + "Max: " + getMaxValue());
-			list.add(TextFormatting.DARK_GRAY + "Value: " + getValue());
+		if (Theme.renderDebugBoxes) {
+			list.add(EnumChatFormatting.DARK_GRAY + "Size: " + getScrollBarSize());
+			list.add(EnumChatFormatting.DARK_GRAY + "Max: " + getMaxValue());
+			list.add(EnumChatFormatting.DARK_GRAY + "Value: " + getValue());
 		}
 	}
 
-	public boolean showValueOnMouseOver()
-	{
+	public boolean showValueOnMouseOver() {
 		return false;
 	}
 
 	@Override
-	public void draw(Theme theme, int x, int y, int w, int h)
-	{
+	public void draw(Theme theme, int x, int y, int w, int h) {
 		int scrollBarSize = getScrollBarSize();
 
-		if (scrollBarSize > 0)
-		{
+		if (scrollBarSize > 0) {
 			int v = getValue();
 
-			if (grab != -10000)
-			{
-				if (isMouseButtonDown(MouseButton.LEFT))
-				{
-					if (plane.isVertical)
-					{
+			if (grab != -10000) {
+				if (isMouseButtonDown(MouseButton.LEFT)) {
+					if (plane.isVertical) {
 						v = (int) ((getMouseY() - (y + grab)) * getMaxValue() / (double) (height - scrollBarSize));
-					}
-					else
-					{
+					} else {
 						v = (int) ((getMouseX() - (x + grab)) * getMaxValue() / (double) (width - scrollBarSize));
 					}
-				}
-				else
-				{
+				} else {
 					grab = -10000;
 				}
 			}
@@ -160,66 +132,52 @@ public class ScrollBar extends Widget
 
 		drawBackground(theme, x, y, width, height);
 
-		if (scrollBarSize > 0)
-		{
-			if (plane.isVertical)
-			{
+		if (scrollBarSize > 0) {
+			if (plane.isVertical) {
 				drawScrollBar(theme, x, y + getValueI(height - scrollBarSize), width, scrollBarSize);
-			}
-			else
-			{
+			} else {
 				drawScrollBar(theme, x + getValueI(width - scrollBarSize), y, scrollBarSize, height);
 			}
 		}
 	}
 
-	public void drawBackground(Theme theme, int x, int y, int w, int h)
-	{
+	public void drawBackground(Theme theme, int x, int y, int w, int h) {
 		theme.drawScrollBarBackground(x, y, w, h, getWidgetType());
 	}
 
-	public void drawScrollBar(Theme theme, int x, int y, int w, int h)
-	{
+	public void drawScrollBar(Theme theme, int x, int y, int w, int h) {
 		theme.drawScrollBar(x, y, w, h, WidgetType.mouseOver(grab != -10000), plane.isVertical);
 	}
 
-	public void onMoved()
-	{
+	public void onMoved() {
 	}
 
-	public boolean canMouseScrollPlane()
-	{
+	public boolean canMouseScrollPlane() {
 		return canAlwaysScrollPlane || isShiftKeyDown() != plane.isVertical;
 	}
 
-	public boolean canMouseScroll()
-	{
+	public boolean canMouseScroll() {
 		return canAlwaysScroll || isMouseOver();
 	}
 
-	public void setValue(int v)
-	{
-		v = MathHelper.clamp(v, getMinValue(), getMaxValue());
+	public void setValue(int v) {
+		v = MathHelper.clamp_int(v, getMinValue(), getMaxValue());
 
-		if (value != v)
-		{
+		if (value != v) {
 			value = v;
 			onMoved();
 		}
 	}
 
-	public int getValue()
-	{
+	public int getValue() {
 		return value;
 	}
 
-	public int getValueI(int max)
-	{
+	public int getValueI(int max) {
 		return (int) MathUtils.map(getMinValue(), getMaxValue(), 0, max, value);
 	}
 
-	public int getScrollStep()
-	{
+	public int getScrollStep() {
 		return scrollStep;
 	}
 }

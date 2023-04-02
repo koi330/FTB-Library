@@ -1,6 +1,6 @@
 package com.feed_the_beast.ftblib.lib.util.misc;
 
-import net.minecraft.util.IStringSerializable;
+import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 
 /**
  * @author LatvianModder

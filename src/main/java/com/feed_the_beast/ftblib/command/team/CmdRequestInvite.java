@@ -10,45 +10,37 @@ import com.feed_the_beast.ftblib.lib.data.Universe;
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.event.ClickEvent;
-
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumChatFormatting;
 import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * @author LatvianModder
  */
-public class CmdRequestInvite extends CmdBase
-{
-	public CmdRequestInvite()
-	{
+public class CmdRequestInvite extends CmdBase {
+	public CmdRequestInvite() {
 		super("request_invite", Level.ALL);
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos)
-	{
-		if (args.length == 1)
-		{
-			return getListOfStringsMatchingLastWord(args, EnumTeamStatus.VALID_VALUES);
+	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+		if (args.length == 1) {
+			return getListOfStringsFromIterableMatchingLastWord(args, EnumTeamStatus.VALID_VALUES);
 		}
 
-		return super.getTabCompletions(server, sender, args, pos);
+		return super.addTabCompletionOptions(sender, args);
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		ForgePlayer p = CommandUtils.getForgePlayer(getCommandSenderAsPlayer(sender));
 
-		if (p.hasTeam())
-		{
+		if (p.hasTeam()) {
 			throw FTBLib.error(sender, "ftblib.lang.team.error.must_leave");
 		}
 
@@ -56,24 +48,22 @@ public class CmdRequestInvite extends CmdBase
 
 		ForgeTeam team = Universe.get().getTeam(args[0]);
 
-		if (!team.isValid())
-		{
+		if (!team.isValid()) {
 			throw FTBLib.error(sender, "error", args[0]);
 		}
 
 		team.setRequestingInvite(p, true);
 
-		ITextComponent component = new TextComponentString("");
-		component.appendSibling(new TextComponentTranslation("ftblib.lang.team.gui.members.requesting_invite"));
+		IChatComponent component = new ChatComponentText("");
+		component.appendSibling(new ChatComponentTranslation("ftblib.lang.team.gui.members.requesting_invite"));
 		component.appendText(": ");
-		component.appendSibling(StringUtils.color(p.getDisplayName(), TextFormatting.BLUE));
-		component.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/team status " + p.getName() + " member"));
+		component.appendSibling(StringUtils.color(p.getDisplayName(), EnumChatFormatting.BLUE));
+		component.getChatStyle().setChatClickEvent(
+				new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/team status " + p.getName() + " member"));
 
-		for (ForgePlayer player : team.getPlayersWithStatus(EnumTeamStatus.MOD))
-		{
-			if (player.isOnline())
-			{
-				player.getPlayer().sendMessage(new TextComponentTranslation("ftblib.lang.team.gui.members.requesting_invite"));
+		for (ForgePlayer player : team.getPlayersWithStatus(EnumTeamStatus.MOD)) {
+			if (player.isOnline()) {
+				player.getPlayer().addChatMessage(new ChatComponentTranslation("ftblib.lang.team.gui.members.requesting_invite"));
 			}
 		}
 	}

@@ -2,22 +2,20 @@ package com.feed_the_beast.ftblib.lib.icon;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author LatvianModder
  */
-public class PartIcon extends IconWithParent
-{
+public class PartIcon extends IconWithParent {
 	public final Icon parent;
 	public int textureWidth, textureHeight;
 	public int posX, posY, corner, width, height;
 
 	private Icon all, middleU, middleD, middleL, middleR, cornerNN, cornerPN, cornerNP, cornerPP, center;
 
-	public PartIcon(Icon icon, int x, int y, int w, int h, int c)
-	{
+	public PartIcon(Icon icon, int x, int y, int w, int h, int c) {
 		super(icon);
 		parent = icon;
 		textureWidth = 256;
@@ -30,25 +28,21 @@ public class PartIcon extends IconWithParent
 		updateParts();
 	}
 
-	public PartIcon(Icon icon)
-	{
+	public PartIcon(Icon icon) {
 		this(icon, 0, 0, 256, 256, 6);
 	}
 
-	public PartIcon setTextureSize(int w, int h)
-	{
+	public PartIcon setTextureSize(int w, int h) {
 		textureWidth = w;
 		textureHeight = h;
 		return this;
 	}
 
-	private Icon get(int x, int y, int w, int h)
-	{
+	private Icon get(int x, int y, int w, int h) {
 		return parent.withUV(posX + x, posY + y, w, h, textureWidth, textureHeight);
 	}
 
-	public void updateParts()
-	{
+	public void updateParts() {
 		int mw = width - corner * 2;
 		int mh = height - corner * 2;
 		all = get(0, 0, width, height);
@@ -64,8 +58,7 @@ public class PartIcon extends IconWithParent
 	}
 
 	@Override
-	public PartIcon copy()
-	{
+	public PartIcon copy() {
 		PartIcon icon = new PartIcon(parent.copy());
 		icon.posX = posX;
 		icon.posY = posY;
@@ -78,8 +71,7 @@ public class PartIcon extends IconWithParent
 	}
 
 	@Override
-	protected void setProperties(IconProperties properties)
-	{
+	protected void setProperties(IconProperties properties) {
 		super.setProperties(properties);
 		posX = properties.getInt("x", posX);
 		posY = properties.getInt("y", posY);
@@ -91,12 +83,10 @@ public class PartIcon extends IconWithParent
 
 		String s = properties.getString("pos", "");
 
-		if (!s.isEmpty())
-		{
+		if (!s.isEmpty()) {
 			String[] s1 = s.split(",", 4);
 
-			if (s1.length == 4)
-			{
+			if (s1.length == 4) {
 				posX = Integer.parseInt(s1[0]);
 				posY = Integer.parseInt(s1[1]);
 				width = Integer.parseInt(s1[2]);
@@ -109,19 +99,16 @@ public class PartIcon extends IconWithParent
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void bindTexture()
-	{
+	public void bindTexture() {
 		parent.bindTexture();
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void draw(int x, int y, int w, int h)
-	{
+	public void draw(int x, int y, int w, int h) {
 		bindTexture();
 
-		if (w == width && h == height)
-		{
+		if (w == width && h == height) {
 			all.draw(x, y, w, h);
 			return;
 		}
@@ -144,8 +131,7 @@ public class PartIcon extends IconWithParent
 	}
 
 	@Override
-	public JsonElement getJson()
-	{
+	public JsonElement getJson() {
 		JsonObject json = new JsonObject();
 		json.addProperty("id", "part");
 		json.add("parent", parent.getJson());

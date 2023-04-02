@@ -1,6 +1,8 @@
 package com.feed_the_beast.ftblib.client;
 
 import com.feed_the_beast.ftblib.FTBLibConfig;
+import com.feed_the_beast.ftblib.client.resource.IResourceType;
+import com.feed_the_beast.ftblib.client.resource.ISelectiveResourceReloadListener;
 import com.feed_the_beast.ftblib.events.SidebarButtonCreatedEvent;
 import com.feed_the_beast.ftblib.lib.io.DataReader;
 import com.feed_the_beast.ftblib.lib.util.JsonUtils;
@@ -10,8 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.resource.IResourceType;
-import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -31,6 +33,7 @@ public enum SidebarButtonManager implements ISelectiveResourceReloadListener
 	public final List<SidebarButtonGroup> groups = new ArrayList<>();
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void onResourceManagerReload(IResourceManager manager, Predicate<IResourceType> resourcePredicate)
 	{
 		if (!resourcePredicate.test(FTBLibResourceType.FTB_CONFIG))
@@ -40,7 +43,7 @@ public enum SidebarButtonManager implements ISelectiveResourceReloadListener
 
 		groups.clear();
 
-		JsonElement element = DataReader.get(new File(Minecraft.getMinecraft().gameDir, "local/client/sidebar_buttons.json")).safeJson();
+		JsonElement element = DataReader.get(new File(Minecraft.getMinecraft().mcDataDir, "local/client/sidebar_buttons.json")).safeJson();
 		JsonObject sidebarButtonConfig;
 
 		if (element.isJsonObject())
@@ -54,11 +57,11 @@ public enum SidebarButtonManager implements ISelectiveResourceReloadListener
 
 		Map<ResourceLocation, SidebarButtonGroup> groupMap = new HashMap<>();
 
-		for (String domain : manager.getResourceDomains())
+		for (String domain : (Set<String>) manager.getResourceDomains())
 		{
 			try
 			{
-				for (IResource resource : manager.getAllResources(new ResourceLocation(domain, "sidebar_button_groups.json")))
+				for (IResource resource : (List<IResource>) manager.getAllResources(new ResourceLocation(domain, "sidebar_button_groups.json")))
 				{
 					JsonElement json = DataReader.get(resource).json();
 
@@ -89,11 +92,11 @@ public enum SidebarButtonManager implements ISelectiveResourceReloadListener
 			}
 		}
 
-		for (String domain : manager.getResourceDomains())
+		for (String domain : (Set<String>) manager.getResourceDomains())
 		{
 			try
 			{
-				for (IResource resource : manager.getAllResources(new ResourceLocation(domain, "sidebar_buttons.json")))
+				for (IResource resource : (List<IResource>) manager.getAllResources(new ResourceLocation(domain, "sidebar_buttons.json")))
 				{
 					JsonElement json = DataReader.get(resource).json();
 
@@ -126,13 +129,13 @@ public enum SidebarButtonManager implements ISelectiveResourceReloadListener
 
 								group.getButtons().add(button);
 
-								if (sidebarButtonConfig.has(button.id.getNamespace()))
+								if (sidebarButtonConfig.has(button.id.getResourceDomain()))
 								{
-									JsonElement e = sidebarButtonConfig.get(button.id.getNamespace());
+									JsonElement e = sidebarButtonConfig.get(button.id.getResourceDomain());
 
-									if (e.isJsonObject() && e.getAsJsonObject().has(button.id.getPath()))
+									if (e.isJsonObject() && e.getAsJsonObject().has(button.id.getResourcePath()))
 									{
-										button.setConfig(e.getAsJsonObject().get(button.id.getPath()).getAsBoolean());
+										button.setConfig(e.getAsJsonObject().get(button.id.getResourcePath()).getAsBoolean());
 									}
 								}
 								else if (sidebarButtonConfig.has(button.id.toString()))
@@ -183,18 +186,18 @@ public enum SidebarButtonManager implements ISelectiveResourceReloadListener
 		{
 			for (SidebarButton button : group.getButtons())
 			{
-				JsonObject o1 = o.getAsJsonObject(button.id.getNamespace());
+				JsonObject o1 = o.getAsJsonObject(button.id.getResourceDomain());
 
 				if (o1 == null)
 				{
 					o1 = new JsonObject();
-					o.add(button.id.getNamespace(), o1);
+					o.add(button.id.getResourceDomain(), o1);
 				}
 
-				o1.addProperty(button.id.getPath(), button.getConfig());
+				o1.addProperty(button.id.getResourcePath(), button.getConfig());
 			}
 		}
 
-		JsonUtils.toJsonSafe(new File(Minecraft.getMinecraft().gameDir, "local/client/sidebar_buttons.json"), o);
+		JsonUtils.toJsonSafe(new File(Minecraft.getMinecraft().mcDataDir, "local/client/sidebar_buttons.json"), o);
 	}
 }

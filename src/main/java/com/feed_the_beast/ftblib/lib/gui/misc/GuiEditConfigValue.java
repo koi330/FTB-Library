@@ -58,7 +58,7 @@ public class GuiEditConfigValue extends GuiBase
 			{
 				GuiHelper.playClickSound();
 
-				if (value.setValueFromString(Minecraft.getMinecraft().player, textBox.getText(), false))
+				if (value.setValueFromString(Minecraft.getMinecraft().thePlayer, textBox.getText(), false))
 				{
 					callback.onCallback(value, true);
 				}
@@ -95,7 +95,7 @@ public class GuiEditConfigValue extends GuiBase
 			@Override
 			public boolean isValid(String txt)
 			{
-				return value.setValueFromString(Minecraft.getMinecraft().player, txt, true);
+				return value.setValueFromString(Minecraft.getMinecraft().thePlayer, txt, true);
 			}
 
 			@Override

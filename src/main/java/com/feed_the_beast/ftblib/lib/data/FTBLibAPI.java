@@ -20,11 +20,15 @@ import com.feed_the_beast.ftblib.net.MessageEditConfig;
 import com.feed_the_beast.ftblib.net.MessageSyncData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.status.INetHandlerStatusClient;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,31 +36,24 @@ import java.util.UUID;
 /**
  * @author LatvianModder
  */
-public class FTBLibAPI
-{
-	public static void reloadServer(Universe universe, ICommandSender sender, EnumReloadType type, ResourceLocation id)
-	{
+public class FTBLibAPI {
+	public static void reloadServer(Universe universe, ICommandSender sender, EnumReloadType type,
+			ResourceLocation id) {
 		long ms = System.currentTimeMillis();
 		universe.clearCache();
 
 		HashSet<ResourceLocation> failed = new HashSet<>();
 		ServerReloadEvent event = new ServerReloadEvent(universe, sender, type, id, failed);
 
-		for (Map.Entry<ResourceLocation, IReloadHandler> entry : FTBLibCommon.RELOAD_IDS.entrySet())
-		{
-			try
-			{
-				if (event.reload(entry.getKey()) && !entry.getValue().onReload(event))
-				{
+		for (Map.Entry<ResourceLocation, IReloadHandler> entry : FTBLibCommon.RELOAD_IDS.entrySet()) {
+			try {
+				if (event.reload(entry.getKey()) && !entry.getValue().onReload(event)) {
 					event.failedToReload(entry.getKey());
 				}
-			}
-			catch (Exception ex)
-			{
+			} catch (Exception ex) {
 				event.failedToReload(entry.getKey());
 
-				if (FTBLibConfig.debugging.print_more_errors)
-				{
+				if (FTBLibConfig.debugging.print_more_errors) {
 					ex.printStackTrace();
 				}
 			}
@@ -64,34 +61,33 @@ public class FTBLibAPI
 
 		event.post();
 
-		for (EntityPlayerMP player : universe.server.getPlayerList().getPlayers())
-		{
+		for (EntityPlayerMP player : (List<EntityPlayerMP>) universe.server.getConfigurationManager().playerEntityList) {
 			ForgePlayer p = universe.getPlayer(player);
 			new MessageSyncData(false, player, p).sendTo(player);
 		}
 
 		String millis = (System.currentTimeMillis() - ms) + "ms";
 
-		if (type == EnumReloadType.RELOAD_COMMAND)
-		{
-			for (EntityPlayerMP player : universe.server.getPlayerList().getPlayers())
-			{
+		if (type == EnumReloadType.RELOAD_COMMAND) {
+			for (EntityPlayerMP player : (List<EntityPlayerMP>) universe.server.getConfigurationManager().playerEntityList) {
 				Notification notification = Notification.of(FTBLibNotifications.RELOAD_SERVER);
 				notification.addLine(FTBLib.lang(player, "ftblib.lang.reload_server", millis));
 
-				if (event.isClientReloadRequired())
-				{
-					notification.addLine(FTBLib.lang(player, "ftblib.lang.reload_client", StringUtils.color(new TextComponentString("F3 + T"), TextFormatting.GOLD)));
+				if (event.isClientReloadRequired()) {
+					notification.addLine(FTBLib.lang(player, "ftblib.lang.reload_client",
+							StringUtils.color(new ChatComponentText("F3 + T"), EnumChatFormatting.GOLD)));
 				}
 
-				if (!failed.isEmpty())
-				{
-					notification.addLine(StringUtils.color(FTBLib.lang(player, "ftblib.lang.reload_failed"), TextFormatting.RED));
+				if (!failed.isEmpty()) {
+					notification.addLine(
+							StringUtils.color(FTBLib.lang(player, "ftblib.lang.reload_failed"),
+									EnumChatFormatting.RED));
 					FTBLib.LOGGER.warn("These IDs failed to reload:");
 
-					for (ResourceLocation f : failed)
-					{
-						notification.addLine(StringUtils.color(new TextComponentString(f.toString()), TextFormatting.RED));
+					for (ResourceLocation f : failed) {
+						notification
+								.addLine(
+										StringUtils.color(new ChatComponentText(f.toString()), EnumChatFormatting.RED));
 						FTBLib.LOGGER.warn("- " + f);
 					}
 				}
@@ -101,21 +97,19 @@ public class FTBLibAPI
 				notification.send(universe.server, player);
 			}
 		}
-
-		universe.server.reload();
+		reload(universe.server);
+		// universe.server.reload();
 		FTBLib.LOGGER.info("Reloaded server in " + millis);
 	}
 
-	public static void editServerConfig(EntityPlayerMP player, ConfigGroup group, IConfigCallback callback)
-	{
-		FTBLibCommon.TEMP_SERVER_CONFIG.put(player.getGameProfile().getId(), new FTBLibCommon.EditingConfig(group, callback));
+	public static void editServerConfig(EntityPlayerMP player, ConfigGroup group, IConfigCallback callback) {
+		FTBLibCommon.TEMP_SERVER_CONFIG.put(player.getGameProfile().getId(),
+				new FTBLibCommon.EditingConfig(group, callback));
 		new MessageEditConfig(group).sendTo(player);
 	}
 
-	public static ConfigValue createConfigValueFromId(String id)
-	{
-		if (id.isEmpty())
-		{
+	public static ConfigValue createConfigValueFromId(String id) {
+		if (id.isEmpty()) {
 			return ConfigNull.INSTANCE;
 		}
 
@@ -125,29 +119,24 @@ public class FTBLibAPI
 		return value == null || value.isNull() ? ConfigNull.INSTANCE : value;
 	}
 
-	public static void sendCloseGuiPacket(EntityPlayerMP player)
-	{
+	public static void sendCloseGuiPacket(EntityPlayerMP player) {
 		new MessageCloseGui().sendTo(player);
 	}
 
 	/**
-	 * Helper method for other mods so they don't have to deal with other classes than this
+	 * Helper method for other mods so they don't have to deal with other classes
+	 * than this
 	 */
-	public static boolean arePlayersInSameTeam(UUID player1, UUID player2)
-	{
-		if (!Universe.loaded())
-		{
+	public static boolean arePlayersInSameTeam(UUID player1, UUID player2) {
+		if (!Universe.loaded()) {
 			return false;
-		}
-		else if (player1 == player2 || player1.equals(player2))
-		{
+		} else if (player1 == player2 || player1.equals(player2)) {
 			return true;
 		}
 
 		ForgePlayer p1 = Universe.get().getPlayer(player1);
 
-		if (p1 == null || !p1.hasTeam())
-		{
+		if (p1 == null || !p1.hasTeam()) {
 			return false;
 		}
 
@@ -155,44 +144,36 @@ public class FTBLibAPI
 		return p2 != null && p2.hasTeam() && p1.team.equalsTeam(p2.team);
 	}
 
-	public static boolean isPlayerInTeam(UUID player, String team)
-	{
-		if (!Universe.loaded())
-		{
+	public static boolean isPlayerInTeam(UUID player, String team) {
+		if (!Universe.loaded()) {
 			return false;
 		}
 
 		ForgePlayer p = Universe.get().getPlayer(player);
 
-		if (p == null)
-		{
+		if (p == null) {
 			return false;
 		}
 
 		return p.hasTeam() ? p.team.getId().equals(team) : team.isEmpty();
 	}
 
-	public static boolean isPlayerInTeam(UUID player, int team)
-	{
-		if (!Universe.loaded())
-		{
+	public static boolean isPlayerInTeam(UUID player, int team) {
+		if (!Universe.loaded()) {
 			return false;
 		}
 
 		ForgePlayer p = Universe.get().getPlayer(player);
 
-		if (p == null)
-		{
+		if (p == null) {
 			return false;
 		}
 
 		return p.hasTeam() ? p.team.getUID() == team : team == 0;
 	}
 
-	public static String getTeam(UUID player)
-	{
-		if (!Universe.loaded())
-		{
+	public static String getTeam(UUID player) {
+		if (!Universe.loaded()) {
 			return "";
 		}
 
@@ -200,14 +181,28 @@ public class FTBLibAPI
 		return p == null ? "" : p.team.getId();
 	}
 
-	public static short getTeamID(UUID player)
-	{
-		if (!Universe.loaded())
-		{
+	public static short getTeamID(UUID player) {
+		if (!Universe.loaded()) {
 			return 0;
 		}
 
 		ForgePlayer p = Universe.get().getPlayer(player);
 		return p == null ? 0 : p.team.getUID();
 	}
+
+	public static void reload(MinecraftServer server)
+	{
+		//TODO: check if this is important
+		if (Thread.currentThread().getName().equals("Server thread")) {
+			server.getConfigurationManager().saveAllPlayerData();
+			// server.worldServers[0].getLootTableManager().reloadLootTables();
+			// server.getAdvancementManager().reload();
+			// server.getFunctionManager().reload();
+			// server.getConfigurationManager().reloadResources();
+		} else {
+			// server.addScheduledTask((s) -> reload(s));
+		}
+
+	}
+
 }

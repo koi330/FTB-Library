@@ -2,7 +2,7 @@ package com.feed_the_beast.ftblib.lib.util.misc;
 
 import com.feed_the_beast.ftblib.lib.gui.GuiIcons;
 import com.feed_the_beast.ftblib.lib.icon.Icon;
-import net.minecraft.util.IStringSerializable;
+import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 
 /**
  * @author LatvianModder

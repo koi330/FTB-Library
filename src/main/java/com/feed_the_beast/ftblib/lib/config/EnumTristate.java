@@ -1,25 +1,25 @@
 package com.feed_the_beast.ftblib.lib.config;
 
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
+import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
+
+import cpw.mods.fml.common.eventhandler.Event;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraft.util.ChatComponentTranslation;
 
 /**
  * @author LatvianModder
  */
-public enum EnumTristate implements IStringSerializable
-{
+public enum EnumTristate implements IStringSerializable {
 	TRUE("true", Event.Result.ALLOW, ConfigBoolean.COLOR_TRUE, 1),
 	FALSE("false", Event.Result.DENY, ConfigBoolean.COLOR_FALSE, 0),
 	DEFAULT("default", Event.Result.DEFAULT, ConfigEnum.COLOR, 2);
 
-	public static final NameMap<EnumTristate> NAME_MAP = NameMap.createWithNameAndColor(DEFAULT, (sender, value) -> new TextComponentTranslation(value.getName()), EnumTristate::getColor, values());
+	public static final NameMap<EnumTristate> NAME_MAP = NameMap.createWithNameAndColor(DEFAULT,
+			(sender, value) -> new ChatComponentTranslation(value.getName()), EnumTristate::getColor, values());
 
-	public static EnumTristate read(NBTTagCompound nbt, String key)
-	{
+	public static EnumTristate read(NBTTagCompound nbt, String key) {
 		return nbt.hasKey(key) ? nbt.getBoolean(key) ? TRUE : FALSE : DEFAULT;
 	}
 
@@ -28,8 +28,7 @@ public enum EnumTristate implements IStringSerializable
 	private final Color4I color;
 	private final int opposite;
 
-	EnumTristate(String s, Event.Result r, Color4I c, int o)
-	{
+	EnumTristate(String s, Event.Result r, Color4I c, int o) {
 		name = s;
 		result = r;
 		color = c;
@@ -37,55 +36,44 @@ public enum EnumTristate implements IStringSerializable
 	}
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 
-	public Event.Result getResult()
-	{
+	public Event.Result getResult() {
 		return result;
 	}
 
-	public Color4I getColor()
-	{
+	public Color4I getColor() {
 		return color;
 	}
 
-	public boolean isTrue()
-	{
+	public boolean isTrue() {
 		return this == TRUE;
 	}
 
-	public boolean isFalse()
-	{
+	public boolean isFalse() {
 		return this == FALSE;
 	}
 
-	public boolean isDefault()
-	{
+	public boolean isDefault() {
 		return this == DEFAULT;
 	}
 
-	public boolean get(boolean def)
-	{
+	public boolean get(boolean def) {
 		return isDefault() ? def : isTrue();
 	}
 
-	public EnumTristate getOpposite()
-	{
+	public EnumTristate getOpposite() {
 		return NAME_MAP.get(opposite);
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return name;
 	}
 
-	public void write(NBTTagCompound nbt, String key)
-	{
-		if (!isDefault())
-		{
+	public void write(NBTTagCompound nbt, String key) {
+		if (!isDefault()) {
 			nbt.setBoolean(key, isTrue());
 		}
 	}

@@ -8,7 +8,7 @@ import com.feed_the_beast.ftblib.lib.gui.WidgetType;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,43 +17,39 @@ import java.util.function.Consumer;
 /**
  * @author LatvianModder
  */
-public class GuiActionList extends GuiButtonListBase
-{
-	private class ActionButton extends SimpleTextButton
-	{
+public class GuiActionList extends GuiButtonListBase {
+	private class ActionButton extends SimpleTextButton {
 		private final Action.Inst action;
 
-		private ActionButton(Panel panel, Action.Inst a)
-		{
+		private ActionButton(Panel panel, Action.Inst a) {
 			super(panel, a.title.getFormattedText(), a.icon);
 			action = a;
 		}
 
 		@Override
-		public void onClicked(MouseButton button)
-		{
+		public void onClicked(MouseButton button) {
 			GuiHelper.playClickSound();
 
-			if (action.requiresConfirm)
-			{
-				String key = "team_action." + action.id.getNamespace() + "." + action.id.getPath() + ".confirmation";
-				openYesNo(action.title.getFormattedText() + "?", I18n.hasKey(key) ? (TextFormatting.RED + I18n.format(key)) : "", () -> callback.accept(action.id));
-			}
-			else
-			{
+			if (action.requiresConfirm) {
+				String key = "team_action." + action.id.getResourceDomain() + "." + action.id.getResourcePath() + ".confirmation";
+				openYesNo(action.title.getFormattedText() + "?",
+						// I18n.hasKey(key)
+						//TODO: this might be bad
+						true
+						? (EnumChatFormatting.RED + I18n.format(key)) : "",
+						() -> callback.accept(action.id));
+			} else {
 				callback.accept(action.id);
 			}
 		}
 
 		@Override
-		public boolean renderTitleInCenter()
-		{
+		public boolean renderTitleInCenter() {
 			return false;
 		}
 
 		@Override
-		public WidgetType getWidgetType()
-		{
+		public WidgetType getWidgetType() {
 			return action.enabled ? WidgetType.mouseOver(isMouseOver()) : WidgetType.DISABLED;
 		}
 	}
@@ -61,8 +57,7 @@ public class GuiActionList extends GuiButtonListBase
 	private final ArrayList<Action.Inst> actions;
 	private final Consumer<ResourceLocation> callback;
 
-	public GuiActionList(String title, Collection<Action.Inst> a, Consumer<ResourceLocation> c)
-	{
+	public GuiActionList(String title, Collection<Action.Inst> a, Consumer<ResourceLocation> c) {
 		setTitle(title);
 		actions = new ArrayList<>(a);
 		actions.sort(null);
@@ -70,10 +65,8 @@ public class GuiActionList extends GuiButtonListBase
 	}
 
 	@Override
-	public void addButtons(Panel panel)
-	{
-		for (Action.Inst a : actions)
-		{
+	public void addButtons(Panel panel) {
+		for (Action.Inst a : actions) {
 			panel.add(new ActionButton(panel, a));
 		}
 	}

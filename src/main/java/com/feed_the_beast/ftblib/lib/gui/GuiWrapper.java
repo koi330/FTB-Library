@@ -1,17 +1,16 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
-import com.feed_the_beast.ftblib.integration.FTBLibJEIIntegration;
-import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.client.config.GuiUtils;
-import net.minecraftforge.fml.common.Loader;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+
+import cpw.mods.fml.common.Loader;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.item.ItemStack;
 
 /**
  * @author LatvianModder
@@ -40,7 +39,7 @@ public class GuiWrapper extends GuiScreen implements IGuiWrapper
 	}
 
 	@Override
-	protected final void mouseClicked(int mouseX, int mouseY, int button) throws IOException
+	protected final void mouseClicked(int mouseX, int mouseY, int button)
 	{
 		wrappedGui.updateMouseOver(mouseX, mouseY);
 
@@ -56,11 +55,11 @@ public class GuiWrapper extends GuiScreen implements IGuiWrapper
 	}
 
 	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int button)
+	protected void mouseMovedOrUp(int mouseX, int mouseY, int button)
 	{
 		wrappedGui.updateMouseOver(mouseX, mouseY);
 		wrappedGui.mouseReleased(MouseButton.get(button));
-		super.mouseReleased(mouseX, mouseY, button);
+		super.mouseMovedOrUp(mouseX, mouseY, button);
 	}
 
 	@Override
@@ -90,34 +89,31 @@ public class GuiWrapper extends GuiScreen implements IGuiWrapper
 
 	private void handleIngredientKey(int key, Object object)
 	{
-		FTBLibJEIIntegration.handleIngredientKey(key, object);
+		//TODO: this was a hack from ftblib
+		// FTBLibJEIIntegration.handleIngredientKey(key, object);
 	}
 
 	@Override
-	public void handleMouseInput() throws IOException
+	public void handleMouseInput()
 	{
 		super.handleMouseInput();
 		int scroll = Mouse.getEventDWheel();
 
-		if (scroll != 0)
-		{
+		if (scroll != 0) {
 			wrappedGui.mouseScrolled(scroll / 120);
 		}
 	}
 
 	@Override
-	public void handleKeyboardInput() throws IOException
+	public void handleKeyboardInput()
 	{
-		if (!(Keyboard.getEventKey() == 0 && Keyboard.getEventCharacter() >= ' ' || Keyboard.getEventKeyState()))
-		{
+		if (!(Keyboard.getEventKey() == 0 && Keyboard.getEventCharacter() >= ' ' || Keyboard.getEventKeyState())) {
 			wrappedGui.keyReleased(Keyboard.getEventKey());
-		}
-		else
-		{
+		} else {
 			super.handleKeyboardInput();
 		}
 	}
-
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks)
 	{
@@ -154,7 +150,7 @@ public class GuiWrapper extends GuiScreen implements IGuiWrapper
 			{
 				Object ingredient = WrappedIngredient.unwrap(object);
 
-				if (ingredient instanceof ItemStack && !((ItemStack) ingredient).isEmpty())
+				if (ingredient instanceof ItemStack && ((ItemStack) ingredient) != null)
 				{
 					renderToolTip((ItemStack) ingredient, mouseX, mouseY);
 				}
@@ -162,7 +158,7 @@ public class GuiWrapper extends GuiScreen implements IGuiWrapper
 		}
 		else
 		{
-			GuiUtils.drawHoveringText(tempTextList, mouseX, Math.max(mouseY, 18), wrappedGui.getScreen().getScaledWidth(), wrappedGui.getScreen().getScaledHeight(), 0, theme.getFont());
+			drawHoveringText(tempTextList, mouseX, Math.max(mouseY, 18), theme.getFont());
 		}
 
 		tempTextList.clear();

@@ -1,5 +1,14 @@
 package com.feed_the_beast.ftblib.client;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
 import com.feed_the_beast.ftblib.lib.OtherMods;
 import com.feed_the_beast.ftblib.lib.client.ClientUtils;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
@@ -11,17 +20,10 @@ import com.feed_the_beast.ftblib.lib.util.JsonUtils;
 import com.feed_the_beast.ftblib.lib.util.SidedUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import cpw.mods.fml.common.Loader;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Loader;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * @author LatvianModder
@@ -128,7 +130,7 @@ public class SidebarButton implements Comparable<SidebarButton>
 
 	public String getLangKey()
 	{
-		return "sidebar_button." + id.getNamespace() + '.' + id.getPath();
+		return "sidebar_button." + id.getResourceDomain() + '.' + id.getResourcePath();
 	}
 
 	public String getTooltipLangKey()
