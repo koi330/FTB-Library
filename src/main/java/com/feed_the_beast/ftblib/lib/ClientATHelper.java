@@ -1,13 +1,12 @@
 package com.feed_the_beast.ftblib.lib;
 
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
  * @author LatvianModder

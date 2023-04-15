@@ -100,8 +100,9 @@ public class GuiSelectItemStack extends GuiBase {
 
 		@Override
 		public void drawIcon(Theme theme, int x, int y, int w, int h) {
-			if (stack.getItem() == FTBLib.CUSTOM_ICON_ITEM && stack.hasTagCompound()
-					&& !stack.getTagCompound().getString("icon").isEmpty()) {
+			// if (stack.getItem() == FTBLib.CUSTOM_ICON_ITEM && stack.hasTagCompound()
+			// 		&& !stack.getTagCompound().getString("icon").isEmpty()) {
+			if (!stack.getTagCompound().getString("icon").isEmpty()) {
 				Icon.getIcon(stack.getTagCompound().getString("icon")).draw(x, y, w, h);
 			} else {
 				GuiHelper.drawItem(stack, x, y, w / 16D, h / 16D, true);

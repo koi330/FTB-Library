@@ -1,9 +1,5 @@
 package com.feed_the_beast.ftblib.lib;
 
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommand;
 import net.minecraft.event.ClickEvent;
@@ -11,6 +7,9 @@ import net.minecraft.event.HoverEvent;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
+
+import javax.annotation.Nullable;
+import java.util.Set;
 
 /**
  * @author LatvianModder

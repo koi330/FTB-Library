@@ -1,17 +1,16 @@
 package com.feed_the_beast.ftblib.lib;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.function.BiFunction;
-
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
-
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.function.BiFunction;
 
 /**
  * @author LatvianModder

@@ -1,15 +1,13 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import java.util.HashMap;
-
 import javax.annotation.Nullable;
-
-import cpw.mods.fml.common.network.IGuiHandler;
+import java.util.HashMap;
 
 /**
  * @author LatvianModder

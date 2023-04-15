@@ -1,10 +1,6 @@
 package com.feed_the_beast.ftblib.lib.io;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Made by LatvianModder

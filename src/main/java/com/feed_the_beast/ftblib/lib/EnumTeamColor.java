@@ -4,7 +4,6 @@ import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.util.EnumDyeColorHelper;
 import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
-
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 

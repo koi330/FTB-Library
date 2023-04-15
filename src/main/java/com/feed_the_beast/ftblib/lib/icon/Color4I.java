@@ -23,6 +23,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 
 /**
  * @author LatvianModder
@@ -246,9 +247,9 @@ public class Color4I extends Icon {
 		return rgb((int) (r * 255D), (int) (g * 255D), (int) (b * 255D));
 	}
 
-	// public static Color4I rgb(Vec3d color) {
-	// 	return rgb((int) (color.x * 255D), (int) (color.y * 255D), (int) (color.z * 255D));
-	// }
+	 public static Color4I rgb(Vec3 color) {
+	 	return rgb((int) (color.xCoord * 255D), (int) (color.yCoord * 255D), (int) (color.zCoord * 255D));
+	 }
 
 	int red, green, blue, alpha;
 

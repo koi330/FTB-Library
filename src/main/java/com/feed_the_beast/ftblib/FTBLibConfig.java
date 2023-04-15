@@ -2,7 +2,6 @@ package com.feed_the_beast.ftblib;
 
 import com.feed_the_beast.ftblib.lib.config.EnumTristate;
 
-import codechicken.lib.config.ConfigFile;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
