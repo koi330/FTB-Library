@@ -3,48 +3,44 @@ package com.feed_the_beast.ftblib.client;
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.FTBLibConfig;
 import com.feed_the_beast.ftblib.events.client.CustomClickEvent;
-import com.feed_the_beast.ftblib.lib.ClientATHelper;
 import com.feed_the_beast.ftblib.lib.client.ClientUtils;
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.gui.GuiIcons;
+import com.feed_the_beast.ftblib.lib.gui.Widget;
 import com.feed_the_beast.ftblib.lib.icon.AtlasSpriteIcon;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.icon.IconPresets;
 import com.feed_the_beast.ftblib.lib.icon.IconRenderer;
 import com.feed_the_beast.ftblib.lib.util.InvUtils;
 import com.feed_the_beast.ftblib.lib.util.NBTUtils;
-import com.feed_the_beast.ftblib.lib.util.SidedUtils;
 import com.feed_the_beast.ftblib.lib.util.text_components.Notification;
 import com.feed_the_beast.ftblib.net.MessageAdminPanelGui;
 import com.feed_the_beast.ftblib.net.MessageMyTeamGui;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.asm.transformers.EventSubscriptionTransformer;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,23 +56,23 @@ public class FTBLibClientEventHandler {
 	public static Rectangle lastDrawnArea = new Rectangle();
 	public static boolean shouldRenderIcons = false;
 
-	private static final IChatListener CHAT_LISTENER = (type, component) -> {
-		if (type == ChatType.GAME_INFO) {
-			if (component instanceof Notification || FTBLibClientConfig.replace_vanilla_status_messages) {
-				ResourceLocation id = component instanceof Notification ? ((Notification) component).getId()
-						: Notification.VANILLA_STATUS;
-				Temp.MAP.remove(id);
-
-				if (currentNotification != null && currentNotification.widget.id.equals(id)) {
-					currentNotification = null;
-				}
-
-				Temp.MAP.put(id, component);
-			} else {
-				Minecraft.getMinecraft().ingameGUI.setOverlayMessage(component.getFormattedText(), false);
-			}
-		}
-	};
+//	private static final IChatListener CHAT_LISTENER = (type, component) -> {
+//		if (type == ChatType.GAME_INFO) {
+//			if (component instanceof Notification || FTBLibClientConfig.replace_vanilla_status_messages) {
+//				ResourceLocation id = component instanceof Notification ? ((Notification) component).getId()
+//						: Notification.VANILLA_STATUS;
+//				Temp.MAP.remove(id);
+//
+//				if (currentNotification != null && currentNotification.widget.id.equals(id)) {
+//					currentNotification = null;
+//				}
+//
+//				Temp.MAP.put(id, component);
+//			} else {
+//				Minecraft.getMinecraft().ingameGUI.setOverlayMessage(component.getFormattedText(), false);
+//			}
+//		}
+//	};
 
 	public static class NotificationWidget {
 		public final IChatComponent notification;
@@ -157,7 +153,7 @@ public class FTBLibClientEventHandler {
 
 			for (int i = 0; i < widget.text.size(); i++) {
 				String string = widget.text.get(i);
-				widget.font.drawStringWithShadow(string, -widget.font.getStringWidth(string) / 2F, offy + i * 11,
+				widget.font.drawStringWithShadow(string, (int) (-widget.font.getStringWidth(string) / 2F), offy + i * 11,
 						0xFFFFFF | (alpha << 24));
 			}
 
@@ -183,36 +179,36 @@ public class FTBLibClientEventHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public static void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-		SidedUtils.UNIVERSE_UUID_CLIENT = null;
-		currentNotification = null;
-		Temp.MAP.clear();
-		ClientATHelper.getChatListeners().get(ChatType.GAME_INFO).clear();
-		ClientATHelper.getChatListeners().get(ChatType.GAME_INFO).add(CHAT_LISTENER);
-	}
+//	@SubscribeEvent
+//	public static void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+//		SidedUtils.UNIVERSE_UUID_CLIENT = null;
+//		currentNotification = null;
+//		Temp.MAP.clear();
+//		ClientATHelper.getChatListeners().get(ChatType.GAME_INFO).clear();
+//		ClientATHelper.getChatListeners().get(ChatType.GAME_INFO).add(CHAT_LISTENER);
+//	}
 
 	@SubscribeEvent
 	public static void onTooltip(ItemTooltipEvent event) {
 		if (FTBLibClientConfig.item_ore_names) {
-			Collection<String> ores = InvUtils.getOreNames(null, event.getItemStack());
+			Collection<String> ores = InvUtils.getOreNames(null, event.itemStack);
 
 			if (!ores.isEmpty()) {
-				event.getToolTip().add(I18n.format("ftblib_client.general.item_ore_names.item_tooltip"));
+				event.toolTip.add(I18n.format("ftblib_client.general.item_ore_names.item_tooltip"));
 
 				for (String or : ores) {
-					event.getToolTip().add("> " + or);
+					event.toolTip.add("> " + or);
 				}
 			}
 		}
 
 		if (FTBLibClientConfig.item_nbt && GuiScreen.isShiftKeyDown()) {
-			NBTTagCompound nbt = GuiScreen.isAltKeyDown()
-					? event.getItemStack().getItem().getNBTShareTag(event.getItemStack())
-					: event.getItemStack().getTagCompound();
+			NBTTagCompound nbt = Widget.isAltKeyDown()
+					? event.itemStack.writeToNBT(new NBTTagCompound())
+					: event.itemStack.getTagCompound();
 
 			if (nbt != null) {
-				event.getToolTip().add(NBTUtils.getColoredNBTString(nbt));
+				event.toolTip.add(NBTUtils.getColoredNBTString(nbt));
 			}
 		}
 	}
@@ -221,8 +217,8 @@ public class FTBLibClientEventHandler {
 	public static void onGuiInit(final GuiScreenEvent.InitGuiEvent.Post event) {
 		// sidebarButtonScale = 0D;
 
-		if (areButtonsVisible(event.getGui())) {
-			event.getButtonList().add(new GuiButtonSidebarGroup((InventoryEffectRenderer) event.getGui()));
+		if (areButtonsVisible(event.gui)) {
+			event.buttonList.add(new GuiButtonSidebarGroup((InventoryEffectRenderer) event.gui));
 		}
 	}
 
@@ -234,7 +230,7 @@ public class FTBLibClientEventHandler {
 	@SubscribeEvent
 	public static void onClientTick(TickEvent.ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
-			if (Minecraft.getMinecraft().world == null) {
+			if (Minecraft.getMinecraft().theWorld == null) {
 				currentNotification = null;
 				Temp.MAP.clear();
 			}
@@ -263,7 +259,7 @@ public class FTBLibClientEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
 	public static void onGameOverlayRender(RenderGameOverlayEvent.Text event) {
 		if (currentNotification != null && !currentNotification.isImportant()) {
-			currentNotification.render(event.getResolution(), event.getPartialTicks());
+			currentNotification.render(event.resolution, event.partialTicks);
 			GlStateManager.color(1F, 1F, 1F, 1F);
 			GlStateManager.disableLighting();
 			GlStateManager.enableBlend();
@@ -278,7 +274,8 @@ public class FTBLibClientEventHandler {
 				IconRenderer.render();
 			}
 		} else if (currentNotification != null && currentNotification.isImportant()) {
-			currentNotification.render(new ScaledResolution(Minecraft.getMinecraft()), event.renderTickTime);
+			Minecraft mc = Minecraft.getMinecraft();
+			currentNotification.render(new ScaledResolution(mc, mc.displayWidth, mc.displayHeight), event.renderTickTime);
 			GlStateManager.color(1F, 1F, 1F, 1F);
 			GlStateManager.disableLighting();
 			GlStateManager.enableBlend();
@@ -294,7 +291,7 @@ public class FTBLibClientEventHandler {
 	public static void onDebugInfoEvent(RenderGameOverlayEvent.Text event) {
 		if (FTBLibClientConfig.debug_helper && !Minecraft.getMinecraft().gameSettings.showDebugInfo
 				&& Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-			event.getLeft().add(I18n.format("debug.help.help"));
+			event.left.add(I18n.format("debug.help.help"));
 		}
 	}
 
@@ -307,7 +304,7 @@ public class FTBLibClientEventHandler {
 
 				if (o instanceof AtlasSpriteIcon) {
 					AtlasSpriteIcon a = (AtlasSpriteIcon) o;
-					event.getMap().registerSprite(new ResourceLocation(a.name));
+					event.map.registerIcon(a.name);
 					IconPresets.MAP.put(a.name, a);
 				}
 			}
@@ -320,8 +317,8 @@ public class FTBLibClientEventHandler {
 
 	@SubscribeEvent
 	public static void onCustomClick(CustomClickEvent event) {
-		if (event.getID().getNamespace().equals(FTBLib.MOD_ID)) {
-			switch (event.getID().getPath()) {
+		if (event.getID().getResourceDomain().equals(FTBLib.MOD_ID)) {
+			switch (event.getID().getResourcePath()) {
 				case "client_config_gui":
 					new GuiClientConfig().openGui();
 					break;
@@ -361,13 +358,13 @@ public class FTBLibClientEventHandler {
 		}
 
 		@Override
-		public void drawButton(Minecraft mc, int mx, int my, float partialTicks) {
+		public void drawButton(Minecraft mc, int mx, int my) {
 			buttons.clear();
 			mouseOver = null;
 			int rx, ry = 0;
 			boolean addedAny;
-			boolean top = FTBLibClientConfig.action_buttons.top() || !gui.mc.player.getActivePotionEffects().isEmpty()
-					|| (gui instanceof GuiInventory && ((GuiInventory) gui).func_194310_f().isVisible());
+			boolean top = FTBLibClientConfig.action_buttons.top() || !gui.mc.thePlayer.getActivePotionEffects().isEmpty();
+//					|| (gui instanceof GuiInventory && ((GuiInventory) gui).func_194310_f().isVisible());
 
 			for (SidebarButtonGroup group : SidebarButtonManager.INSTANCE.groups) {
 				rx = 0;
@@ -386,8 +383,8 @@ public class FTBLibClientEventHandler {
 				}
 			}
 
-			int guiLeft = gui.getGuiLeft();
-			int guiTop = gui.getGuiTop();
+			int guiLeft = gui.guiLeft;
+			int guiTop = gui.guiTop;
 
 			if (top) {
 				for (GuiButtonSidebar button : buttons) {
@@ -407,8 +404,8 @@ public class FTBLibClientEventHandler {
 				}
 			}
 
-			x = Integer.MAX_VALUE;
-			y = Integer.MAX_VALUE;
+			int x = Integer.MAX_VALUE;
+			int y = Integer.MAX_VALUE;
 			int maxX = Integer.MIN_VALUE;
 			int maxY = Integer.MIN_VALUE;
 
