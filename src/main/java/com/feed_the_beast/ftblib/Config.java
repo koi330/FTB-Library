@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Config {
+    //TODO: NEED TO GET THIS WORKING FULLY
 
     String modid();
 
