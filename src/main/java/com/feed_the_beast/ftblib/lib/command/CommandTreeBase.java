@@ -90,22 +90,22 @@ public abstract class CommandTreeBase extends CommandBase {
             List<String> keys = new ArrayList<>();
 
             for (ICommand c : getSubCommands()) {
-                if (c.checkPermission(MinecraftServer.getServer(), sender)) {
-                    keys.add(c.getName());
+                if (c.canCommandSenderUseCommand(sender)) {
+                    keys.add(c.getCommandName());
                 }
             }
 
             keys.sort(null);
-            return getListOfStringsMatchingLastWord(args, keys);
+            return getListOfStringsFromIterableMatchingLastWord(args, keys);
         }
 
         ICommand cmd = getSubCommand(args[0]);
 
         if (cmd != null) {
-            return cmd.getTabCompletions(MinecraftServer.getServer(), sender, shiftArgs(args), pos);
+            return cmd.addTabCompletionOptions(sender, shiftArgs(args));
         }
 
-        return super.getTabCompletions(MinecraftServer.getServer(), sender, args, pos);
+        return super.addTabCompletionOptions(sender, args);
     }
 
     @Override
@@ -124,8 +124,7 @@ public abstract class CommandTreeBase extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 1) {
             String subCommandsString = getAvailableSubCommandsString(MinecraftServer.getServer(), sender);
-            sender.sendMessage(ChatComponentTranslation.createComponentTranslation(sender,
-                    "commands.tree_base.available_subcommands", subCommandsString));
+            sender.addChatMessage(new ChatComponentTranslation("commands.tree_base.available_subcommands", subCommandsString));
         } else {
             ICommand cmd = getSubCommand(args[0]);
 
@@ -133,10 +132,10 @@ public abstract class CommandTreeBase extends CommandBase {
                 String subCommandsString = getAvailableSubCommandsString(MinecraftServer.getServer(), sender);
                 throw new CommandException("commands.tree_base.invalid_cmd.list_subcommands", args[0],
                         subCommandsString);
-            } else if (!cmd.checkPermission(MinecraftServer.getServer(), sender)) {
+            } else if (!cmd.canCommandSenderUseCommand(sender)) {
                 throw new CommandException("commands.generic.permission");
             } else {
-                cmd.processCommand(MinecraftServer.getServer(), sender, shiftArgs(args));
+                cmd.processCommand(sender, shiftArgs(args));
             }
         }
     }
@@ -144,8 +143,8 @@ public abstract class CommandTreeBase extends CommandBase {
     private String getAvailableSubCommandsString(MinecraftServer server, ICommandSender sender) {
         Collection<String> availableCommands = new ArrayList<>();
         for (ICommand command : getSubCommands()) {
-            if (command.checkPermission(server, sender)) {
-                availableCommands.add(command.getName());
+            if (command.canCommandSenderUseCommand(sender)) {
+                availableCommands.add(command.getCommandName());
             }
         }
         return CommandBase.joinNiceStringFromCollection(availableCommands);

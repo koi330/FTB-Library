@@ -3,8 +3,6 @@ package com.feed_the_beast.ftblib.lib.command;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.command.CommandTreeBase;
 
 /**
  * @author LatvianModder
@@ -31,7 +29,7 @@ public class CmdTreeBase extends CommandTreeBase implements ICommandWithParent
 	}
 
 	@Override
-	public final String getName()
+	public final String getCommandName()
 	{
 		return name;
 	}
@@ -53,11 +51,11 @@ public class CmdTreeBase extends CommandTreeBase implements ICommandWithParent
 	}
 
 	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+	public boolean canCommandSenderUseCommand(ICommandSender sender)
 	{
 		for (ICommand command : getSubCommands())
 		{
-			if (command.checkPermission(server, sender))
+			if (command.canCommandSenderUseCommand(sender))
 			{
 				return true;
 			}

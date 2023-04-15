@@ -3,8 +3,6 @@ package com.feed_the_beast.ftblib.lib.command;
 import net.minecraft.command.CommandHelp;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.command.CommandTreeBase;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,19 +22,19 @@ public class CmdTreeHelp extends CommandHelp
 	}
 
 	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+	public boolean canCommandSenderUseCommand(ICommandSender sender)
 	{
 		return true;
 	}
 
 	@Override
-	protected List<ICommand> getSortedPossibleCommands(ICommandSender sender, MinecraftServer server)
+	protected List<ICommand> getSortedPossibleCommands(ICommandSender sender)
 	{
 		List<ICommand> list = new ArrayList<>();
 
 		for (ICommand command : parent.getSubCommands())
 		{
-			if (command.checkPermission(server, sender))
+			if (command.canCommandSenderUseCommand(sender))
 			{
 				list.add(command);
 			}
@@ -47,7 +45,7 @@ public class CmdTreeHelp extends CommandHelp
 	}
 
 	@Override
-	protected Map<String, ICommand> getCommandMap(MinecraftServer server)
+	protected Map<String, ICommand> getCommands()
 	{
 		return parent.getCommandMap();
 	}
