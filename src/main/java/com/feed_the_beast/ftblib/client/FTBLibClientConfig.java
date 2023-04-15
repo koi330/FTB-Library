@@ -1,11 +1,9 @@
 package com.feed_the_beast.ftblib.client;
 
-import com.feed_the_beast.ftblib.FTBLib;
+import com.feed_the_beast.ftblib.Config;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
 
 /**
  * @author LatvianModder
@@ -35,7 +33,7 @@ public class FTBLibClientConfig {
 	public static boolean debug_helper = true;
 
 	public static void sync() {
-		ConfigManager.sync("ftblib_client", Config.Type.INSTANCE);
+//		ConfigManager.sync("ftblib_client", Config.Type.INSTANCE);
 	}
 
 	@SubscribeEvent

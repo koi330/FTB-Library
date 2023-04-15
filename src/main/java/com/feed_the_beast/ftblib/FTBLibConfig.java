@@ -5,6 +5,7 @@ import com.feed_the_beast.ftblib.lib.config.EnumTristate;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.common.config.Configuration;
 
 /**
  * @author LatvianModder
@@ -13,6 +14,9 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = FTBLib.MOD_ID, category = "")
 public class FTBLibConfig
 {
+	public static final String CONFIG_LOCATION = "ftblib.cfg";
+
+	Configuration config;
 
 	@Config.LangKey("stat.generalButton")
 	public static final General general = new General();
@@ -82,7 +86,7 @@ public class FTBLibConfig
 
 	public static boolean sync()
 	{
-		ConfigManager.sync(FTBLib.MOD_ID, Config.Type.INSTANCE);
+//		ConfigManager.sync(FTBLib.MOD_ID, Config.Type.INSTANCE);
 		return true;
 	}
 
