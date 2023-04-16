@@ -1,11 +1,11 @@
 [
 	{
-		"modid": "ftblib",
-		"name": "FTB Library",
+		"modid": "${modId}",
+		"name": "${modName}",
 		"description": "",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"url": "http://minecraft.curseforge.com/projects/ftblib",
+		"version": "${modVersion}",
+		"mcversion": "${minecraftVersion}",
+		"url": "",
 		"updateUrl": "",
 		"authorList": ["LatvianModder"],
 		"credits": "",
