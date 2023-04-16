@@ -53,6 +53,6 @@ public interface ITeleporter {
 
     // used internally to handle vanilla hardcoding
     default boolean isVanilla() {
-        return getClass() == Teleporter.class;
+        return false;
     }
 }
