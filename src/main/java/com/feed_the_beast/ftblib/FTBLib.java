@@ -78,7 +78,7 @@ public class FTBLib
 	public void onPreInit(FMLPreInitializationEvent event)
 	{
 		Locale.setDefault(Locale.US);
-		FTBLibConfig.sync();
+		FTBLibConfig.init(event);
 		PROXY.preInit(event);
 	}
 

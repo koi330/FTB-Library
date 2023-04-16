@@ -35,7 +35,7 @@ public class FTBLibClient extends FTBLibCommon
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		super.preInit(event);
-		FTBLibClientConfig.sync();
+		FTBLibClientConfig.init(event);
 		ClientUtils.localPlayerHead = new PlayerHeadIcon(Minecraft.getMinecraft().getSession().func_148256_e().getId());
 		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(FTBLibClientConfigManager.INSTANCE);
 		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(SidebarButtonManager.INSTANCE);

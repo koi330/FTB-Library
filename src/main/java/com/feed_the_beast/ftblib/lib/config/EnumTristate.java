@@ -23,6 +23,14 @@ public enum EnumTristate implements IStringSerializable {
 		return nbt.hasKey(key) ? nbt.getBoolean(key) ? TRUE : FALSE : DEFAULT;
 	}
 
+	public static EnumTristate string2tristate(String tristate) {
+		switch (tristate) {
+			case "true": return TRUE;
+			case "false": return FALSE;
+			default: return DEFAULT;
+		}
+	}
+
 	private final String name;
 	private final Event.Result result;
 	private final Color4I color;
