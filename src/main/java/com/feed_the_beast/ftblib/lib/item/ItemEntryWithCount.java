@@ -42,7 +42,7 @@ public class ItemEntryWithCount
 		{
 			ItemStack stack = ItemStackSerializer.read(nbtb);
 			entry = ItemEntry.get(stack);
-			count = nbt != null && nbt.hasKey("RealCount") ? nbt.getInteger("RealCount") : stack.stackSize;
+			count = nbt != null && nbt.hasKey("RealCount") ? nbt.getInteger("RealCount") : stack == null ? 0 : stack.stackSize;
 			return;
 		}
 

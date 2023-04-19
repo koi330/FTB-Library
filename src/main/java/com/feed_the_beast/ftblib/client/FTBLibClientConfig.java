@@ -15,6 +15,7 @@ import java.io.File;
 public class FTBLibClientConfig {
 
 	public static Configuration config;
+	public static final FTBLibClientConfig INST = new FTBLibClientConfig();
 
 	public static void init(FMLPreInitializationEvent event) {
 		config = new Configuration(new File(event.getModConfigurationDirectory() + "../local/client/ftblib.cfg"));
@@ -43,7 +44,7 @@ public class FTBLibClientConfig {
 	public static boolean debug_helper;
 
 	@SubscribeEvent
-	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
 		if (event.modID.equals(FTBLib.MOD_ID)) {
 			sync();
 		}

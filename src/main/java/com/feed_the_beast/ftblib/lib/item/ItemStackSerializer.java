@@ -152,6 +152,6 @@ public class ItemStackSerializer {
 		}
 
 		ItemStack stack = ItemStack.loadItemStackFromNBT(nbt);
-		return stack == null ? InvUtils.EMPTY_STACK : stack;
+		return stack;
 	}
 }

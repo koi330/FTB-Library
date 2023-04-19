@@ -46,6 +46,9 @@ public abstract class CommandTreeBase extends CommandBase {
 
     public void addSubcommand(ICommand command) {
         commandMap.put(command.getCommandName(), command);
+        if (command.getCommandAliases() == null) {
+            return;
+        }
         for (String alias : (List<String>) command.getCommandAliases()) {
             commandAliasMap.put(alias, command);
         }

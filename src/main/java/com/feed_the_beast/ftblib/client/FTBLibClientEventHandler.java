@@ -50,8 +50,8 @@ import java.util.List;
 /**
  * @author LatvianModder
  */
-// @Mod.EventHandler(modid = FTBLib.MOD_ID, value = Side.CLIENT)
 public class FTBLibClientEventHandler {
+	public static final FTBLibClientEventHandler INST = new FTBLibClientEventHandler();
 	private static Temp currentNotification;
 	public static Rectangle lastDrawnArea = new Rectangle();
 	public static boolean shouldRenderIcons = false;
@@ -189,7 +189,7 @@ public class FTBLibClientEventHandler {
 //	}
 
 	@SubscribeEvent
-	public static void onTooltip(ItemTooltipEvent event) {
+	public void onTooltip(ItemTooltipEvent event) {
 		if (FTBLibClientConfig.item_ore_names) {
 			Collection<String> ores = InvUtils.getOreNames(null, event.itemStack);
 
@@ -214,7 +214,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onGuiInit(final GuiScreenEvent.InitGuiEvent.Post event) {
+	public void onGuiInit(final GuiScreenEvent.InitGuiEvent.Post event) {
 		// sidebarButtonScale = 0D;
 
 		if (areButtonsVisible(event.gui)) {
@@ -228,7 +228,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onClientTick(TickEvent.ClientTickEvent event) {
+	public void onClientTick(TickEvent.ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
 			if (Minecraft.getMinecraft().theWorld == null) {
 				currentNotification = null;
@@ -257,7 +257,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-	public static void onGameOverlayRender(RenderGameOverlayEvent.Text event) {
+	public void onGameOverlayRender(RenderGameOverlayEvent.Text event) {
 		if (currentNotification != null && !currentNotification.isImportant()) {
 			currentNotification.render(event.resolution, event.partialTicks);
 			GlStateManager.color(1F, 1F, 1F, 1F);
@@ -268,7 +268,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-	public static void onRenderTick(TickEvent.RenderTickEvent event) {
+	public void onRenderTick(TickEvent.RenderTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
 			if (shouldRenderIcons) {
 				IconRenderer.render();
@@ -288,7 +288,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onDebugInfoEvent(RenderGameOverlayEvent.Text event) {
+	public void onDebugInfoEvent(RenderGameOverlayEvent.Text event) {
 		if (FTBLibClientConfig.debug_helper && !Minecraft.getMinecraft().gameSettings.showDebugInfo
 				&& Keyboard.isKeyDown(Keyboard.KEY_F3)) {
 			event.left.add(I18n.format("debug.help.help"));
@@ -296,7 +296,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onBeforeTexturesStitched(TextureStitchEvent.Pre event) {
+	public void onBeforeTexturesStitched(TextureStitchEvent.Pre event) {
 		try {
 			for (Field field : GuiIcons.class.getDeclaredFields()) {
 				field.setAccessible(true);
@@ -316,7 +316,7 @@ public class FTBLibClientEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onCustomClick(CustomClickEvent event) {
+	public void onCustomClick(CustomClickEvent event) {
 		if (event.getID().getResourceDomain().equals(FTBLib.MOD_ID)) {
 			switch (event.getID().getResourcePath()) {
 				case "client_config_gui":

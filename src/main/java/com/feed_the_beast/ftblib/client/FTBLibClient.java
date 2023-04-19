@@ -19,6 +19,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.common.MinecraftForge;
+
 import org.lwjgl.opengl.Display;
 
 import java.util.HashMap;
@@ -45,6 +47,9 @@ public class FTBLibClient extends FTBLibCommon
 		{
 			Display.setTitle("Minecraft 1.7.10 Dev :: " + Minecraft.getMinecraft().getSession().getUsername());
 		}
+
+		MinecraftForge.EVENT_BUS.register(FTBLibClientConfig.INST);
+		MinecraftForge.EVENT_BUS.register(FTBLibClientEventHandler.INST);
 	}
 
 	@Override

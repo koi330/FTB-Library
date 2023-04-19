@@ -14,6 +14,7 @@ public class FTBLibConfig
 {
 
 	public static Configuration config;
+	public static final FTBLibConfig INST = new FTBLibConfig();
 
 	public static final String GEN_CAT = Configuration.CATEGORY_GENERAL;
 	public static final String TEAM_CAT = "team";
@@ -92,7 +93,7 @@ public class FTBLibConfig
 	}
 
 	@SubscribeEvent
-	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
 	{
 		if (event.modID.equals(FTBLib.MOD_ID))
 		{

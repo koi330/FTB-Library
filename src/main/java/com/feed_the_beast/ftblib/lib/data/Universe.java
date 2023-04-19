@@ -29,6 +29,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
@@ -134,14 +135,14 @@ public class Universe {
 	}
 
 	@SubscribeEvent
-	public static void onWorldSaved(WorldEvent.Save event) {
+	public void onWorldSaved(WorldEvent.Save event) {
 		if (loaded()) {
 			INSTANCE.save();
 		}
 	}
 
 	@SubscribeEvent
-	public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+	public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 		if (loaded() && event.player instanceof EntityPlayerMP && !ServerUtils.isFake((EntityPlayerMP) event.player)) {
 			LOGGED_IN_PLAYERS.add(event.player.getUniqueID());
 			INSTANCE.onPlayerLoggedIn((EntityPlayerMP) event.player);
@@ -149,7 +150,7 @@ public class Universe {
 	}
 
 	@SubscribeEvent
-	public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+	public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
 		if (loaded() && event.player instanceof EntityPlayerMP
 				&& LOGGED_IN_PLAYERS.remove(event.player.getUniqueID())) {
 			ForgePlayer p = INSTANCE.getPlayer(event.player.getGameProfile());
@@ -161,7 +162,7 @@ public class Universe {
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
-	public static void onPlayerClone(net.minecraftforge.event.entity.player.PlayerEvent.Clone event) {
+	public void onPlayerClone(net.minecraftforge.event.entity.player.PlayerEvent.Clone event) {
 		if (event.entity instanceof EntityPlayerMP) {
 			ForgePlayer p = INSTANCE.getPlayer(event.entityPlayer.getGameProfile());
 
@@ -178,7 +179,7 @@ public class Universe {
 	}
 
 	@SubscribeEvent
-	public static void onTickEvent(TickEvent.WorldTickEvent event) {
+	public void onTickEvent(TickEvent.WorldTickEvent event) {
 		if (!loaded()) {
 			return;
 		}

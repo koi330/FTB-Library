@@ -13,8 +13,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 // @Mod.EventBusSubscriber(modid = FTBLib.MOD_ID)
 public class FTBLibEventHandler
 {
+	public static final FTBLibEventHandler INST = new FTBLibEventHandler();
 	@SubscribeEvent
-	public static void onPlayerTick(TickEvent.PlayerTickEvent event)
+	public void onPlayerTick(TickEvent.PlayerTickEvent event)
 	{
 		if (event.player.ticksExisted % 5 == 2 && event.player instanceof EntityPlayerMP)
 		{

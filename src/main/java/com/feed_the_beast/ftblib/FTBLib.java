@@ -7,6 +7,8 @@ import com.feed_the_beast.ftblib.command.team.CmdTeam;
 import com.feed_the_beast.ftblib.lib.command.CommandUtils;
 import com.feed_the_beast.ftblib.lib.data.Universe;
 import com.feed_the_beast.ftblib.lib.util.SidedUtils;
+
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
@@ -18,6 +20,8 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.util.IChatComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -31,7 +35,7 @@ import java.util.Map;
 		name = FTBLib.MOD_NAME,
 		version = FTBLib.VERSION,
 		acceptableRemoteVersions = "*",
-		dependencies = "required-after:forge@[0.0.0.forge,);after:jei@[4.6.0,);"
+		dependencies = ""
 )
 public class FTBLib
 {
@@ -80,6 +84,8 @@ public class FTBLib
 		Locale.setDefault(Locale.US);
 		FTBLibConfig.init(event);
 		PROXY.preInit(event);
+		MinecraftForge.EVENT_BUS.register(FTBLibConfig.INST);
+		MinecraftForge.EVENT_BUS.register(FTBLibEventHandler.INST);
 	}
 
 	@Mod.EventHandler
@@ -92,6 +98,8 @@ public class FTBLib
 	public void onServerAboutToStart(FMLServerAboutToStartEvent event)
 	{
 		Universe.onServerAboutToStart(event);
+		MinecraftForge.EVENT_BUS.register(Universe.get());
+		FMLCommonHandler.instance().bus().register(Universe.get());
 	}
 
 	@Mod.EventHandler
