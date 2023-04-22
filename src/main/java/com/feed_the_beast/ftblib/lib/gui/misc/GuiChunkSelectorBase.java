@@ -12,13 +12,12 @@ import com.feed_the_beast.ftblib.lib.gui.WidgetLayout;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.ChunkPosition;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +37,7 @@ public class GuiChunkSelectorBase extends GuiBase
 	}
 
 	public static final int TILE_SIZE = 12;
-	private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, CachedVertexData.POSITION_COLOR);
+	private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, false, true, false);
 
 	static
 	{

@@ -3,8 +3,8 @@ package com.feed_the_beast.ftblib.lib.client;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.icon.MutableColor4I;
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
+
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.shader.TesselatorVertexState;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
@@ -18,38 +18,25 @@ import java.util.List;
  */
 public class CachedVertexData
 {
-
-	public static final TesselatorVertexState POSITION_COLOR;
-
-	static {
-		Tessellator tessellator = new Tessellator();
-		tessellator.setColorRGBA(0, 0, 0, 0);
-		tessellator.addVertex(0, 0, 0);
-		POSITION_COLOR = tessellator.getVertexState(0, 0, 0);
-		//TODO: This might break horribly
-	}
-
 	private final int mode;
-	private final TesselatorVertexState format;
 	private final List<CachedVertex> list;
 	private final boolean hasTex, hasColor, hasNormal;
 	public final MutableColor4I color;
 	public double minU = 0D, minV = 0D, maxU = 1D, maxV = 1D;
 
-	private CachedVertexData(int m, TesselatorVertexState f, Collection<CachedVertex> oldList)
+	private CachedVertexData(int m, boolean tex, boolean color, boolean normal, Collection<CachedVertex> oldList)
 	{
 		mode = m;
 		list = new ArrayList<>(oldList);
-		format = f;
-		hasTex = f.getHasTexture();
-		hasColor = f.getHasColor();
-		hasNormal = f.getHasNormals();
-		color = Color4I.WHITE.mutable();
+		hasTex = tex;
+		hasColor = color;
+		hasNormal = normal;
+		this.color = Color4I.WHITE.mutable();
 	}
 
-	public CachedVertexData(int m, TesselatorVertexState f)
+	public CachedVertexData(int m, boolean tex, boolean color, boolean normal)
 	{
-		this(m, f, Collections.emptyList());
+		this(m, tex, color, normal, Collections.emptyList());
 	}
 
 	public void reset()
@@ -59,7 +46,7 @@ public class CachedVertexData
 
 	public CachedVertexData copy()
 	{
-		return new CachedVertexData(mode, format, list);
+		return new CachedVertexData(mode, hasTex, hasColor, hasNormal, list);
 	}
 
 	public CachedVertex pos(double x, double y, double z)
@@ -82,7 +69,6 @@ public class CachedVertexData
 		}
 
 		tessellator.startDrawing(mode);
-		tessellator.setVertexState(format);
 		for (CachedVertex v : list)
 		{
 			
