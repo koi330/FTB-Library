@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 /**
  * @author LatvianModder
  */
-// @Mod.EventBusSubscriber(modid = FTBLib.MOD_ID)
 public class FTBLibEventHandler
 {
 	public static final FTBLibEventHandler INST = new FTBLibEventHandler();

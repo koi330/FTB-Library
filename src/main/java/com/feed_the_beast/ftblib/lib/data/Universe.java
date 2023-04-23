@@ -63,7 +63,6 @@ import java.util.UUID;
 /**
  * @author LatvianModder
  */
-// @Mod.EventBusSubscriber(modid = FTBLib.MOD_ID)
 public class Universe {
 	private static class ScheduledTask {
 		private final TimeType type;

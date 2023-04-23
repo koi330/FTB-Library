@@ -89,6 +89,11 @@ public class FTBLib
 	}
 
 	@Mod.EventHandler
+	public void onInit(FMLInitializationEvent event) {
+		PROXY.init(event);
+	}
+
+	@Mod.EventHandler
 	public void onPostInit(FMLPostInitializationEvent event)
 	{
 		PROXY.postInit();

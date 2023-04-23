@@ -14,6 +14,7 @@ import com.feed_the_beast.ftblib.lib.gui.misc.ChunkSelectorMap;
 import com.feed_the_beast.ftblib.lib.icon.PlayerHeadIcon;
 import com.feed_the_beast.ftblib.lib.net.MessageToClient;
 
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -50,6 +51,11 @@ public class FTBLibClient extends FTBLibCommon
 
 		MinecraftForge.EVENT_BUS.register(FTBLibClientConfig.INST);
 		MinecraftForge.EVENT_BUS.register(FTBLibClientEventHandler.INST);
+	}
+
+	@Override
+	public void init(FMLInitializationEvent event) {
+		super.init(event);
 	}
 
 	@Override

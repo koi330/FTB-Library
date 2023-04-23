@@ -39,6 +39,7 @@ import com.feed_the_beast.ftblib.lib.util.InvUtils;
 import com.feed_the_beast.ftblib.net.FTBLibNetHandler;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.nbt.NBTTagCompound;
@@ -88,6 +89,12 @@ public class FTBLibCommon {
 			FTBLib.LOGGER.info("Loading FTBLib in development environment");
 		}
 
+
+		// CHAT_FORMATTING_SUBSTITUTES.put("tag", player -> new
+		// ChatComponentText(player.getTag()));
+	}
+
+	public void init(FMLInitializationEvent event) {
 		FTBLibNetHandler.init();
 
 		FTBLibPreInitRegistryEvent.Registry registry = new FTBLibPreInitRegistryEvent.Registry() {
@@ -163,8 +170,6 @@ public class FTBLibCommon {
 
 		CHAT_FORMATTING_SUBSTITUTES.put("name", ForgePlayer::getDisplayName);
 		CHAT_FORMATTING_SUBSTITUTES.put("team", player -> player.team.getTitle());
-		// CHAT_FORMATTING_SUBSTITUTES.put("tag", player -> new
-		// ChatComponentText(player.getTag()));
 	}
 
 	public void postInit() {

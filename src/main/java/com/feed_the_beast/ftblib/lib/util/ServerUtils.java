@@ -93,7 +93,7 @@ public class ServerUtils {
 	public static boolean isVanillaClient(ICommandSender sender) {
 		if (sender instanceof EntityPlayerMP) {
 			NetHandlerPlayServer connection = ((EntityPlayerMP) sender).playerNetServerHandler;
-			return connection != null && connection.netManager.channel().attr(NetworkRegistry.MOD_CONTAINER) != null;
+			return connection != null && connection.netManager.channel().attr(NetworkRegistry.MOD_CONTAINER) == null;
 			// return connection != null; //&& !connection.netManager.channel().attr(NetworkRegistry.FML_MARKER).get();
 		}
 
