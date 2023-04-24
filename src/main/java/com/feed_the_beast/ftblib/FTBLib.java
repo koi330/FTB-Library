@@ -1,5 +1,6 @@
 package com.feed_the_beast.ftblib;
 
+import com.feed_the_beast.ftblib.client.FTBLibClientEventHandler;
 import com.feed_the_beast.ftblib.command.CmdAddFakePlayer;
 import com.feed_the_beast.ftblib.command.CmdMySettings;
 import com.feed_the_beast.ftblib.command.CmdReload;
@@ -86,6 +87,7 @@ public class FTBLib
 		PROXY.preInit(event);
 		MinecraftForge.EVENT_BUS.register(FTBLibConfig.INST);
 		MinecraftForge.EVENT_BUS.register(FTBLibEventHandler.INST);
+		FMLCommonHandler.instance().bus().register(FTBLibEventHandler.INST);
 	}
 
 	@Mod.EventHandler

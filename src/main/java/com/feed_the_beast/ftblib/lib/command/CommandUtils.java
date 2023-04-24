@@ -63,7 +63,6 @@ public class CommandUtils {
 						p = p1;
 					} else {
 						ChunkCoordinates pos = sender.getPlayerCoordinates();
-						//TODO: check real coords and not just chunk
 						double d = p1.getPlayer().getDistanceSq(pos.posX, pos.posY, pos.posZ);
 
 						if (d < dist) {

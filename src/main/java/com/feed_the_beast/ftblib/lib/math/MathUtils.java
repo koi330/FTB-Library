@@ -302,7 +302,6 @@ public class MathUtils {
 
 		AxisAlignedBB[] boxes = new AxisAlignedBB[6];
 
-		//TODO: AT
 		for (EnumFacing f : EnumFacing.faceList) {
 			boxes[f.order_a] = rotateAABB(box, f);
 		}

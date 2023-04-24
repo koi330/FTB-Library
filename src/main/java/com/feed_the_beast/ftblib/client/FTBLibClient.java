@@ -3,6 +3,7 @@ package com.feed_the_beast.ftblib.client;
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.FTBLibCommon;
 import com.feed_the_beast.ftblib.FTBLibConfig;
+import com.feed_the_beast.ftblib.FTBLibEventHandler;
 import com.feed_the_beast.ftblib.command.client.CommandClientConfig;
 import com.feed_the_beast.ftblib.command.client.CommandListAdvancements;
 import com.feed_the_beast.ftblib.command.client.CommandPrintItem;
@@ -14,6 +15,7 @@ import com.feed_the_beast.ftblib.lib.gui.misc.ChunkSelectorMap;
 import com.feed_the_beast.ftblib.lib.icon.PlayerHeadIcon;
 import com.feed_the_beast.ftblib.lib.net.MessageToClient;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.client.Minecraft;
@@ -51,6 +53,7 @@ public class FTBLibClient extends FTBLibCommon
 
 		MinecraftForge.EVENT_BUS.register(FTBLibClientConfig.INST);
 		MinecraftForge.EVENT_BUS.register(FTBLibClientEventHandler.INST);
+		FMLCommonHandler.instance().bus().register(FTBLibClientEventHandler.INST);
 	}
 
 	@Override

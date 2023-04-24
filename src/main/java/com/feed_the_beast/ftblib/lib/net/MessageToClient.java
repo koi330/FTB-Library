@@ -54,7 +54,8 @@ public abstract class MessageToClient extends MessageBase {
 
 	public final void sendToAllTracking(NetworkRegistry.TargetPoint pos) {
 		FMLEmbeddedChannel channel = getWrapper().getChannel(Side.SERVER);
-		channel.attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT); //TODO: ?
+		// target was changed but it's not used so... ok?
+		channel.attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
 		channel.attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(pos);
 		channel.writeAndFlush(this).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}

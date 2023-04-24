@@ -18,6 +18,8 @@ import com.feed_the_beast.ftblib.lib.util.text_components.Notification;
 import com.feed_the_beast.ftblib.net.MessageCloseGui;
 import com.feed_the_beast.ftblib.net.MessageEditConfig;
 import com.feed_the_beast.ftblib.net.MessageSyncData;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;

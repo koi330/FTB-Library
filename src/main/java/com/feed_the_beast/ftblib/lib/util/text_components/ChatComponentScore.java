@@ -49,9 +49,6 @@ public class ChatComponentScore extends ChatComponentStyle {
 
     public void resolve(ICommandSender sender) {
 
-        MinecraftServer server = MinecraftServer.getServer();
-        //TODO : get server from sender
-
     }
 
     @Override

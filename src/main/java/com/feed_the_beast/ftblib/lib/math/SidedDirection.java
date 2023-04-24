@@ -18,7 +18,6 @@ public enum SidedDirection
 
 	static
 	{
-		//TODO: at
 		for (EnumFacing side : EnumFacing.faceList)
 		{
 			for (EnumFacing rot : EnumFacing.faceList)
