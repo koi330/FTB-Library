@@ -61,11 +61,11 @@ public class ServerUtils {
 	public static IChatComponent getDimensionName(int dim) {
 		switch (dim) {
 			case 0:
-				return new ChatComponentTranslation("createWorld.customize.preset.overworld");
+				return new ChatComponentTranslation("ftblib.world.dimension.overworld");
 			case -1:
-				return new ChatComponentTranslation("advancements.nether.root.title");
+				return new ChatComponentTranslation("ftblib.world.dimension.nether");
 			case 1:
-				return new ChatComponentTranslation("advancements.end.root.title");
+				return new ChatComponentTranslation("ftblib.world.dimension.end");
 			default:
 				// for (DimensionType type : DimensionType.values()) {
 				// 	if (type.getId() == dim) {

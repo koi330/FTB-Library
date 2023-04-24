@@ -9,13 +9,13 @@
 	},
 	"settings": {
 		"group": "ftblib:info",
-		"icon": "ftblib:icons/settings",
+		"icon": "ftblib:textures/icons/settings.png",
 		"x": 100,
 		"click": "custom:ftblib:client_config_gui"
 	},
 	"admin_panel": {
 		"group": "ftblib:info",
-		"icon": "ftblib:icons/settings_red",
+		"icon": "ftblib:textures/icons/settings_red.png",
 		"x": 110,
 		"click": "custom:ftblib:admin_panel_gui",
 		"requires_op": true,

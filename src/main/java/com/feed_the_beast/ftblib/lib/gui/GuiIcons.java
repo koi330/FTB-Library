@@ -68,23 +68,18 @@ public interface GuiIcons
 	Icon CHECK = get("check");
 	Icon STAR = get("star");
 	Icon HEART = get("heart");
-	Icon BOOK = Icon.getIcon("minecraft:items/book_normal");
-	Icon BOOK_RED = Icon.getIcon("minecraft:items/book_enchanted");
-	Icon BARRIER = Icon.getIcon("minecraft:items/barrier");
+	Icon BOOK = Icon.getIcon("minecraft:textures/items/book_normal.png");
+	Icon BOOK_RED = Icon.getIcon("minecraft:textures/items/book_enchanted.png");
+	Icon BARRIER = CANCEL;
 	Icon TOGGLE_GAMEMODE = get("toggle_gamemode");
 	Icon TOGGLE_RAIN = get("toggle_rain");
 	Icon TOGGLE_DAY = get("toggle_day");
 	Icon TOGGLE_NIGHT = get("toggle_night");
 	Icon LOCK = get("lock");
 	Icon LOCK_OPEN = get("lock_open");
-	Icon SUPPORT = getImage("support");
+	Icon SUPPORT = get("support");
 
 	static Icon get(String id)
-	{
-		return Icon.getIcon("ftblib:icons/" + id);
-	}
-
-	static Icon getImage(String id)
 	{
 		return Icon.getIcon("ftblib:textures/icons/" + id + ".png");
 	}

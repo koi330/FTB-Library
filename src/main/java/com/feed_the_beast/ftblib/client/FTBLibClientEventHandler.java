@@ -295,25 +295,25 @@ public class FTBLibClientEventHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public void onBeforeTexturesStitched(TextureStitchEvent.Pre event) {
-		try {
-			for (Field field : GuiIcons.class.getDeclaredFields()) {
-				field.setAccessible(true);
-				Object o = field.get(null);
-
-				if (o instanceof AtlasSpriteIcon) {
-					AtlasSpriteIcon a = (AtlasSpriteIcon) o;
-					event.map.registerIcon(a.name);
-					IconPresets.MAP.put(a.name, a);
-				}
-			}
-		} catch (Exception ex) {
-			if (FTBLibConfig.debugging.print_more_errors) {
-				ex.printStackTrace();
-			}
-		}
-	}
+//	@SubscribeEvent
+//	public void onBeforeTexturesStitched(TextureStitchEvent.Pre event) {
+//		try {
+//			for (Field field : GuiIcons.class.getDeclaredFields()) {
+//				field.setAccessible(true);
+//				Object o = field.get(null);
+//
+//				if (o instanceof AtlasSpriteIcon) {
+//					AtlasSpriteIcon a = (AtlasSpriteIcon) o;
+//					event.map.registerIcon(a.name);
+//					IconPresets.MAP.put(a.name, a);
+//				}
+//			}
+//		} catch (Exception ex) {
+//			if (FTBLibConfig.debugging.print_more_errors) {
+//				ex.printStackTrace();
+//			}
+//		}
+//	}
 
 	@SubscribeEvent
 	public void onCustomClick(CustomClickEvent event) {

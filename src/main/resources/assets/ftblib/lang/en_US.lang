@@ -101,6 +101,10 @@ ftblib.select_item.caps=Edit Capabilities
 ftblib.select_item.display_name=Set Display Name
 ftblib.select_team.gui=Select Team
 
+ftblib.world.dimension.overworld=Overworld
+ftblib.world.dimension.end=The End
+ftblib.world.dimension.nether=Nether
+
 # Config
 ftblib.general.clientless_mode=Clientless Mode
 ftblib.general.replace_reload_command=Replace /reload Command
