@@ -18,7 +18,7 @@ public class FTBLibClientConfig {
 	public static final FTBLibClientConfig INST = new FTBLibClientConfig();
 
 	public static void init(FMLPreInitializationEvent event) {
-		config = new Configuration(new File(event.getModConfigurationDirectory() + "../local/client/ftblib.cfg"));
+		config = new Configuration(new File(event.getModConfigurationDirectory() + "/../local/client/ftblib.cfg"));
 		sync();
 	}
 
@@ -33,6 +33,7 @@ public class FTBLibClientConfig {
 
 		action_buttons = EnumSidebarButtonPlacement.string2placement(config.get(Configuration.CATEGORY_GENERAL, "action_buttons", "auto", "DISABLED: Buttons are hidden;\nTOP_LEFT: Buttons are placed on top-left corner, where NEI has it's buttons;\nINVENTORY_SIDE: Buttons are placed on the side or top of your inventory, depending on potion effects and crafting book;\nAUTO: When NEI is installed, INVENTORY_SIDE, else TOP_LEFT.").getString());
 
+		config.save();
 
 		return true;
 	}
