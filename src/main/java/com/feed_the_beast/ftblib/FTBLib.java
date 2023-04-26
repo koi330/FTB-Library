@@ -42,7 +42,7 @@ public class FTBLib
 {
 	public static final String MOD_ID = "ftblib";
 	public static final String MOD_NAME = "FTB Library";
-	public static final String VERSION = "0.0.0.ftblib";
+	public static final String VERSION = "GRADLETOKEN_VERSION";
 	public static final String THIS_DEP = "required-after:" + MOD_ID + "@[" + VERSION + ",)";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 	public static final String KEY_CATEGORY = "key.categories.ftbmods";
@@ -60,9 +60,6 @@ public class FTBLib
 
 	@SidedProxy(serverSide = "com.feed_the_beast.ftblib.FTBLibCommon", clientSide = "com.feed_the_beast.ftblib.client.FTBLibClient")
 	public static FTBLibCommon PROXY;
-
-	// @GameRegistry.ObjectHolder("ftbquests:custom_icon")
-	// public static Item CUSTOM_ICON_ITEM;
 
 	public static IChatComponent lang(@Nullable ICommandSender sender, String key, Object... args)
 	{
