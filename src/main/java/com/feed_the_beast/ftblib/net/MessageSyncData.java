@@ -9,6 +9,7 @@ import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.FTBLibCommon;
 import com.feed_the_beast.ftblib.FTBLibConfig;
 import com.feed_the_beast.ftblib.events.SyncGamerulesEvent;
+import com.feed_the_beast.ftblib.lib.client.ClientUtils;
 import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
 import com.feed_the_beast.ftblib.lib.data.ISyncData;
 import com.feed_the_beast.ftblib.lib.io.Bits;
@@ -24,12 +25,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * @author LatvianModder
  */
 public class MessageSyncData extends MessageToClient {
 	private static final int LOGIN = 1;
+	private static final int OP = 2;
 
 	private int flags;
 	private UUID universeId;
@@ -40,7 +43,9 @@ public class MessageSyncData extends MessageToClient {
 	}
 
 	public MessageSyncData(boolean login, EntityPlayerMP player, ForgePlayer forgePlayer) {
+		boolean op = MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
 		flags = Bits.setFlag(0, LOGIN, login);
+		flags = Bits.setFlag(flags, OP, op);
 		universeId = forgePlayer.team.universe.getUUID();
 		syncData = new NBTTagCompound();
 
@@ -94,5 +99,7 @@ public class MessageSyncData extends MessageToClient {
 		if (FTBLibConfig.debugging.print_more_info && Bits.getFlag(flags, LOGIN)) {
 			FTBLib.LOGGER.info("Synced data from universe " + StringUtils.fromUUID(SidedUtils.UNIVERSE_UUID_CLIENT));
 		}
+
+		ClientUtils.is_op = Bits.getFlag(flags, OP);
 	}
 }
