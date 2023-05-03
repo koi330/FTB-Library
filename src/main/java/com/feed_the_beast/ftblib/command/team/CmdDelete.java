@@ -22,7 +22,7 @@ public class CmdDelete extends CmdBase {
 	@Override
 	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
 		if (args.length == 1) {
-			return getListOfStringsFromIterableMatchingLastWord(args, Universe.get().getTeams());
+			return matchFromIterable(args, Universe.get().getTeams());
 		}
 
 		return super.addTabCompletionOptions(sender, args);

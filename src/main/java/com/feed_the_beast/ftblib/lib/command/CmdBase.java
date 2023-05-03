@@ -1,5 +1,11 @@
 package com.feed_the_beast.ftblib.lib.command;
 
+import com.feed_the_beast.ftblib.lib.EnumTeamStatus;
+import com.feed_the_beast.ftblib.lib.util.FinalIDObject;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -76,7 +82,7 @@ public abstract class CmdBase extends CommandBase implements ICommandWithParent 
 			return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
 		}
 
-		return (List<String>) super.addTabCompletionOptions(sender, args);
+		return super.addTabCompletionOptions(sender, args);
 	}
 
 	@Override
@@ -87,5 +93,10 @@ public abstract class CmdBase extends CommandBase implements ICommandWithParent 
 	@Override
 	public void setParent(@Nullable ICommand c) {
 		parent = c;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<String> matchFromIterable(String[] args, Iterable<?> possibilities) {
+		return getListOfStringsFromIterableMatchingLastWord(args, Iterables.transform(possibilities, Object::toString));
 	}
 }

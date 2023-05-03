@@ -28,7 +28,7 @@ public class CmdStatus extends CmdBase {
 	@Override
 	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
 		if (args.length == 2) {
-			return getListOfStringsFromIterableMatchingLastWord(args, EnumTeamStatus.VALID_VALUES);
+			return matchFromIterable(args, EnumTeamStatus.VALID_VALUES);
 		}
 
 		return super.addTabCompletionOptions(sender, args);

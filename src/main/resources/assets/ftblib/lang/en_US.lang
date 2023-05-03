@@ -164,6 +164,7 @@ ftblib.lang.team.error.no_team=You must be in a Team to do that!
 ftblib.lang.team.error.must_leave=You must leave your Team to do that!
 ftblib.lang.team.error.not_owner=You are not the owner of this Team!
 ftblib.lang.team.error.not_member=%s is not a member of this Team!
+ftblib.lang.team.error.already_member=%s is already a member of this Team!
 ftblib.lang.team.error.must_transfer_ownership=You must transfer ownership!
 ftblib.lang.team.error.already_invited=%s already is invited!
 ftblib.lang.team.error.failed_to_join=Can't join this team!

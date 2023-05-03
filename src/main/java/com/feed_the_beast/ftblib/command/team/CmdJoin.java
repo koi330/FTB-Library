@@ -79,7 +79,7 @@ public class CmdJoin extends CmdBase {
 
 			team.addMember(p, false);
 		} else {
-			throw FTBLib.error(sender, "ftblib.lang.team.error.not_member", p.getDisplayName());
+			throw FTBLib.error(sender, "ftblib.lang.team.error.already_member", p.getDisplayName());
 		}
 	}
 }

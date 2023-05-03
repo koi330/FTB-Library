@@ -9,6 +9,7 @@ import com.feed_the_beast.ftblib.lib.util.ServerUtils;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IChatComponent;
@@ -74,14 +75,12 @@ public class CommandUtils {
 				break;
 			}
 			default: {
-				// EntityPlayerMP e = EntitySelector.matchOneEntity(sender, name, EntityPlayerMP.class);
-
-				// if (e == null) {
-				// 	p = Universe.get().getPlayer(name);
-				// } else {
-				// 	p = Universe.get().getPlayer(e);
-				// }
-				p = null;
+				 EntityPlayerMP e = PlayerSelector.matchOnePlayer(sender, name);
+				 if (e == null) {
+				 	p = Universe.get().getPlayer(name);
+				 } else {
+				 	p = Universe.get().getPlayer(e);
+				 }
 			}
 		}
 
