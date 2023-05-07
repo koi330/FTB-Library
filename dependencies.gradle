@@ -2,5 +2,5 @@
 
 dependencies {
     api("com.github.GTNewHorizons:waila:1.5.21:dev")
-    // api("codechicken.nei.NotEnoughItems:2.3.39")
+    shadowCompile("it.unimi.dsi:fastutil:8.5.12")
 }

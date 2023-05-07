@@ -1,6 +1,5 @@
 package com.feed_the_beast.ftblib;
 
-import com.feed_the_beast.ftblib.client.FTBLibClientEventHandler;
 import com.feed_the_beast.ftblib.command.CmdAddFakePlayer;
 import com.feed_the_beast.ftblib.command.CmdMySettings;
 import com.feed_the_beast.ftblib.command.CmdReload;
@@ -8,20 +7,25 @@ import com.feed_the_beast.ftblib.command.team.CmdTeam;
 import com.feed_the_beast.ftblib.lib.command.CommandUtils;
 import com.feed_the_beast.ftblib.lib.data.Universe;
 import com.feed_the_beast.ftblib.lib.util.SidedUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.util.IChatComponent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nullable;

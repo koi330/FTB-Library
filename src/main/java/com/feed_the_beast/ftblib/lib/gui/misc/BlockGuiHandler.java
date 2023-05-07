@@ -1,5 +1,8 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -7,14 +10,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 
 /**
  * @author LatvianModder
  */
 public class BlockGuiHandler implements IGuiHandler
 {
-	private final HashMap<Integer, BlockGuiSupplier> map = new HashMap<>();
+	private final Int2ObjectMap<BlockGuiSupplier> map = new Int2ObjectOpenHashMap<>();
 
 	public void add(BlockGuiSupplier h)
 	{

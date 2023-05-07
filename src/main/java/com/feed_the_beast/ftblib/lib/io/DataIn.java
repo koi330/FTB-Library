@@ -9,6 +9,9 @@ import com.google.gson.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.EncoderException;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
@@ -170,7 +173,7 @@ public class DataIn {
 
 			if (keyDeserializer == INT) {
 				map = CommonUtils
-						.cast(linked ? new HashMap<>(size) : new HashMap<Integer, V>(size));
+						.cast(linked ? new HashMap<>(size) : new Int2ObjectOpenHashMap<V>(size));
 			} else {
 				map = linked ? new LinkedHashMap<>(size) : new HashMap<>(size);
 			}
@@ -341,14 +344,14 @@ public class DataIn {
 		return Icon.getIcon(readJson());
 	}
 
-	public List<Integer> readIntList() {
+	public IntArrayList readIntList() {
 		int size = readVarInt();
 
 		if (size == 0) {
-			return new ArrayList<>();
+			return new IntArrayList();
 		}
 
-		List<Integer> list = new ArrayList<>();
+		IntArrayList list = new IntArrayList();
 
 		for (int i = 0; i < size; i++) {
 			list.add(readInt());
