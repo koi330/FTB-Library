@@ -8,6 +8,7 @@ public interface OtherMods
 	String BAUBLES = "baubles";
 	String JEI = "jei";
 	String NEI = "nei";
+	String NEI_GTNH = "NotEnoughItems";
 	String MC_MULTIPART = "mcmultipart";
 	String CHISELS_AND_BITS = "chiselsandbits";
 	String ICHUN_UTIL = "ichunutil";

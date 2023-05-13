@@ -28,6 +28,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -215,8 +216,6 @@ public class FTBLibClientEventHandler {
 
 	@SubscribeEvent
 	public void onGuiInit(final GuiScreenEvent.InitGuiEvent.Post event) {
-		// sidebarButtonScale = 0D;
-
 		if (areButtonsVisible(event.gui)) {
 			event.buttonList.add(new GuiButtonSidebarGroup((InventoryEffectRenderer) event.gui));
 		}
@@ -431,6 +430,9 @@ public class FTBLibClientEventHandler {
 			height = maxY - y;
 			zLevel = 0F;
 
+			xPosition = x;
+			yPosition = y;
+
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(0, 0, 500);
 
@@ -495,7 +497,7 @@ public class FTBLibClientEventHandler {
 			GlStateManager.popMatrix();
 			zLevel = 0F;
 
-			lastDrawnArea = new Rectangle(x, y, width, height);
+			lastDrawnArea = new Rectangle(xPosition, yPosition, width, height);
 		}
 
 		@Override

@@ -16,14 +16,12 @@ public enum EnumSidebarButtonPlacement
 	INVENTORY_SIDE,
 	AUTO;
 
-	public boolean top()
-	{
-		switch (this)
-		{
+	public boolean top() {
+		switch (this) {
 			case TOP_LEFT:
 				return true;
 			case AUTO:
-				return !Loader.isModLoaded(OtherMods.NEI);
+				return SidebarButton.NEI_NOT_LOADED.getAsBoolean();
 			default:
 				return false;
 		}

@@ -170,6 +170,7 @@ public class ServerUtils {
 	}
 
 	public static void notify(MinecraftServer server, @Nullable EntityPlayer player, IChatComponent component) {
+		//todo: add notification stuff, map in Temp
 		if (player == null) {
 			for (EntityPlayer player1 : (List<EntityPlayer>) server.getConfigurationManager().playerEntityList) {
 				player1.addChatComponentMessage(component);
