@@ -1,5 +1,12 @@
 package com.feed_the_beast.ftblib.net;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Predicate;
+
+import net.minecraft.util.ResourceLocation;
+
 import com.feed_the_beast.ftblib.client.teamsgui.GuiManageAllies;
 import com.feed_the_beast.ftblib.client.teamsgui.GuiManageEnemies;
 import com.feed_the_beast.ftblib.client.teamsgui.GuiManageMembers;
@@ -15,112 +22,105 @@ import com.feed_the_beast.ftblib.lib.net.NetworkWrapper;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.ResourceLocation;
-
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * @author LatvianModder
  */
 public class MessageMyTeamPlayerList extends MessageToClient {
-	public static class Entry implements Comparable<Entry> {
-		private static final DataOut.Serializer<Entry> SERIALIZER = (data, object) -> object.writeData(data);
-		private static final DataIn.Deserializer<Entry> DESERIALIZER = Entry::new;
 
-		public final UUID uuid;
-		public final String name;
-		public EnumTeamStatus status;
-		public boolean requestingInvite;
+    public static class Entry implements Comparable<Entry> {
 
-		private Entry(DataIn data) {
-			uuid = data.readUUID();
-			name = data.readString();
-			status = EnumTeamStatus.NAME_MAP.read(data);
-			requestingInvite = data.readBoolean();
-		}
+        private static final DataOut.Serializer<Entry> SERIALIZER = (data, object) -> object.writeData(data);
+        private static final DataIn.Deserializer<Entry> DESERIALIZER = Entry::new;
 
-		public Entry(ForgePlayer player, EnumTeamStatus s, boolean i) {
-			uuid = player.getId();
-			name = player.getDisplayNameString();
-			status = s;
-			requestingInvite = i;
-		}
+        public final UUID uuid;
+        public final String name;
+        public EnumTeamStatus status;
+        public boolean requestingInvite;
 
-		private void writeData(DataOut data) {
-			data.writeUUID(uuid);
-			data.writeString(name);
-			EnumTeamStatus.NAME_MAP.write(data, status);
-			data.writeBoolean(requestingInvite);
-		}
+        private Entry(DataIn data) {
+            uuid = data.readUUID();
+            name = data.readString();
+            status = EnumTeamStatus.NAME_MAP.read(data);
+            requestingInvite = data.readBoolean();
+        }
 
-		public int getSortIndex() {
-			return requestingInvite ? 1000 : Math.max(status.getStatus(), status == EnumTeamStatus.ENEMY ? 1 : 0);
-		}
+        public Entry(ForgePlayer player, EnumTeamStatus s, boolean i) {
+            uuid = player.getId();
+            name = player.getDisplayNameString();
+            status = s;
+            requestingInvite = i;
+        }
 
-		@Override
-		public int compareTo(Entry o) {
-			int o1s = getSortIndex();
-			int o2s = o.getSortIndex();
-			return o1s == o2s ? name.compareToIgnoreCase(o.name) : o2s - o1s;
-		}
-	}
+        private void writeData(DataOut data) {
+            data.writeUUID(uuid);
+            data.writeString(name);
+            EnumTeamStatus.NAME_MAP.write(data, status);
+            data.writeBoolean(requestingInvite);
+        }
 
-	private ResourceLocation id;
-	private Collection<Entry> entries;
+        public int getSortIndex() {
+            return requestingInvite ? 1000 : Math.max(status.getStatus(), status == EnumTeamStatus.ENEMY ? 1 : 0);
+        }
 
-	public MessageMyTeamPlayerList() {
-	}
+        @Override
+        public int compareTo(Entry o) {
+            int o1s = getSortIndex();
+            int o2s = o.getSortIndex();
+            return o1s == o2s ? name.compareToIgnoreCase(o.name) : o2s - o1s;
+        }
+    }
 
-	public MessageMyTeamPlayerList(ResourceLocation _id, ForgePlayer player,
-			Predicate<EnumTeamStatus> predicate) {
-		id = _id;
-		entries = new ArrayList<>();
+    private ResourceLocation id;
+    private Collection<Entry> entries;
 
-		for (ForgePlayer p : player.team.universe.getPlayers()) {
-			if (p != player) {
-				EnumTeamStatus status = player.team.getHighestStatus(p);
+    public MessageMyTeamPlayerList() {}
 
-				if (status != EnumTeamStatus.OWNER && predicate.test(status)) {
-					entries.add(new Entry(p, status, player.team.isRequestingInvite(p)));
-				}
-			}
-		}
-	}
+    public MessageMyTeamPlayerList(ResourceLocation _id, ForgePlayer player, Predicate<EnumTeamStatus> predicate) {
+        id = _id;
+        entries = new ArrayList<>();
 
-	@Override
-	public NetworkWrapper getWrapper() {
-		return FTBLibNetHandler.MY_TEAM;
-	}
+        for (ForgePlayer p : player.team.universe.getPlayers()) {
+            if (p != player) {
+                EnumTeamStatus status = player.team.getHighestStatus(p);
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeResourceLocation(id);
-		data.writeCollection(entries, Entry.SERIALIZER);
-	}
+                if (status != EnumTeamStatus.OWNER && predicate.test(status)) {
+                    entries.add(new Entry(p, status, player.team.isRequestingInvite(p)));
+                }
+            }
+        }
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		id = data.readResourceLocation();
-		entries = data.readCollection(Entry.DESERIALIZER);
-	}
+    @Override
+    public NetworkWrapper getWrapper() {
+        return FTBLibNetHandler.MY_TEAM;
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void onMessage() {
-		if (id.equals(FTBLibTeamGuiActions.MEMBERS.getId())) {
-			new GuiManageMembers(entries).openGui();
-		} else if (id.equals(FTBLibTeamGuiActions.ALLIES.getId())) {
-			new GuiManageAllies(entries).openGui();
-		} else if (id.equals(FTBLibTeamGuiActions.MODERATORS.getId())) {
-			new GuiManageModerators(entries).openGui();
-		} else if (id.equals(FTBLibTeamGuiActions.ENEMIES.getId())) {
-			new GuiManageEnemies(entries).openGui();
-		} else if (id.equals(FTBLibTeamGuiActions.TRANSFER_OWNERSHIP.getId())) {
-			new GuiTransferOwnership(entries).openGui();
-		}
-	}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeResourceLocation(id);
+        data.writeCollection(entries, Entry.SERIALIZER);
+    }
+
+    @Override
+    public void readData(DataIn data) {
+        id = data.readResourceLocation();
+        entries = data.readCollection(Entry.DESERIALIZER);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void onMessage() {
+        if (id.equals(FTBLibTeamGuiActions.MEMBERS.getId())) {
+            new GuiManageMembers(entries).openGui();
+        } else if (id.equals(FTBLibTeamGuiActions.ALLIES.getId())) {
+            new GuiManageAllies(entries).openGui();
+        } else if (id.equals(FTBLibTeamGuiActions.MODERATORS.getId())) {
+            new GuiManageModerators(entries).openGui();
+        } else if (id.equals(FTBLibTeamGuiActions.ENEMIES.getId())) {
+            new GuiManageEnemies(entries).openGui();
+        } else if (id.equals(FTBLibTeamGuiActions.TRANSFER_OWNERSHIP.getId())) {
+            new GuiTransferOwnership(entries).openGui();
+        }
+    }
 }

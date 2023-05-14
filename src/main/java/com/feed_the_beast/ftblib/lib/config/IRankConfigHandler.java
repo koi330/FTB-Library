@@ -1,22 +1,24 @@
 package com.feed_the_beast.ftblib.lib.config;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.server.MinecraftServer;
+import java.util.Collection;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
+
+import net.minecraft.server.MinecraftServer;
+
+import com.mojang.authlib.GameProfile;
 
 /**
  * @author LatvianModder
  */
-public interface IRankConfigHandler
-{
-	void registerRankConfig(RankConfigValueInfo info);
+public interface IRankConfigHandler {
 
-	Collection<RankConfigValueInfo> getRegisteredConfigs();
+    void registerRankConfig(RankConfigValueInfo info);
 
-	ConfigValue getConfigValue(MinecraftServer server, GameProfile profile, String node);
+    Collection<RankConfigValueInfo> getRegisteredConfigs();
 
-	@Nullable
-	RankConfigValueInfo getInfo(String node);
+    ConfigValue getConfigValue(MinecraftServer server, GameProfile profile, String node);
+
+    @Nullable
+    RankConfigValueInfo getInfo(String node);
 }

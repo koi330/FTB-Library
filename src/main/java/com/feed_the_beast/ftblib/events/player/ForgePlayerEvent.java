@@ -6,18 +6,16 @@ import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
 /**
  * @author LatvianModder
  */
-public abstract class ForgePlayerEvent extends ForgeTeamEvent
-{
-	private final ForgePlayer player;
+public abstract class ForgePlayerEvent extends ForgeTeamEvent {
 
-	public ForgePlayerEvent(ForgePlayer p)
-	{
-		super(p.team);
-		player = p;
-	}
+    private final ForgePlayer player;
 
-	public ForgePlayer getPlayer()
-	{
-		return player;
-	}
+    public ForgePlayerEvent(ForgePlayer p) {
+        super(p.team);
+        player = p;
+    }
+
+    public ForgePlayer getPlayer() {
+        return player;
+    }
 }

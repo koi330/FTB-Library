@@ -1,306 +1,246 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
-import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 
-public class Widget implements IGuiWrapper
-{
-	public Panel parent;
-	public int posX, posY, width, height;
-	protected boolean isMouseOver;
+public class Widget implements IGuiWrapper {
 
-	public Widget(Panel p)
-	{
-		parent = p;
-	}
+    public Panel parent;
+    public int posX, posY, width, height;
+    protected boolean isMouseOver;
 
-	@Override
-	public GuiBase getGui()
-	{
-		return parent.getGui();
-	}
+    public Widget(Panel p) {
+        parent = p;
+    }
 
-	public void setX(int v)
-	{
-		posX = v;
-	}
+    @Override
+    public GuiBase getGui() {
+        return parent.getGui();
+    }
 
-	public void setY(int v)
-	{
-		posY = v;
-	}
+    public void setX(int v) {
+        posX = v;
+    }
 
-	public void setWidth(int v)
-	{
-		width = Math.max(v, 0);
-	}
+    public void setY(int v) {
+        posY = v;
+    }
 
-	public void setHeight(int v)
-	{
-		height = Math.max(v, 0);
-	}
+    public void setWidth(int v) {
+        width = Math.max(v, 0);
+    }
 
-	public final void setPos(int x, int y)
-	{
-		setX(x);
-		setY(y);
-	}
+    public void setHeight(int v) {
+        height = Math.max(v, 0);
+    }
 
-	public final void setSize(int w, int h)
-	{
-		setWidth(w);
-		setHeight(h);
-	}
+    public final void setPos(int x, int y) {
+        setX(x);
+        setY(y);
+    }
 
-	public final Widget setPosAndSize(int x, int y, int w, int h)
-	{
-		setX(x);
-		setY(y);
-		setWidth(w);
-		setHeight(h);
-		return this;
-	}
+    public final void setSize(int w, int h) {
+        setWidth(w);
+        setHeight(h);
+    }
 
-	public int getX()
-	{
-		return parent.getX() + posX;
-	}
+    public final Widget setPosAndSize(int x, int y, int w, int h) {
+        setX(x);
+        setY(y);
+        setWidth(w);
+        setHeight(h);
+        return this;
+    }
 
-	public int getY()
-	{
-		return parent.getY() + posY;
-	}
+    public int getX() {
+        return parent.getX() + posX;
+    }
 
-	public boolean collidesWith(int x, int y, int w, int h)
-	{
-		int ay = getY();
-		if (ay >= y + h || ay + height <= y)
-		{
-			return false;
-		}
+    public int getY() {
+        return parent.getY() + posY;
+    }
 
-		int ax = getX();
-		return ax < x + w && ax + width > x;
-	}
+    public boolean collidesWith(int x, int y, int w, int h) {
+        int ay = getY();
+        if (ay >= y + h || ay + height <= y) {
+            return false;
+        }
 
-	public boolean isEnabled()
-	{
-		return true;
-	}
+        int ax = getX();
+        return ax < x + w && ax + width > x;
+    }
 
-	public boolean shouldDraw()
-	{
-		return true;
-	}
+    public boolean isEnabled() {
+        return true;
+    }
 
-	public String getTitle()
-	{
-		return "";
-	}
+    public boolean shouldDraw() {
+        return true;
+    }
 
-	public WidgetType getWidgetType()
-	{
-		return WidgetType.mouseOver(isMouseOver());
-	}
+    public String getTitle() {
+        return "";
+    }
 
-	public void addMouseOverText(List<String> list)
-	{
-		String title = getTitle();
+    public WidgetType getWidgetType() {
+        return WidgetType.mouseOver(isMouseOver());
+    }
 
-		if (!title.isEmpty())
-		{
-			list.add(title);
-		}
-	}
+    public void addMouseOverText(List<String> list) {
+        String title = getTitle();
 
-	public final boolean isMouseOver()
-	{
-		return isMouseOver;
-	}
+        if (!title.isEmpty()) {
+            list.add(title);
+        }
+    }
 
-	public boolean checkMouseOver(int mouseX, int mouseY)
-	{
-		if (parent == null)
-		{
-			return true;
-		}
-		else if (!parent.isMouseOver())
-		{
-			return false;
-		}
+    public final boolean isMouseOver() {
+        return isMouseOver;
+    }
 
-		int ax = getX();
-		int ay = getY();
-		return mouseX >= ax && mouseY >= ay && mouseX < ax + width && mouseY < ay + height;
-	}
+    public boolean checkMouseOver(int mouseX, int mouseY) {
+        if (parent == null) {
+            return true;
+        } else if (!parent.isMouseOver()) {
+            return false;
+        }
 
-	public void updateMouseOver(int mouseX, int mouseY)
-	{
-		isMouseOver = checkMouseOver(mouseX, mouseY);
-	}
+        int ax = getX();
+        int ay = getY();
+        return mouseX >= ax && mouseY >= ay && mouseX < ax + width && mouseY < ay + height;
+    }
 
-	public boolean shouldAddMouseOverText()
-	{
-		return isEnabled() && isMouseOver();
-	}
+    public void updateMouseOver(int mouseX, int mouseY) {
+        isMouseOver = checkMouseOver(mouseX, mouseY);
+    }
 
-	public void draw(Theme theme, int x, int y, int w, int h)
-	{
-	}
+    public boolean shouldAddMouseOverText() {
+        return isEnabled() && isMouseOver();
+    }
 
-	public boolean mousePressed(MouseButton button)
-	{
-		return false;
-	}
+    public void draw(Theme theme, int x, int y, int w, int h) {}
 
-	public void mouseReleased(MouseButton button)
-	{
-	}
+    public boolean mousePressed(MouseButton button) {
+        return false;
+    }
 
-	public boolean mouseScrolled(int scroll)
-	{
-		return false;
-	}
+    public void mouseReleased(MouseButton button) {}
 
-	public boolean keyPressed(int key, char keyChar)
-	{
-		return false;
-	}
+    public boolean mouseScrolled(int scroll) {
+        return false;
+    }
 
-	public void keyReleased(int key)
-	{
-	}
+    public boolean keyPressed(int key, char keyChar) {
+        return false;
+    }
 
-	public ScaledResolution getScreen()
-	{
-		return parent.getScreen();
-	}
+    public void keyReleased(int key) {}
 
-	public int getMouseX()
-	{
-		return parent.getMouseX();
-	}
+    public ScaledResolution getScreen() {
+        return parent.getScreen();
+    }
 
-	public int getMouseY()
-	{
-		return parent.getMouseY();
-	}
+    public int getMouseX() {
+        return parent.getMouseX();
+    }
 
-	public float getPartialTicks()
-	{
-		return parent.getPartialTicks();
-	}
+    public int getMouseY() {
+        return parent.getMouseY();
+    }
 
-	public boolean handleClick(String scheme, String path)
-	{
-		return parent.handleClick(scheme, path);
-	}
+    public float getPartialTicks() {
+        return parent.getPartialTicks();
+    }
 
-	public final boolean handleClick(String click)
-	{
-		int index = click.indexOf(':');
+    public boolean handleClick(String scheme, String path) {
+        return parent.handleClick(scheme, path);
+    }
 
-		if (index == -1)
-		{
-			return handleClick("", click);
-		}
+    public final boolean handleClick(String click) {
+        int index = click.indexOf(':');
 
-		return handleClick(click.substring(0, index), click.substring(index + 1));
-	}
+        if (index == -1) {
+            return handleClick("", click);
+        }
 
-	public void onClosed()
-	{
-	}
+        return handleClick(click.substring(0, index), click.substring(index + 1));
+    }
 
-	@Nullable
-	public Object getIngredientUnderMouse()
-	{
-		return null;
-	}
+    public void onClosed() {}
 
-	public boolean isGhostIngredientTarget(Object ingredient)
-	{
-		return false;
-	}
+    @Nullable
+    public Object getIngredientUnderMouse() {
+        return null;
+    }
 
-	public void acceptGhostIngredient(Object ingredient)
-	{
-	}
+    public boolean isGhostIngredientTarget(Object ingredient) {
+        return false;
+    }
 
-	public static boolean isMouseButtonDown(MouseButton button)
-	{
-		return Mouse.isButtonDown(button.id);
-	}
+    public void acceptGhostIngredient(Object ingredient) {}
 
-	public static boolean isKeyDown(int key)
-	{
-		return Keyboard.isKeyDown(key);
-	}
+    public static boolean isMouseButtonDown(MouseButton button) {
+        return Mouse.isButtonDown(button.id);
+    }
 
-	public static String getClipboardString()
-	{
-		return GuiScreen.getClipboardString();
-	}
+    public static boolean isKeyDown(int key) {
+        return Keyboard.isKeyDown(key);
+    }
 
-	public static void setClipboardString(String string)
-	{
-		GuiScreen.setClipboardString(string);
-	}
+    public static String getClipboardString() {
+        return GuiScreen.getClipboardString();
+    }
 
-	public static boolean isShiftKeyDown()
-	{
-		return GuiScreen.isShiftKeyDown();
-	}
+    public static void setClipboardString(String string) {
+        GuiScreen.setClipboardString(string);
+    }
 
-	public static boolean isCtrlKeyDown()
-	{
-		return GuiScreen.isCtrlKeyDown();
-	}
+    public static boolean isShiftKeyDown() {
+        return GuiScreen.isShiftKeyDown();
+    }
 
-	public static boolean isAltKeyDown()
-	{
-		return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
-	}
+    public static boolean isCtrlKeyDown() {
+        return GuiScreen.isCtrlKeyDown();
+    }
 
-	public static boolean isKeyComboCtrlX(int key)
-	{
-		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_X);
-	}
+    public static boolean isAltKeyDown() {
+        return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
+    }
 
-	public static boolean isKeyComboCtrlV(int key)
-	{
-		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V);
-	}
+    public static boolean isKeyComboCtrlX(int key) {
+        return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_X);
+    }
 
-	public static boolean isKeyComboCtrlC(int key)
-	{
-		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_C);
-	}
+    public static boolean isKeyComboCtrlV(int key) {
+        return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V);
+    }
 
-	public static boolean isKeyComboCtrlA(int key)
-	{
-		return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_A);
-	}
+    public static boolean isKeyComboCtrlC(int key) {
+        return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_C);
+    }
 
-	public void tick()
-	{
-	}
+    public static boolean isKeyComboCtrlA(int key) {
+        return isCtrlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_A);
+    }
 
-	public String toString()
-	{
-		String s = getClass().getSimpleName();
+    public void tick() {}
 
-		if (s.isEmpty())
-		{
-			s = getClass().getSuperclass().getSimpleName();
-		}
+    public String toString() {
+        String s = getClass().getSimpleName();
 
-		return s;
-	}
+        if (s.isEmpty()) {
+            s = getClass().getSuperclass().getSimpleName();
+        }
+
+        return s;
+    }
 }

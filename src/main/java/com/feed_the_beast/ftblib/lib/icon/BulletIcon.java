@@ -1,117 +1,119 @@
 package com.feed_the_beast.ftblib.lib.icon;
 
+import net.minecraft.client.renderer.Tessellator;
+
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.Tessellator;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
 /**
  * @author LatvianModder
  */
 public class BulletIcon extends Icon {
-	private static final MutableColor4I DEFAULT_COLOR = Color4I.rgb(0xEDEDED).mutable();
-	private static final MutableColor4I DEFAULT_COLOR_B = Color4I.rgb(0xFFFFFF).mutable();
-	private static final MutableColor4I DEFAULT_COLOR_D = Color4I.rgb(0xDDDDDD).mutable();
 
-	private Color4I color, colorB, colorD;
-	private boolean inverse;
+    private static final MutableColor4I DEFAULT_COLOR = Color4I.rgb(0xEDEDED).mutable();
+    private static final MutableColor4I DEFAULT_COLOR_B = Color4I.rgb(0xFFFFFF).mutable();
+    private static final MutableColor4I DEFAULT_COLOR_D = Color4I.rgb(0xDDDDDD).mutable();
 
-	public BulletIcon() {
-		color = Icon.EMPTY;
-		colorB = Icon.EMPTY;
-		colorD = Icon.EMPTY;
-		inverse = false;
-	}
+    private Color4I color, colorB, colorD;
+    private boolean inverse;
 
-	@Override
-	public BulletIcon copy() {
-		BulletIcon icon = new BulletIcon();
-		icon.color = color;
-		icon.colorB = colorB;
-		icon.colorD = colorD;
-		icon.inverse = inverse;
-		return icon;
-	}
+    public BulletIcon() {
+        color = Icon.EMPTY;
+        colorB = Icon.EMPTY;
+        colorD = Icon.EMPTY;
+        inverse = false;
+    }
 
-	public BulletIcon setColor(Color4I col) {
-		color = col;
+    @Override
+    public BulletIcon copy() {
+        BulletIcon icon = new BulletIcon();
+        icon.color = color;
+        icon.colorB = colorB;
+        icon.colorD = colorD;
+        icon.inverse = inverse;
+        return icon;
+    }
 
-		if (color.isEmpty()) {
-			return this;
-		}
+    public BulletIcon setColor(Color4I col) {
+        color = col;
 
-		MutableColor4I c = color.mutable();
-		c.addBrightness(18);
-		colorB = c.copy();
-		c = color.mutable();
-		c.addBrightness(-18);
-		colorD = c.copy();
-		return this;
-	}
+        if (color.isEmpty()) {
+            return this;
+        }
 
-	@Override
-	public BulletIcon withColor(Color4I col) {
-		return copy().setColor(col);
-	}
+        MutableColor4I c = color.mutable();
+        c.addBrightness(18);
+        colorB = c.copy();
+        c = color.mutable();
+        c.addBrightness(-18);
+        colorD = c.copy();
+        return this;
+    }
 
-	@Override
-	public BulletIcon withTint(Color4I c) {
-		return withColor(color.withTint(c));
-	}
+    @Override
+    public BulletIcon withColor(Color4I col) {
+        return copy().setColor(col);
+    }
 
-	public BulletIcon setInverse(boolean v) {
-		inverse = v;
-		return this;
-	}
+    @Override
+    public BulletIcon withTint(Color4I c) {
+        return withColor(color.withTint(c));
+    }
 
-	@Override
-	protected void setProperties(IconProperties properties) {
-		super.setProperties(properties);
-		inverse = properties.getBoolean("inverse", inverse);
-	}
+    public BulletIcon setInverse(boolean v) {
+        inverse = v;
+        return this;
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void draw(int x, int y, int w, int h) {
-		Color4I c, cb, cd;
+    @Override
+    protected void setProperties(IconProperties properties) {
+        super.setProperties(properties);
+        inverse = properties.getBoolean("inverse", inverse);
+    }
 
-		if (color.isEmpty()) {
-			c = DEFAULT_COLOR;
-			cb = DEFAULT_COLOR_B;
-			cd = DEFAULT_COLOR_D;
-		} else {
-			c = color;
-			cb = colorB;
-			cd = colorD;
-		}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void draw(int x, int y, int w, int h) {
+        Color4I c, cb, cd;
 
-		GlStateManager.disableTexture2D();
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		GuiHelper.addRectToBuffer(tessellator, x, y + 1, 1, h - 2, inverse ? cd : cb);
-		GuiHelper.addRectToBuffer(tessellator, x + w - 1, y + 1, 1, h - 2, inverse ? cb : cd);
-		GuiHelper.addRectToBuffer(tessellator, x + 1, y, w - 2, 1, inverse ? cd : cb);
-		GuiHelper.addRectToBuffer(tessellator, x + 1, y + h - 1, w - 2, 1, inverse ? cb : cd);
-		GuiHelper.addRectToBuffer(tessellator, x + 1, y + 1, w - 2, h - 2, c);
+        if (color.isEmpty()) {
+            c = DEFAULT_COLOR;
+            cb = DEFAULT_COLOR_B;
+            cd = DEFAULT_COLOR_D;
+        } else {
+            c = color;
+            cb = colorB;
+            cd = colorD;
+        }
 
-		tessellator.draw();
-		GlStateManager.enableTexture2D();
-		GlStateManager.color(1F, 1F, 1F, 1F);
-	}
+        GlStateManager.disableTexture2D();
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        GuiHelper.addRectToBuffer(tessellator, x, y + 1, 1, h - 2, inverse ? cd : cb);
+        GuiHelper.addRectToBuffer(tessellator, x + w - 1, y + 1, 1, h - 2, inverse ? cb : cd);
+        GuiHelper.addRectToBuffer(tessellator, x + 1, y, w - 2, 1, inverse ? cd : cb);
+        GuiHelper.addRectToBuffer(tessellator, x + 1, y + h - 1, w - 2, 1, inverse ? cb : cd);
+        GuiHelper.addRectToBuffer(tessellator, x + 1, y + 1, w - 2, h - 2, c);
 
-	@Override
-	public JsonElement getJson() {
-		JsonObject o = new JsonObject();
-		o.addProperty("id", "bullet");
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
+        GlStateManager.color(1F, 1F, 1F, 1F);
+    }
 
-		if (!color.isEmpty()) {
-			o.add("color", color.getJson());
-		}
+    @Override
+    public JsonElement getJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("id", "bullet");
 
-		return o;
-	}
+        if (!color.isEmpty()) {
+            o.add("color", color.getJson());
+        }
+
+        return o;
+    }
 }

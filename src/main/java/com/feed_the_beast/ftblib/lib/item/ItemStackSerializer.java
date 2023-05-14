@@ -1,157 +1,158 @@
 package com.feed_the_beast.ftblib.lib.item;
 
-import net.minecraft.init.Items;
+import javax.annotation.Nullable;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.oredict.OreDictionary;
-
-import javax.annotation.Nullable;
 
 import com.feed_the_beast.ftblib.lib.util.InvUtils;
 
 import cpw.mods.fml.common.registry.GameData;
 
 public class ItemStackSerializer {
-	public static ItemStack parseItemThrowingException(String input) throws Exception {
-		input = input.trim();
-		if (input.isEmpty() || input.equals("-") || input.equals("minecraft:air")) {
-			return InvUtils.EMPTY_STACK;
-		} else if (input.startsWith("{")) {
-			NBTTagCompound nbt = (NBTTagCompound) JsonToNBT.func_150315_a(input);
 
-			if (nbt.getByte("Count") <= 0) {
-				nbt.setByte("Count", (byte) 1);
-			}
+    public static ItemStack parseItemThrowingException(String input) throws Exception {
+        input = input.trim();
+        if (input.isEmpty() || input.equals("-") || input.equals("minecraft:air")) {
+            return InvUtils.EMPTY_STACK;
+        } else if (input.startsWith("{")) {
+            NBTTagCompound nbt = (NBTTagCompound) JsonToNBT.func_150315_a(input);
 
-			return ItemStack.loadItemStackFromNBT(nbt);
-		}
+            if (nbt.getByte("Count") <= 0) {
+                nbt.setByte("Count", (byte) 1);
+            }
 
-		String[] s1 = input.split(" ", 4);
-		Item item = GameData.getItemRegistry().getObject(new ResourceLocation(s1[0]).toString());
+            return ItemStack.loadItemStackFromNBT(nbt);
+        }
 
-		if (item == null) {
-			throw new NullPointerException("Unknown item: " + s1[0]);
-		} else if (item == null) {
-			return InvUtils.EMPTY_STACK;
-		}
+        String[] s1 = input.split(" ", 4);
+        Item item = GameData.getItemRegistry().getObject(new ResourceLocation(s1[0]).toString());
 
-		int stackSize = 1, meta = 0;
+        if (item == null) {
+            throw new NullPointerException("Unknown item: " + s1[0]);
+        } else if (item == null) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-		if (s1.length >= 2) {
-			stackSize = MathHelper.parseIntWithDefault(s1[1], 1);
-		}
+        int stackSize = 1, meta = 0;
 
-		if (s1.length >= 3) {
-			meta = (s1[2].charAt(0) == '*') ? OreDictionary.WILDCARD_VALUE : MathHelper.parseIntWithDefault(s1[2], 0);
-		}
+        if (s1.length >= 2) {
+            stackSize = MathHelper.parseIntWithDefault(s1[1], 1);
+        }
 
-		ItemStack itemstack = new ItemStack(item, stackSize, meta);
+        if (s1.length >= 3) {
+            meta = (s1[2].charAt(0) == '*') ? OreDictionary.WILDCARD_VALUE : MathHelper.parseIntWithDefault(s1[2], 0);
+        }
 
-		if (s1.length >= 4) {
-			itemstack.setTagCompound((NBTTagCompound) JsonToNBT.func_150315_a(s1[3]));
-		}
+        ItemStack itemstack = new ItemStack(item, stackSize, meta);
 
-		return itemstack == null ? InvUtils.EMPTY_STACK : itemstack;
-	}
+        if (s1.length >= 4) {
+            itemstack.setTagCompound((NBTTagCompound) JsonToNBT.func_150315_a(s1[3]));
+        }
 
-	public static ItemStack parseItem(String input) {
-		try {
-			return parseItemThrowingException(input);
-		} catch (Exception ex) {
-			return InvUtils.EMPTY_STACK;
-		}
-	}
+        return itemstack == null ? InvUtils.EMPTY_STACK : itemstack;
+    }
 
-	public static String toString(ItemStack stack) {
-		if (stack == null) {
-			return "minecraft:air";
-		}
+    public static ItemStack parseItem(String input) {
+        try {
+            return parseItemThrowingException(input);
+        } catch (Exception ex) {
+            return InvUtils.EMPTY_STACK;
+        }
+    }
 
-		NBTTagCompound nbt = stack.writeToNBT(new NBTTagCompound());
+    public static String toString(ItemStack stack) {
+        if (stack == null) {
+            return "minecraft:air";
+        }
 
-		if (nbt.hasKey("ForgeCaps")) {
-			return nbt.toString();
-		}
+        NBTTagCompound nbt = stack.writeToNBT(new NBTTagCompound());
 
-		StringBuilder builder = new StringBuilder(String.valueOf(GameData.getItemRegistry().getNameForObject(stack.getItem())));
+        if (nbt.hasKey("ForgeCaps")) {
+            return nbt.toString();
+        }
 
-		int count = stack.stackSize;
-		int meta = stack.getItemDamage();
-		NBTTagCompound tag = stack.getTagCompound();
+        StringBuilder builder = new StringBuilder(
+                String.valueOf(GameData.getItemRegistry().getNameForObject(stack.getItem())));
 
-		if (count > 1 || meta != 0 || tag != null) {
-			builder.append(' ');
-			builder.append(count);
-		}
+        int count = stack.stackSize;
+        int meta = stack.getItemDamage();
+        NBTTagCompound tag = stack.getTagCompound();
 
-		if (meta != 0 || tag != null) {
-			builder.append(' ');
-			builder.append(meta);
-		}
+        if (count > 1 || meta != 0 || tag != null) {
+            builder.append(' ');
+            builder.append(count);
+        }
 
-		if (tag != null) {
-			builder.append(' ');
-			builder.append(tag);
-		}
+        if (meta != 0 || tag != null) {
+            builder.append(' ');
+            builder.append(meta);
+        }
 
-		return builder.toString();
-	}
+        if (tag != null) {
+            builder.append(' ');
+            builder.append(tag);
+        }
 
-	public static NBTBase write(ItemStack stack, boolean forceCompound) {
-		if (stack == null) {
-			return forceCompound ? new NBTTagCompound() : new NBTTagString("");
-		}
+        return builder.toString();
+    }
 
-		NBTTagCompound nbt = stack.writeToNBT(new NBTTagCompound());
+    public static NBTBase write(ItemStack stack, boolean forceCompound) {
+        if (stack == null) {
+            return forceCompound ? new NBTTagCompound() : new NBTTagString("");
+        }
 
-		if (!nbt.hasKey("ForgeCaps") && !nbt.hasKey("tag")) {
-			if (!forceCompound) {
-				return new NBTTagString(toString(stack));
-			}
+        NBTTagCompound nbt = stack.writeToNBT(new NBTTagCompound());
 
-			NBTTagCompound nbt1 = new NBTTagCompound();
-			nbt1.setString("item", toString(stack));
-			return nbt1;
-		}
+        if (!nbt.hasKey("ForgeCaps") && !nbt.hasKey("tag")) {
+            if (!forceCompound) {
+                return new NBTTagString(toString(stack));
+            }
 
-		if (nbt.getByte("Count") == 1) {
-			nbt.removeTag("Count");
-		}
+            NBTTagCompound nbt1 = new NBTTagCompound();
+            nbt1.setString("item", toString(stack));
+            return nbt1;
+        }
 
-		if (nbt.getShort("Damage") == 0) {
-			nbt.removeTag("Damage");
-		}
+        if (nbt.getByte("Count") == 1) {
+            nbt.removeTag("Count");
+        }
 
-		return nbt;
-	}
+        if (nbt.getShort("Damage") == 0) {
+            nbt.removeTag("Damage");
+        }
 
-	public static ItemStack read(@Nullable NBTBase nbtBase) {
-		if (nbtBase == null) {
-			return InvUtils.EMPTY_STACK;
-		} else if (nbtBase instanceof NBTTagString) {
-			return parseItem(((NBTTagString) nbtBase).func_150285_a_());
-		} else if (!(nbtBase instanceof NBTTagCompound)) {
-			return InvUtils.EMPTY_STACK;
-		}
+        return nbt;
+    }
 
-		NBTTagCompound nbt = (NBTTagCompound) nbtBase;
+    public static ItemStack read(@Nullable NBTBase nbtBase) {
+        if (nbtBase == null) {
+            return InvUtils.EMPTY_STACK;
+        } else if (nbtBase instanceof NBTTagString) {
+            return parseItem(((NBTTagString) nbtBase).func_150285_a_());
+        } else if (!(nbtBase instanceof NBTTagCompound)) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-		if (nbt.hasKey("item", Constants.NBT.TAG_STRING)) {
-			return parseItem(nbt.getString("item"));
-		}
+        NBTTagCompound nbt = (NBTTagCompound) nbtBase;
 
-		if (!nbt.hasKey("Count")) {
-			nbt.setByte("Count", (byte) 1);
-		}
+        if (nbt.hasKey("item", Constants.NBT.TAG_STRING)) {
+            return parseItem(nbt.getString("item"));
+        }
 
-		ItemStack stack = ItemStack.loadItemStackFromNBT(nbt);
-		return stack;
-	}
+        if (!nbt.hasKey("Count")) {
+            nbt.setByte("Count", (byte) 1);
+        }
+
+        ItemStack stack = ItemStack.loadItemStackFromNBT(nbt);
+        return stack;
+    }
 }

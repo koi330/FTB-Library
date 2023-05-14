@@ -1,59 +1,59 @@
 package com.feed_the_beast.ftblib.lib.block;
 
+import net.minecraft.util.Vec3;
+
 import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 import com.feed_the_beast.ftblib.lib.util.misc.EnumScreenPosition;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
-
-import net.minecraft.util.Vec3;
-
 
 /**
  * @author LatvianModder
  */
 public enum EnumHorizontalOffset implements IStringSerializable {
-	CENTER("center", EnumScreenPosition.CENTER),
-	NORTH("north", EnumScreenPosition.BOTTOM),
-	NORTH_EAST("north_east", EnumScreenPosition.BOTTOM_RIGHT),
-	EAST("east", EnumScreenPosition.RIGHT),
-	SOUTH_EAST("south_east", EnumScreenPosition.TOP_RIGHT),
-	SOUTH("south", EnumScreenPosition.TOP),
-	SOUTH_WEST("south_west", EnumScreenPosition.TOP_LEFT),
-	WEST("west", EnumScreenPosition.LEFT),
-	NORTH_WEST("north_west", EnumScreenPosition.BOTTOM_LEFT);
 
-	public static final EnumHorizontalOffset[] VALUES = values();
-	private static final EnumHorizontalOffset[] OPPOSITES = { CENTER, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, NORTH,
-			NORTH_EAST, EAST, SOUTH_EAST };
-	public static final NameMap<EnumHorizontalOffset> NAME_MAP = NameMap.create(CENTER, VALUES);
+    CENTER("center", EnumScreenPosition.CENTER),
+    NORTH("north", EnumScreenPosition.BOTTOM),
+    NORTH_EAST("north_east", EnumScreenPosition.BOTTOM_RIGHT),
+    EAST("east", EnumScreenPosition.RIGHT),
+    SOUTH_EAST("south_east", EnumScreenPosition.TOP_RIGHT),
+    SOUTH("south", EnumScreenPosition.TOP),
+    SOUTH_WEST("south_west", EnumScreenPosition.TOP_LEFT),
+    WEST("west", EnumScreenPosition.LEFT),
+    NORTH_WEST("north_west", EnumScreenPosition.BOTTOM_LEFT);
 
-	private final String name;
-	public final EnumScreenPosition screenPosition;
-	public final int x_offset;
-	public final int y_offset;
-	public final int z_offset;
+    public static final EnumHorizontalOffset[] VALUES = values();
+    private static final EnumHorizontalOffset[] OPPOSITES = { CENTER, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, NORTH,
+            NORTH_EAST, EAST, SOUTH_EAST };
+    public static final NameMap<EnumHorizontalOffset> NAME_MAP = NameMap.create(CENTER, VALUES);
 
-	EnumHorizontalOffset(String n, EnumScreenPosition p) {
-		name = n;
-		screenPosition = p;
-		x_offset = p.offsetX;
-		y_offset = 0;
-		z_offset = p.offsetY;
-	}
+    private final String name;
+    public final EnumScreenPosition screenPosition;
+    public final int x_offset;
+    public final int y_offset;
+    public final int z_offset;
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    EnumHorizontalOffset(String n, EnumScreenPosition p) {
+        name = n;
+        screenPosition = p;
+        x_offset = p.offsetX;
+        y_offset = 0;
+        z_offset = p.offsetY;
+    }
 
-	public Vec3 offset(int posx, int posy, int posz) {
-		return Vec3.createVectorHelper(x_offset + posx, y_offset + posy, z_offset + posz);
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	public boolean isCenter() {
-		return this == CENTER;
-	}
+    public Vec3 offset(int posx, int posy, int posz) {
+        return Vec3.createVectorHelper(x_offset + posx, y_offset + posy, z_offset + posz);
+    }
 
-	public EnumHorizontalOffset opposite() {
-		return OPPOSITES[ordinal()];
-	}
+    public boolean isCenter() {
+        return this == CENTER;
+    }
+
+    public EnumHorizontalOffset opposite() {
+        return OPPOSITES[ordinal()];
+    }
 }

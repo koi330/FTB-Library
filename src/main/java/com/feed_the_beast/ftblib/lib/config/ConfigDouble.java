@@ -1,10 +1,11 @@
 package com.feed_the_beast.ftblib.lib.config;
 
-import com.feed_the_beast.ftblib.lib.icon.Color4I;
-import com.feed_the_beast.ftblib.lib.io.DataIn;
-import com.feed_the_beast.ftblib.lib.io.DataOut;
-import com.feed_the_beast.ftblib.lib.util.StringUtils;
-import com.google.gson.JsonElement;
+import java.util.List;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
@@ -12,243 +13,246 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
+import com.feed_the_beast.ftblib.lib.icon.Color4I;
+import com.feed_the_beast.ftblib.lib.io.DataIn;
+import com.feed_the_beast.ftblib.lib.io.DataOut;
+import com.feed_the_beast.ftblib.lib.util.StringUtils;
+import com.google.gson.JsonElement;
 
 /**
  * @author LatvianModder
  */
 public class ConfigDouble extends ConfigValue implements DoubleSupplier {
-	public static final String ID = "double";
 
-	public static class SimpleDouble extends ConfigDouble {
-		private final DoubleSupplier get;
-		private final DoubleConsumer set;
+    public static final String ID = "double";
 
-		public SimpleDouble(double min, double max, DoubleSupplier g, DoubleConsumer s) {
-			super(0D, min, max);
-			get = g;
-			set = s;
-		}
+    public static class SimpleDouble extends ConfigDouble {
 
-		@Override
-		public double getDouble() {
-			return get.getAsDouble();
-		}
+        private final DoubleSupplier get;
+        private final DoubleConsumer set;
 
-		@Override
-		public void setDouble(double v) {
-			set.accept(v);
-		}
-	}
+        public SimpleDouble(double min, double max, DoubleSupplier g, DoubleConsumer s) {
+            super(0D, min, max);
+            get = g;
+            set = s;
+        }
 
-	private double value;
-	private double min = Double.NEGATIVE_INFINITY;
-	private double max = Double.POSITIVE_INFINITY;
+        @Override
+        public double getDouble() {
+            return get.getAsDouble();
+        }
 
-	public ConfigDouble(double v) {
-		value = v;
-	}
+        @Override
+        public void setDouble(double v) {
+            set.accept(v);
+        }
+    }
 
-	public ConfigDouble(double v, double mn, double mx) {
-		this(MathHelper.clamp_double(v, mn, mx));
-		min = mn;
-		max = mx;
-	}
+    private double value;
+    private double min = Double.NEGATIVE_INFINITY;
+    private double max = Double.POSITIVE_INFINITY;
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    public ConfigDouble(double v) {
+        value = v;
+    }
 
-	@Override
-	public double getDouble() {
-		return value;
-	}
+    public ConfigDouble(double v, double mn, double mx) {
+        this(MathHelper.clamp_double(v, mn, mx));
+        min = mn;
+        max = mx;
+    }
 
-	public void setDouble(double v) {
-		value = MathHelper.clamp_double(v, getMin(), getMax());
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	public ConfigDouble setMin(double v) {
-		min = v;
-		return this;
-	}
+    @Override
+    public double getDouble() {
+        return value;
+    }
 
-	public ConfigDouble setMax(double v) {
-		max = v;
-		return this;
-	}
+    public void setDouble(double v) {
+        value = MathHelper.clamp_double(v, getMin(), getMax());
+    }
 
-	public double getMin() {
-		return min;
-	}
+    public ConfigDouble setMin(double v) {
+        min = v;
+        return this;
+    }
 
-	public double getMax() {
-		return max;
-	}
+    public ConfigDouble setMax(double v) {
+        max = v;
+        return this;
+    }
 
-	@Override
-	public String getString() {
-		String s = Double.toString(getDouble());
-		return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
-	}
+    public double getMin() {
+        return min;
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		return new ChatComponentText(StringUtils.formatDouble(getDouble(), true));
-	}
+    public double getMax() {
+        return max;
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return getDouble() != 0D;
-	}
+    @Override
+    public String getString() {
+        String s = Double.toString(getDouble());
+        return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
+    }
 
-	@Override
-	public int getInt() {
-		return (int) getDouble();
-	}
+    @Override
+    public IChatComponent getStringForGUI() {
+        return new ChatComponentText(StringUtils.formatDouble(getDouble(), true));
+    }
 
-	@Override
-	public long getLong() {
-		return (long) getDouble();
-	}
+    @Override
+    public boolean getBoolean() {
+        return getDouble() != 0D;
+    }
 
-	@Override
-	public ConfigDouble copy() {
-		return new ConfigDouble(getDouble(), getMin(), getMax());
-	}
+    @Override
+    public int getInt() {
+        return (int) getDouble();
+    }
 
-	@Override
-	public boolean equalsValue(ConfigValue value) {
-		return getDouble() == value.getDouble();
-	}
+    @Override
+    public long getLong() {
+        return (long) getDouble();
+    }
 
-	@Override
-	public Color4I getColor() {
-		return ConfigInt.COLOR;
-	}
+    @Override
+    public ConfigDouble copy() {
+        return new ConfigDouble(getDouble(), getMin(), getMax());
+    }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		super.addInfo(inst, list);
-		double min = getMin();
-		double max = getMax();
+    @Override
+    public boolean equalsValue(ConfigValue value) {
+        return getDouble() == value.getDouble();
+    }
 
-		if (min != Double.NEGATIVE_INFINITY) {
-			list.add(EnumChatFormatting.AQUA + "Min: " + EnumChatFormatting.RESET + StringUtils.formatDouble(min));
-		}
+    @Override
+    public Color4I getColor() {
+        return ConfigInt.COLOR;
+    }
 
-		if (max != Double.POSITIVE_INFINITY) {
-			list.add(EnumChatFormatting.AQUA + "Max: " + EnumChatFormatting.RESET + StringUtils.formatDouble(max));
-		}
-	}
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        super.addInfo(inst, list);
+        double min = getMin();
+        double max = getMax();
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		if (string.isEmpty()) {
-			return false;
-		}
+        if (min != Double.NEGATIVE_INFINITY) {
+            list.add(EnumChatFormatting.AQUA + "Min: " + EnumChatFormatting.RESET + StringUtils.formatDouble(min));
+        }
 
-		double min = getMin();
-		double max = getMax();
+        if (max != Double.POSITIVE_INFINITY) {
+            list.add(EnumChatFormatting.AQUA + "Max: " + EnumChatFormatting.RESET + StringUtils.formatDouble(max));
+        }
+    }
 
-		if (string.equals("+Inf")) {
-			if (max != Double.POSITIVE_INFINITY) {
-				return false;
-			}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        if (string.isEmpty()) {
+            return false;
+        }
 
-			if (!simulate) {
-				setDouble(Double.POSITIVE_INFINITY);
-			}
+        double min = getMin();
+        double max = getMax();
 
-			return true;
-		} else if (string.equals("-Inf")) {
-			if (min != Double.NEGATIVE_INFINITY) {
-				return false;
-			}
+        if (string.equals("+Inf")) {
+            if (max != Double.POSITIVE_INFINITY) {
+                return false;
+            }
 
-			if (!simulate) {
-				setDouble(Double.NEGATIVE_INFINITY);
-			}
+            if (!simulate) {
+                setDouble(Double.POSITIVE_INFINITY);
+            }
 
-			return true;
-		}
+            return true;
+        } else if (string.equals("-Inf")) {
+            if (min != Double.NEGATIVE_INFINITY) {
+                return false;
+            }
 
-		try {
-			double multiplier = 1D;
+            if (!simulate) {
+                setDouble(Double.NEGATIVE_INFINITY);
+            }
 
-			if (string.endsWith("K")) {
-				multiplier = 1000D;
-				string = string.substring(0, string.length() - 1);
-			} else if (string.endsWith("M")) {
-				multiplier = 1000000D;
-				string = string.substring(0, string.length() - 1);
-			} else if (string.endsWith("B")) {
-				multiplier = 1000000000D;
-				string = string.substring(0, string.length() - 1);
-			}
+            return true;
+        }
 
-			double val = Double.parseDouble(string.trim()) * multiplier;
+        try {
+            double multiplier = 1D;
 
-			if (val < min || val > max) {
-				return false;
-			}
+            if (string.endsWith("K")) {
+                multiplier = 1000D;
+                string = string.substring(0, string.length() - 1);
+            } else if (string.endsWith("M")) {
+                multiplier = 1000000D;
+                string = string.substring(0, string.length() - 1);
+            } else if (string.endsWith("B")) {
+                multiplier = 1000000000D;
+                string = string.substring(0, string.length() - 1);
+            }
 
-			if (!simulate) {
-				setDouble(val);
-			}
+            double val = Double.parseDouble(string.trim()) * multiplier;
 
-			return true;
-		} catch (Exception ex) {
-			return false;
-		}
-	}
+            if (val < min || val > max) {
+                return false;
+            }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		value = getDouble();
+            if (!simulate) {
+                setDouble(val);
+            }
 
-		if (value != 0D) {
-			nbt.setDouble(key, value);
-		}
-	}
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		setDouble(nbt.getDouble(key));
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        value = getDouble();
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeDouble(getDouble());
-		data.writeDouble(getMin());
-		data.writeDouble(getMax());
-	}
+        if (value != 0D) {
+            nbt.setDouble(key, value);
+        }
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		setDouble(data.readDouble());
-		setMin(data.readDouble());
-		setMax(data.readDouble());
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        setDouble(nbt.getDouble(key));
+    }
 
-	@Override
-	public double getAsDouble() {
-		return getDouble();
-	}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeDouble(getDouble());
+        data.writeDouble(getMin());
+        data.writeDouble(getMax());
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		setDouble(value.getDouble());
-	}
+    @Override
+    public void readData(DataIn data) {
+        setDouble(data.readDouble());
+        setMin(data.readDouble());
+        setMax(data.readDouble());
+    }
 
-	@Override
-	public void setValueFromJson(JsonElement json) {
-		if (json.isJsonPrimitive()) {
-			setDouble(json.getAsDouble());
-		}
-	}
+    @Override
+    public double getAsDouble() {
+        return getDouble();
+    }
+
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        setDouble(value.getDouble());
+    }
+
+    @Override
+    public void setValueFromJson(JsonElement json) {
+        if (json.isJsonPrimitive()) {
+            setDouble(json.getAsDouble());
+        }
+    }
 }

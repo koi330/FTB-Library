@@ -1,22 +1,23 @@
 package com.feed_the_beast.ftblib.command.client;
 
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+
 import com.feed_the_beast.ftblib.lib.command.CmdBase;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
-
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
 
 /**
  * @author LatvianModder
  */
 public class CommandSimulateButton extends CmdBase {
-	public CommandSimulateButton() {
-		super("ftblib_simulate_button", Level.ALL);
-	}
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-		GuiHelper.BLANK_GUI.handleClick(StringUtils.joinSpaceUntilEnd(0, args));
-	}
+    public CommandSimulateButton() {
+        super("ftblib_simulate_button", Level.ALL);
+    }
+
+    @Override
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        GuiHelper.BLANK_GUI.handleClick(StringUtils.joinSpaceUntilEnd(0, args));
+    }
 }

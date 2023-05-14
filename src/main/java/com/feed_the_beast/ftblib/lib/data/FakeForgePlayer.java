@@ -1,57 +1,50 @@
 package com.feed_the_beast.ftblib.lib.data;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import com.feed_the_beast.ftblib.lib.util.ServerUtils;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * @author LatvianModder
  */
-public class FakeForgePlayer extends ForgePlayer
-{
-	public FakeForgePlayer(Universe u)
-	{
-		super(u, ServerUtils.FAKE_PLAYER_PROFILE.getId(), ServerUtils.FAKE_PLAYER_PROFILE.getName());
-	}
+public class FakeForgePlayer extends ForgePlayer {
 
-	@Override
-	public GameProfile getProfile()
-	{
-		return ServerUtils.FAKE_PLAYER_PROFILE;
-	}
+    public FakeForgePlayer(Universe u) {
+        super(u, ServerUtils.FAKE_PLAYER_PROFILE.getId(), ServerUtils.FAKE_PLAYER_PROFILE.getName());
+    }
 
-	@Override
-	public boolean isOnline()
-	{
-		return tempPlayer != null;
-	}
+    @Override
+    public GameProfile getProfile() {
+        return ServerUtils.FAKE_PLAYER_PROFILE;
+    }
 
-	@Override
-	public EntityPlayerMP getPlayer()
-	{
-		if (tempPlayer == null)
-		{
-			throw new NullPointerException("Fake player not set yet!");
-		}
+    @Override
+    public boolean isOnline() {
+        return tempPlayer != null;
+    }
 
-		return tempPlayer;
-	}
+    @Override
+    public EntityPlayerMP getPlayer() {
+        if (tempPlayer == null) {
+            throw new NullPointerException("Fake player not set yet!");
+        }
 
-	@Override
-	public boolean isFake()
-	{
-		return true;
-	}
+        return tempPlayer;
+    }
 
-	@Override
-	public boolean isOP()
-	{
-		return false;
-	}
+    @Override
+    public boolean isFake() {
+        return true;
+    }
 
-	@Override
-	public void markDirty()
-	{
-		team.universe.markDirty();
-	}
+    @Override
+    public boolean isOP() {
+        return false;
+    }
+
+    @Override
+    public void markDirty() {
+        team.universe.markDirty();
+    }
 }

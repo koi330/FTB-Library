@@ -1,9 +1,5 @@
 package com.feed_the_beast.ftblib.lib.io;
 
-import com.feed_the_beast.ftblib.lib.util.JsonUtils;
-import com.google.gson.JsonElement;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,80 +9,73 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import com.feed_the_beast.ftblib.lib.util.JsonUtils;
+import com.google.gson.JsonElement;
+
 /**
  * @author LatvianModder
  */
-public class FileDataReader extends DataReader
-{
-	public final File file;
+public class FileDataReader extends DataReader {
 
-	FileDataReader(File f)
-	{
-		file = f;
-	}
+    public final File file;
 
-	public String toString()
-	{
-		return file.getAbsolutePath();
-	}
+    FileDataReader(File f) {
+        file = f;
+    }
 
-	@Override
-	public boolean canRead()
-	{
-		return file.exists() && file.isFile() && file.canRead();
-	}
+    public String toString() {
+        return file.getAbsolutePath();
+    }
 
-	private void checkFile() throws Exception
-	{
-		if (!canRead())
-		{
-			throw new FileNotFoundException("File is not found/readable!");
-		}
-	}
+    @Override
+    public boolean canRead() {
+        return file.exists() && file.isFile() && file.canRead();
+    }
 
-	@Override
-	public String string() throws Exception
-	{
-		return string(1024);
-	}
+    private void checkFile() throws Exception {
+        if (!canRead()) {
+            throw new FileNotFoundException("File is not found/readable!");
+        }
+    }
 
-	@Override
-	public String string(int bufferSize) throws Exception
-	{
-		checkFile();
+    @Override
+    public String string() throws Exception {
+        return string(1024);
+    }
 
-		try (FileInputStream stream = new FileInputStream(file))
-		{
-			return readStringFromStream(stream, bufferSize);
-		}
-	}
+    @Override
+    public String string(int bufferSize) throws Exception {
+        checkFile();
 
-	@Override
-	public List<String> stringList() throws Exception
-	{
-		checkFile();
+        try (FileInputStream stream = new FileInputStream(file)) {
+            return readStringFromStream(stream, bufferSize);
+        }
+    }
 
-		try (FileInputStream stream = new FileInputStream(file))
-		{
-			return readStringListFromStream(stream);
-		}
-	}
+    @Override
+    public List<String> stringList() throws Exception {
+        checkFile();
 
-	@Override
-	public JsonElement json() throws Exception
-	{
-		checkFile();
+        try (FileInputStream stream = new FileInputStream(file)) {
+            return readStringListFromStream(stream);
+        }
+    }
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)))
-		{
-			return JsonUtils.parse(reader);
-		}
-	}
+    @Override
+    public JsonElement json() throws Exception {
+        checkFile();
 
-	@Override
-	public BufferedImage image() throws Exception
-	{
-		checkFile();
-		return ImageIO.read(file);
-	}
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+            return JsonUtils.parse(reader);
+        }
+    }
+
+    @Override
+    public BufferedImage image() throws Exception {
+        checkFile();
+        return ImageIO.read(file);
+    }
 }

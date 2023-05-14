@@ -1,5 +1,13 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Consumer;
+
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
+
 import com.feed_the_beast.ftblib.lib.data.Action;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.feed_the_beast.ftblib.lib.gui.Panel;
@@ -7,19 +15,13 @@ import com.feed_the_beast.ftblib.lib.gui.SimpleTextButton;
 import com.feed_the_beast.ftblib.lib.gui.WidgetType;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumChatFormatting;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Consumer;
-
 /**
  * @author LatvianModder
  */
 public class GuiActionList extends GuiButtonListBase {
+
     private class ActionButton extends SimpleTextButton {
+
         private final Action.Inst action;
 
         private ActionButton(Panel panel, Action.Inst a) {
@@ -32,8 +34,14 @@ public class GuiActionList extends GuiButtonListBase {
             GuiHelper.playClickSound();
 
             if (action.requiresConfirm) {
-                String key = "team_action." + action.id.getResourceDomain() + "." + action.id.getResourcePath() + ".confirmation";
-                openYesNo(action.title.getFormattedText() + "?", (EnumChatFormatting.RED + I18n.format(key)), () -> callback.accept(action.id));
+                String key = "team_action." + action.id.getResourceDomain()
+                        + "."
+                        + action.id.getResourcePath()
+                        + ".confirmation";
+                openYesNo(
+                        action.title.getFormattedText() + "?",
+                        (EnumChatFormatting.RED + I18n.format(key)),
+                        () -> callback.accept(action.id));
             } else {
                 callback.accept(action.id);
             }

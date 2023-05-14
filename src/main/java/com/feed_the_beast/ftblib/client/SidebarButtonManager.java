@@ -1,19 +1,5 @@
 package com.feed_the_beast.ftblib.client;
 
-import com.feed_the_beast.ftblib.FTBLibConfig;
-import com.feed_the_beast.ftblib.client.resource.IResourceType;
-import com.feed_the_beast.ftblib.client.resource.ISelectiveResourceReloadListener;
-import com.feed_the_beast.ftblib.events.SidebarButtonCreatedEvent;
-import com.feed_the_beast.ftblib.lib.io.DataReader;
-import com.feed_the_beast.ftblib.lib.util.JsonUtils;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -23,181 +9,168 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
+
+import com.feed_the_beast.ftblib.FTBLibConfig;
+import com.feed_the_beast.ftblib.client.resource.IResourceType;
+import com.feed_the_beast.ftblib.client.resource.ISelectiveResourceReloadListener;
+import com.feed_the_beast.ftblib.events.SidebarButtonCreatedEvent;
+import com.feed_the_beast.ftblib.lib.io.DataReader;
+import com.feed_the_beast.ftblib.lib.util.JsonUtils;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * @author LatvianModder
  */
-public enum SidebarButtonManager implements ISelectiveResourceReloadListener
-{
-	INSTANCE;
+public enum SidebarButtonManager implements ISelectiveResourceReloadListener {
 
-	public final List<SidebarButtonGroup> groups = new ArrayList<>();
+    INSTANCE;
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void onResourceManagerReload(IResourceManager manager, Predicate<IResourceType> resourcePredicate)
-	{
-		if (!resourcePredicate.test(FTBLibResourceType.FTB_CONFIG))
-		{
-			return;
-		}
+    public final List<SidebarButtonGroup> groups = new ArrayList<>();
 
-		groups.clear();
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onResourceManagerReload(IResourceManager manager, Predicate<IResourceType> resourcePredicate) {
+        if (!resourcePredicate.test(FTBLibResourceType.FTB_CONFIG)) {
+            return;
+        }
 
-		JsonElement element = DataReader.get(new File(Minecraft.getMinecraft().mcDataDir, "local/client/sidebar_buttons.json")).safeJson();
-		JsonObject sidebarButtonConfig;
+        groups.clear();
 
-		if (element.isJsonObject())
-		{
-			sidebarButtonConfig = element.getAsJsonObject();
-		}
-		else
-		{
-			sidebarButtonConfig = new JsonObject();
-		}
+        JsonElement element = DataReader
+                .get(new File(Minecraft.getMinecraft().mcDataDir, "local/client/sidebar_buttons.json")).safeJson();
+        JsonObject sidebarButtonConfig;
 
-		Map<ResourceLocation, SidebarButtonGroup> groupMap = new HashMap<>();
+        if (element.isJsonObject()) {
+            sidebarButtonConfig = element.getAsJsonObject();
+        } else {
+            sidebarButtonConfig = new JsonObject();
+        }
 
-		for (String domain : (Set<String>) manager.getResourceDomains())
-		{
-			try
-			{
-				for (IResource resource : (List<IResource>) manager.getAllResources(new ResourceLocation(domain, "sidebar_button_groups.json")))
-				{
-					JsonElement json = DataReader.get(resource).json();
+        Map<ResourceLocation, SidebarButtonGroup> groupMap = new HashMap<>();
 
-					for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet())
-					{
-						if (entry.getValue().isJsonObject())
-						{
-							JsonObject groupJson = entry.getValue().getAsJsonObject();
-							int y = 0;
+        for (String domain : (Set<String>) manager.getResourceDomains()) {
+            try {
+                for (IResource resource : (List<IResource>) manager
+                        .getAllResources(new ResourceLocation(domain, "sidebar_button_groups.json"))) {
+                    JsonElement json = DataReader.get(resource).json();
 
-							if (groupJson.has("y"))
-							{
-								y = groupJson.get("y").getAsInt();
-							}
+                    for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
+                        if (entry.getValue().isJsonObject()) {
+                            JsonObject groupJson = entry.getValue().getAsJsonObject();
+                            int y = 0;
 
-							SidebarButtonGroup group = new SidebarButtonGroup(new ResourceLocation(domain, entry.getKey()), y);
-							groupMap.put(group.getId(), group);
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				if (!(ex instanceof FileNotFoundException))
-				{
-					ex.printStackTrace();
-				}
-			}
-		}
+                            if (groupJson.has("y")) {
+                                y = groupJson.get("y").getAsInt();
+                            }
 
-		for (String domain : (Set<String>) manager.getResourceDomains())
-		{
-			try
-			{
-				for (IResource resource : (List<IResource>) manager.getAllResources(new ResourceLocation(domain, "sidebar_buttons.json")))
-				{
-					JsonElement json = DataReader.get(resource).json();
+                            SidebarButtonGroup group = new SidebarButtonGroup(
+                                    new ResourceLocation(domain, entry.getKey()),
+                                    y);
+                            groupMap.put(group.getId(), group);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                if (!(ex instanceof FileNotFoundException)) {
+                    ex.printStackTrace();
+                }
+            }
+        }
 
-					if (json.isJsonObject())
-					{
-						for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet())
-						{
-							if (entry.getValue().isJsonObject())
-							{
-								JsonObject buttonJson = entry.getValue().getAsJsonObject();
+        for (String domain : (Set<String>) manager.getResourceDomains()) {
+            try {
+                for (IResource resource : (List<IResource>) manager
+                        .getAllResources(new ResourceLocation(domain, "sidebar_buttons.json"))) {
+                    JsonElement json = DataReader.get(resource).json();
 
-								if (!buttonJson.has("group"))
-								{
-									continue;
-								}
+                    if (json.isJsonObject()) {
+                        for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
+                            if (entry.getValue().isJsonObject()) {
+                                JsonObject buttonJson = entry.getValue().getAsJsonObject();
 
-								if (!FTBLibConfig.debugging.dev_sidebar_buttons && buttonJson.has("dev_only") && buttonJson.get("dev_only").getAsBoolean())
-								{
-									continue;
-								}
+                                if (!buttonJson.has("group")) {
+                                    continue;
+                                }
 
-								SidebarButtonGroup group = groupMap.get(new ResourceLocation(buttonJson.get("group").getAsString()));
+                                if (!FTBLibConfig.debugging.dev_sidebar_buttons && buttonJson.has("dev_only")
+                                        && buttonJson.get("dev_only").getAsBoolean()) {
+                                    continue;
+                                }
 
-								if (group == null)
-								{
-									continue;
-								}
+                                SidebarButtonGroup group = groupMap
+                                        .get(new ResourceLocation(buttonJson.get("group").getAsString()));
 
-								SidebarButton button = new SidebarButton(new ResourceLocation(domain, entry.getKey()), group, buttonJson);
+                                if (group == null) {
+                                    continue;
+                                }
 
-								group.getButtons().add(button);
+                                SidebarButton button = new SidebarButton(
+                                        new ResourceLocation(domain, entry.getKey()),
+                                        group,
+                                        buttonJson);
 
-								if (sidebarButtonConfig.has(button.id.getResourceDomain()))
-								{
-									JsonElement e = sidebarButtonConfig.get(button.id.getResourceDomain());
+                                group.getButtons().add(button);
 
-									if (e.isJsonObject() && e.getAsJsonObject().has(button.id.getResourcePath()))
-									{
-										button.setConfig(e.getAsJsonObject().get(button.id.getResourcePath()).getAsBoolean());
-									}
-								}
-								else if (sidebarButtonConfig.has(button.id.toString()))
-								{
-									button.setConfig(sidebarButtonConfig.get(button.id.toString()).getAsBoolean());
-								}
-							}
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				if (!(ex instanceof FileNotFoundException))
-				{
-					ex.printStackTrace();
-				}
-			}
-		}
+                                if (sidebarButtonConfig.has(button.id.getResourceDomain())) {
+                                    JsonElement e = sidebarButtonConfig.get(button.id.getResourceDomain());
 
-		for (SidebarButtonGroup group : groupMap.values())
-		{
-			if (!group.getButtons().isEmpty())
-			{
-				group.getButtons().sort(null);
-				groups.add(group);
-			}
-		}
+                                    if (e.isJsonObject() && e.getAsJsonObject().has(button.id.getResourcePath())) {
+                                        button.setConfig(
+                                                e.getAsJsonObject().get(button.id.getResourcePath()).getAsBoolean());
+                                    }
+                                } else if (sidebarButtonConfig.has(button.id.toString())) {
+                                    button.setConfig(sidebarButtonConfig.get(button.id.toString()).getAsBoolean());
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                if (!(ex instanceof FileNotFoundException)) {
+                    ex.printStackTrace();
+                }
+            }
+        }
 
-		groups.sort(null);
+        for (SidebarButtonGroup group : groupMap.values()) {
+            if (!group.getButtons().isEmpty()) {
+                group.getButtons().sort(null);
+                groups.add(group);
+            }
+        }
 
-		for (SidebarButtonGroup group : groups)
-		{
-			for (SidebarButton button : group.getButtons())
-			{
-				new SidebarButtonCreatedEvent(button).post();
-			}
-		}
+        groups.sort(null);
 
-		saveConfig();
-	}
+        for (SidebarButtonGroup group : groups) {
+            for (SidebarButton button : group.getButtons()) {
+                new SidebarButtonCreatedEvent(button).post();
+            }
+        }
 
-	public void saveConfig()
-	{
-		JsonObject o = new JsonObject();
+        saveConfig();
+    }
 
-		for (SidebarButtonGroup group : groups)
-		{
-			for (SidebarButton button : group.getButtons())
-			{
-				JsonObject o1 = o.getAsJsonObject(button.id.getResourceDomain());
+    public void saveConfig() {
+        JsonObject o = new JsonObject();
 
-				if (o1 == null)
-				{
-					o1 = new JsonObject();
-					o.add(button.id.getResourceDomain(), o1);
-				}
+        for (SidebarButtonGroup group : groups) {
+            for (SidebarButton button : group.getButtons()) {
+                JsonObject o1 = o.getAsJsonObject(button.id.getResourceDomain());
 
-				o1.addProperty(button.id.getResourcePath(), button.getConfig());
-			}
-		}
+                if (o1 == null) {
+                    o1 = new JsonObject();
+                    o.add(button.id.getResourceDomain(), o1);
+                }
 
-		JsonUtils.toJsonSafe(new File(Minecraft.getMinecraft().mcDataDir, "local/client/sidebar_buttons.json"), o);
-	}
+                o1.addProperty(button.id.getResourcePath(), button.getConfig());
+            }
+        }
+
+        JsonUtils.toJsonSafe(new File(Minecraft.getMinecraft().mcDataDir, "local/client/sidebar_buttons.json"), o);
+    }
 }

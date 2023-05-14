@@ -1,18 +1,19 @@
 package com.feed_the_beast.ftblib.lib.client;
 
-import org.lwjgl.opengl.*;
-
 import net.minecraft.client.renderer.OpenGlHelper;
+
+import org.lwjgl.opengl.*;
 
 /**
  * For easier 1.8 port!
  */
 public class GlStateManager // GuiLM
 {
+
     public static int glGetError() {
         return GL11.glGetError();
     }
-    
+
     public static void color(float r, float g, float b, float a) {
         GL11.glColor4f(r, g, b, a);
     }
@@ -142,6 +143,7 @@ public class GlStateManager // GuiLM
     }
 
     public static enum DestFactor {
+
         CONSTANT_ALPHA(32771),
         CONSTANT_COLOR(32769),
         DST_ALPHA(772),
@@ -165,6 +167,7 @@ public class GlStateManager // GuiLM
     }
 
     public static enum SourceFactor {
+
         CONSTANT_ALPHA(32771),
         CONSTANT_COLOR(32769),
         DST_ALPHA(772),
@@ -193,6 +196,7 @@ public class GlStateManager // GuiLM
     }
 
     public static enum LogicOp {
+
         AND(5377),
         AND_INVERTED(5380),
         AND_REVERSE(5378),

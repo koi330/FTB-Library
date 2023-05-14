@@ -1,6 +1,5 @@
 package com.feed_the_beast.ftblib.lib.item;
 
-import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -10,147 +9,129 @@ import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
 
+import cpw.mods.fml.common.registry.GameData;
+
 /**
  * @author LatvianModder
  */
-public class ItemEntryWithCount
-{
-	public static final ItemEntryWithCount EMPTY = new ItemEntryWithCount(ItemEntry.EMPTY, 0)
-	{
-		@Override
-		public boolean isEmpty()
-		{
-			return true;
-		}
-	};
+public class ItemEntryWithCount {
 
-	public final ItemEntry entry;
-	public int count;
+    public static final ItemEntryWithCount EMPTY = new ItemEntryWithCount(ItemEntry.EMPTY, 0) {
 
-	public ItemEntryWithCount(ItemEntry e, int c)
-	{
-		entry = e;
-		count = c;
-	}
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+    };
 
-	public ItemEntryWithCount(NBTBase nbtb)
-	{
-		NBTTagCompound nbt = nbtb instanceof NBTTagCompound ? (NBTTagCompound) nbtb : null;
-		NBTBase id = nbt == null ? null : nbt.getTag("I");
+    public final ItemEntry entry;
+    public int count;
 
-		if (id == null)
-		{
-			ItemStack stack = ItemStackSerializer.read(nbtb);
-			entry = ItemEntry.get(stack);
-			count = nbt != null && nbt.hasKey("RealCount") ? nbt.getInteger("RealCount") : stack == null ? 0 : stack.stackSize;
-			return;
-		}
+    public ItemEntryWithCount(ItemEntry e, int c) {
+        entry = e;
+        count = c;
+    }
 
-		if (id instanceof NBTTagIntArray)
-		{
-			ItemEntry e = ItemEntry.EMPTY;
-			int[] ai = ((NBTTagIntArray) id).func_150302_c();
+    public ItemEntryWithCount(NBTBase nbtb) {
+        NBTTagCompound nbt = nbtb instanceof NBTTagCompound ? (NBTTagCompound) nbtb : null;
+        NBTBase id = nbt == null ? null : nbt.getTag("I");
 
-			if (ai.length > 0)
-			{
-				Item item = GameData.getItemRegistry().getObjectById(ai[0]);
+        if (id == null) {
+            ItemStack stack = ItemStackSerializer.read(nbtb);
+            entry = ItemEntry.get(stack);
+            count = nbt != null && nbt.hasKey("RealCount") ? nbt.getInteger("RealCount")
+                    : stack == null ? 0 : stack.stackSize;
+            return;
+        }
 
-				if (item != null && item != null)
-				{
-					count = 1;
-					int meta = 0;
+        if (id instanceof NBTTagIntArray) {
+            ItemEntry e = ItemEntry.EMPTY;
+            int[] ai = ((NBTTagIntArray) id).func_150302_c();
 
-					if (ai.length >= 2)
-					{
-						count = ai[1];
-					}
+            if (ai.length > 0) {
+                Item item = GameData.getItemRegistry().getObjectById(ai[0]);
 
-					if (ai.length >= 3)
-					{
-						meta = ai[2];
-					}
+                if (item != null && item != null) {
+                    count = 1;
+                    int meta = 0;
 
-					NBTTagCompound tag = (NBTTagCompound) nbt.getTag("N");
-					NBTTagCompound caps = (NBTTagCompound) nbt.getTag("C");
-					e = new ItemEntry(item, meta, tag, caps);
-				}
-			}
+                    if (ai.length >= 2) {
+                        count = ai[1];
+                    }
 
-			entry = e;
-			return;
-		}
+                    if (ai.length >= 3) {
+                        meta = ai[2];
+                    }
 
-		Item item = id instanceof NBTTagString ? (Item) GameData.getItemRegistry().getObject(new ResourceLocation(((NBTTagString) id).func_150285_a_())) : GameData
-				.getItemRegistry().getObjectById(((NBTTagInt) id).func_150287_d());
+                    NBTTagCompound tag = (NBTTagCompound) nbt.getTag("N");
+                    NBTTagCompound caps = (NBTTagCompound) nbt.getTag("C");
+                    e = new ItemEntry(item, meta, tag, caps);
+                }
+            }
 
-		if (item != null && item != null)
-		{
-			int meta = nbt.getShort("M");
-			NBTTagCompound tag = (NBTTagCompound) nbt.getTag("N");
-			NBTTagCompound caps = (NBTTagCompound) nbt.getTag("C");
-			entry = new ItemEntry(item, meta, tag, caps);
-			count = nbt.getInteger("S");
-			count = count <= 0 ? 1 : count;
-		}
-		else
-		{
-			entry = ItemEntry.EMPTY;
-			count = 0;
-		}
-	}
+            entry = e;
+            return;
+        }
 
-	public boolean isEmpty()
-	{
-		return count <= 0 || entry.isEmpty();
-	}
+        Item item = id instanceof NBTTagString
+                ? (Item) GameData.getItemRegistry()
+                        .getObject(new ResourceLocation(((NBTTagString) id).func_150285_a_()))
+                : GameData.getItemRegistry().getObjectById(((NBTTagInt) id).func_150287_d());
 
-	public NBTTagCompound serializeNBT()
-	{
-		NBTTagCompound nbt = new NBTTagCompound();
+        if (item != null && item != null) {
+            int meta = nbt.getShort("M");
+            NBTTagCompound tag = (NBTTagCompound) nbt.getTag("N");
+            NBTTagCompound caps = (NBTTagCompound) nbt.getTag("C");
+            entry = new ItemEntry(item, meta, tag, caps);
+            count = nbt.getInteger("S");
+            count = count <= 0 ? 1 : count;
+        } else {
+            entry = ItemEntry.EMPTY;
+            count = 0;
+        }
+    }
 
-		if (isEmpty())
-		{
-			return nbt;
-		}
+    public boolean isEmpty() {
+        return count <= 0 || entry.isEmpty();
+    }
 
-		if (count > 1 || entry.metadata > 0)
-		{
-			int[] ai = new int[entry.metadata > 0 ? 3 : 2];
-			ai[0] = GameData.getItemRegistry().getIDForObject(entry.item);
-			ai[1] = count;
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound nbt = new NBTTagCompound();
 
-			if (entry.metadata > 0)
-			{
-				ai[2] = entry.metadata;
-			}
+        if (isEmpty()) {
+            return nbt;
+        }
 
-			nbt.setIntArray("I", ai);
-		}
-		else
-		{
-			nbt.setInteger("I", GameData.getItemRegistry().getIDForObject(entry.item));
-		}
+        if (count > 1 || entry.metadata > 0) {
+            int[] ai = new int[entry.metadata > 0 ? 3 : 2];
+            ai[0] = GameData.getItemRegistry().getIDForObject(entry.item);
+            ai[1] = count;
 
-		if (entry.nbt != null)
-		{
-			nbt.setTag("N", entry.nbt);
-		}
+            if (entry.metadata > 0) {
+                ai[2] = entry.metadata;
+            }
 
-		if (entry.caps != null)
-		{
-			nbt.setTag("C", entry.caps);
-		}
+            nbt.setIntArray("I", ai);
+        } else {
+            nbt.setInteger("I", GameData.getItemRegistry().getIDForObject(entry.item));
+        }
 
-		return nbt;
-	}
+        if (entry.nbt != null) {
+            nbt.setTag("N", entry.nbt);
+        }
 
-	public ItemStack getStack(boolean copy)
-	{
-		return entry.getStack(count, copy);
-	}
+        if (entry.caps != null) {
+            nbt.setTag("C", entry.caps);
+        }
 
-	public String toString()
-	{
-		return serializeNBT().toString();
-	}
+        return nbt;
+    }
+
+    public ItemStack getStack(boolean copy) {
+        return entry.getStack(count, copy);
+    }
+
+    public String toString() {
+        return serializeNBT().toString();
+    }
 }

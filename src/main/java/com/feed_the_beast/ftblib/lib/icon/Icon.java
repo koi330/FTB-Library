@@ -1,336 +1,336 @@
 package com.feed_the_beast.ftblib.lib.icon;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.util.ResourceLocation;
+
 import com.feed_the_beast.ftblib.lib.client.IPixelBuffer;
 import com.feed_the_beast.ftblib.lib.util.JsonUtils;
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.util.ResourceLocation;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import javax.annotation.Nullable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public abstract class Icon implements Drawable {
-	public static final Color4I EMPTY = new Color4I(255, 255, 255, 255) {
-		@Override
-		public boolean isEmpty() {
-			return true;
-		}
 
-		@Override
-		@SideOnly(Side.CLIENT)
-		public void draw(int x, int y, int w, int h) {
-		}
+    public static final Color4I EMPTY = new Color4I(255, 255, 255, 255) {
 
-		@Override
-		@SideOnly(Side.CLIENT)
-		public void draw3D() {
-		}
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
 
-		@Override
-		public MutableColor4I mutable() {
-			return new MutableColor4I.None();
-		}
+        @Override
+        @SideOnly(Side.CLIENT)
+        public void draw(int x, int y, int w, int h) {}
 
-		@Override
-		@Nullable
-		public IPixelBuffer createPixelBuffer() {
-			return null;
-		}
+        @Override
+        @SideOnly(Side.CLIENT)
+        public void draw3D() {}
 
-		public int hashCode() {
-			return 0;
-		}
+        @Override
+        public MutableColor4I mutable() {
+            return new MutableColor4I.None();
+        }
 
-		public boolean equals(Object o) {
-			return o == this;
-		}
-	};
+        @Override
+        @Nullable
+        public IPixelBuffer createPixelBuffer() {
+            return null;
+        }
 
-	public static Icon getIcon(@Nullable JsonElement json) {
-		if (JsonUtils.isNull(json)) {
-			return EMPTY;
-		} else if (json.isJsonObject()) {
-			JsonObject o = json.getAsJsonObject();
+        public int hashCode() {
+            return 0;
+        }
 
-			if (o.has("id")) {
-				switch (o.get("id").getAsString()) {
-					case "color": {
-						Color4I color = Color4I.fromJson(o.get("color"));
-						return (o.has("mutable") && o.get("mutable").getAsBoolean()) ? color.mutable() : color;
-					}
-					case "padding":
-						return getIcon(o.get("parent")).withPadding(o.has("padding") ? o.get("padding").getAsInt() : 0);
-					case "tint":
-						return getIcon(o.get("parent")).withTint(Color4I.fromJson(o.get("color")));
-					case "animation": {
-						List<Icon> icons = new ArrayList<>();
+        public boolean equals(Object o) {
+            return o == this;
+        }
+    };
 
-						for (JsonElement e : o.get("icons").getAsJsonArray()) {
-							icons.add(getIcon(e));
-						}
+    public static Icon getIcon(@Nullable JsonElement json) {
+        if (JsonUtils.isNull(json)) {
+            return EMPTY;
+        } else if (json.isJsonObject()) {
+            JsonObject o = json.getAsJsonObject();
 
-						return IconAnimation.fromList(icons, true);
-					}
-					case "border": {
-						Icon icon = EMPTY;
-						Color4I outline = EMPTY;
-						boolean roundEdges = false;
+            if (o.has("id")) {
+                switch (o.get("id").getAsString()) {
+                    case "color": {
+                        Color4I color = Color4I.fromJson(o.get("color"));
+                        return (o.has("mutable") && o.get("mutable").getAsBoolean()) ? color.mutable() : color;
+                    }
+                    case "padding":
+                        return getIcon(o.get("parent")).withPadding(o.has("padding") ? o.get("padding").getAsInt() : 0);
+                    case "tint":
+                        return getIcon(o.get("parent")).withTint(Color4I.fromJson(o.get("color")));
+                    case "animation": {
+                        List<Icon> icons = new ArrayList<>();
 
-						if (o.has("icon")) {
-							icon = getIcon(o.get("icon"));
-						}
+                        for (JsonElement e : o.get("icons").getAsJsonArray()) {
+                            icons.add(getIcon(e));
+                        }
 
-						if (o.has("color")) {
-							outline = Color4I.fromJson(o.get("color"));
-						}
+                        return IconAnimation.fromList(icons, true);
+                    }
+                    case "border": {
+                        Icon icon = EMPTY;
+                        Color4I outline = EMPTY;
+                        boolean roundEdges = false;
 
-						if (o.has("round_edges")) {
-							roundEdges = o.get("round_edges").getAsBoolean();
-						}
+                        if (o.has("icon")) {
+                            icon = getIcon(o.get("icon"));
+                        }
 
-						return icon.withBorder(outline, roundEdges);
-					}
-					case "bullet": {
-						return new BulletIcon().withColor(o.has("color") ? Color4I.fromJson(o.get("color")) : EMPTY);
-					}
-					case "part": {
-						PartIcon partIcon = new PartIcon(getIcon(o.get("parent")));
-						partIcon.posX = o.get("x").getAsInt();
-						partIcon.posY = o.get("y").getAsInt();
-						partIcon.width = o.get("width").getAsInt();
-						partIcon.height = o.get("height").getAsInt();
-						partIcon.corner = o.get("corner").getAsInt();
-						partIcon.textureWidth = o.get("texture_width").getAsInt();
-						partIcon.textureHeight = o.get("texture_height").getAsInt();
-						return partIcon;
-					}
-				}
-			}
-		} else if (json.isJsonArray()) {
-			List<Icon> list = new ArrayList<>();
+                        if (o.has("color")) {
+                            outline = Color4I.fromJson(o.get("color"));
+                        }
 
-			for (JsonElement e : json.getAsJsonArray()) {
-				list.add(getIcon(e));
-			}
+                        if (o.has("round_edges")) {
+                            roundEdges = o.get("round_edges").getAsBoolean();
+                        }
 
-			return CombinedIcon.getCombined(list);
-		}
+                        return icon.withBorder(outline, roundEdges);
+                    }
+                    case "bullet": {
+                        return new BulletIcon().withColor(o.has("color") ? Color4I.fromJson(o.get("color")) : EMPTY);
+                    }
+                    case "part": {
+                        PartIcon partIcon = new PartIcon(getIcon(o.get("parent")));
+                        partIcon.posX = o.get("x").getAsInt();
+                        partIcon.posY = o.get("y").getAsInt();
+                        partIcon.width = o.get("width").getAsInt();
+                        partIcon.height = o.get("height").getAsInt();
+                        partIcon.corner = o.get("corner").getAsInt();
+                        partIcon.textureWidth = o.get("texture_width").getAsInt();
+                        partIcon.textureHeight = o.get("texture_height").getAsInt();
+                        return partIcon;
+                    }
+                }
+            }
+        } else if (json.isJsonArray()) {
+            List<Icon> list = new ArrayList<>();
 
-		String s = json.getAsString();
+            for (JsonElement e : json.getAsJsonArray()) {
+                list.add(getIcon(e));
+            }
 
-		if (s.isEmpty()) {
-			return EMPTY;
-		}
+            return CombinedIcon.getCombined(list);
+        }
 
-		Icon icon = IconPresets.MAP.get(s);
-		return icon == null ? getIcon(s) : icon;
-	}
+        String s = json.getAsString();
 
-	public static Icon getIcon(String id) {
-		if (id.isEmpty()) {
-			return EMPTY;
-		}
+        if (s.isEmpty()) {
+            return EMPTY;
+        }
 
-		String[] comb = id.split(" \\+ ");
+        Icon icon = IconPresets.MAP.get(s);
+        return icon == null ? getIcon(s) : icon;
+    }
 
-		if (comb.length > 1) {
-			ArrayList<Icon> list = new ArrayList<>(comb.length);
+    public static Icon getIcon(String id) {
+        if (id.isEmpty()) {
+            return EMPTY;
+        }
 
-			for (String s : comb) {
-				list.add(getIcon(s));
-			}
+        String[] comb = id.split(" \\+ ");
 
-			return CombinedIcon.getCombined(list);
-		}
+        if (comb.length > 1) {
+            ArrayList<Icon> list = new ArrayList<>(comb.length);
 
-		String[] ids = id.split("; ");
+            for (String s : comb) {
+                list.add(getIcon(s));
+            }
 
-		for (int i = 0; i < ids.length; i++) {
-			ids[i] = ids[i].trim();
-		}
+            return CombinedIcon.getCombined(list);
+        }
 
-		Icon icon = getIcon0(ids[0]);
+        String[] ids = id.split("; ");
 
-		if (ids.length > 1 && !icon.isEmpty()) {
-			IconProperties properties = new IconProperties();
+        for (int i = 0; i < ids.length; i++) {
+            ids[i] = ids[i].trim();
+        }
 
-			for (int i = 1; i < ids.length; i++) {
-				String[] p = ids[i].split("=", 2);
-				properties.set(p[0], p.length == 1 ? "1" : p[1]);
-			}
+        Icon icon = getIcon0(ids[0]);
 
-			icon.setProperties(properties);
+        if (ids.length > 1 && !icon.isEmpty()) {
+            IconProperties properties = new IconProperties();
 
-			int padding = properties.getInt("padding", 0);
-			if (padding != 0) {
-				icon = icon.withPadding(padding);
-			}
+            for (int i = 1; i < ids.length; i++) {
+                String[] p = ids[i].split("=", 2);
+                properties.set(p[0], p.length == 1 ? "1" : p[1]);
+            }
 
-			Color4I border = properties.getColor("border");
-			if (border != null) {
-				icon = icon.withBorder(border, properties.getBoolean("border_round_edges", false));
-			}
+            icon.setProperties(properties);
 
-			Color4I color = properties.getColor("color");
-			if (color != null) {
-				icon = icon.withColor(color);
-			}
+            int padding = properties.getInt("padding", 0);
+            if (padding != 0) {
+                icon = icon.withPadding(padding);
+            }
 
-			Color4I tint = properties.getColor("tint");
-			if (tint != null) {
-				icon = icon.withTint(tint);
-			}
-		}
+            Color4I border = properties.getColor("border");
+            if (border != null) {
+                icon = icon.withBorder(border, properties.getBoolean("border_round_edges", false));
+            }
 
-		return icon;
-	}
+            Color4I color = properties.getColor("color");
+            if (color != null) {
+                icon = icon.withColor(color);
+            }
 
-	private static Icon getIcon0(String id) {
-		if (id.isEmpty() || id.equals("none")) {
-			return Icon.EMPTY;
-		}
+            Color4I tint = properties.getColor("tint");
+            if (tint != null) {
+                icon = icon.withTint(tint);
+            }
+        }
 
-		Color4I col = Color4I.fromString(id);
+        return icon;
+    }
 
-		if (!col.isEmpty()) {
-			return col;
-		}
+    private static Icon getIcon0(String id) {
+        if (id.isEmpty() || id.equals("none")) {
+            return Icon.EMPTY;
+        }
 
-		String[] ida = id.split(":", 2);
+        Color4I col = Color4I.fromString(id);
 
-		if (ida.length == 2) {
-			switch (ida[0]) {
-				case "color":
-					return Color4I.fromString(ida[1]);
-				case "item":
-					return ItemIcon.getItemIcon(ida[1]);
-				case "bullet":
-					return new BulletIcon().withColor(Color4I.fromString(ida[1]));
-				case "http":
-				case "https":
-				case "file":
-					try {
-						return new URLImageIcon(new URI(id));
-					} catch (Exception ex) {
-					}
-				case "player":
-					return new PlayerHeadIcon(StringUtils.fromString(ida[1]));
-				case "hollow_rectangle":
-					return new HollowRectangleIcon(Color4I.fromString(ida[1]), false);
-				case "part":
-					return new PartIcon(getIcon(ida[1]));
-			}
-		}
+        if (!col.isEmpty()) {
+            return col;
+        }
 
-		return (id.endsWith(".png") || id.endsWith(".jpg")) ? new ImageIcon(new ResourceLocation(id))
-				: new AtlasSpriteIcon(id);
-	}
+        String[] ida = id.split(":", 2);
 
-	public boolean isEmpty() {
-		return false;
-	}
+        if (ida.length == 2) {
+            switch (ida[0]) {
+                case "color":
+                    return Color4I.fromString(ida[1]);
+                case "item":
+                    return ItemIcon.getItemIcon(ida[1]);
+                case "bullet":
+                    return new BulletIcon().withColor(Color4I.fromString(ida[1]));
+                case "http":
+                case "https":
+                case "file":
+                    try {
+                        return new URLImageIcon(new URI(id));
+                    } catch (Exception ex) {}
+                case "player":
+                    return new PlayerHeadIcon(StringUtils.fromString(ida[1]));
+                case "hollow_rectangle":
+                    return new HollowRectangleIcon(Color4I.fromString(ida[1]), false);
+                case "part":
+                    return new PartIcon(getIcon(ida[1]));
+            }
+        }
 
-	@SideOnly(Side.CLIENT)
-	public void bindTexture() {
-	}
+        return (id.endsWith(".png") || id.endsWith(".jpg")) ? new ImageIcon(new ResourceLocation(id))
+                : new AtlasSpriteIcon(id);
+    }
 
-	public Icon copy() {
-		return this;
-	}
+    public boolean isEmpty() {
+        return false;
+    }
 
-	public JsonElement getJson() {
-		return new JsonPrimitive(toString());
-	}
+    @SideOnly(Side.CLIENT)
+    public void bindTexture() {}
 
-	public final Icon combineWith(Icon icon) {
-		if (icon.isEmpty()) {
-			return this;
-		} else if (isEmpty()) {
-			return icon;
-		}
+    public Icon copy() {
+        return this;
+    }
 
-		return new CombinedIcon(this, icon);
-	}
+    public JsonElement getJson() {
+        return new JsonPrimitive(toString());
+    }
 
-	public final Icon combineWith(Icon... icons) {
-		if (icons.length == 0) {
-			return this;
-		} else if (icons.length == 1) {
-			return combineWith(icons[0]);
-		}
+    public final Icon combineWith(Icon icon) {
+        if (icon.isEmpty()) {
+            return this;
+        } else if (isEmpty()) {
+            return icon;
+        }
 
-		List<Icon> list = new ArrayList<>(icons.length + 1);
-		list.add(this);
-		list.addAll(Arrays.asList(icons));
-		return CombinedIcon.getCombined(list);
-	}
+        return new CombinedIcon(this, icon);
+    }
 
-	public Icon withColor(Color4I color) {
-		return copy();
-	}
+    public final Icon combineWith(Icon... icons) {
+        if (icons.length == 0) {
+            return this;
+        } else if (icons.length == 1) {
+            return combineWith(icons[0]);
+        }
 
-	public final Icon withBorder(Color4I color, boolean roundEdges) {
-		if (color.isEmpty()) {
-			return withPadding(1);
-		}
+        List<Icon> list = new ArrayList<>(icons.length + 1);
+        list.add(this);
+        list.addAll(Arrays.asList(icons));
+        return CombinedIcon.getCombined(list);
+    }
 
-		return new IconWithBorder(this, color, roundEdges);
-	}
+    public Icon withColor(Color4I color) {
+        return copy();
+    }
 
-	public final Icon withPadding(int padding) {
-		return padding == 0 ? this : new IconWithPadding(this, padding);
-	}
+    public final Icon withBorder(Color4I color, boolean roundEdges) {
+        if (color.isEmpty()) {
+            return withPadding(1);
+        }
 
-	public Icon withTint(Color4I color) {
-		return this;
-	}
+        return new IconWithBorder(this, color, roundEdges);
+    }
 
-	public Icon withUV(double u0, double v0, double u1, double v1) {
-		return this;
-	}
+    public final Icon withPadding(int padding) {
+        return padding == 0 ? this : new IconWithPadding(this, padding);
+    }
 
-	public Icon withUV(double x, double y, double w, double h, double tw, double th) {
-		return withUV(x / tw, y / th, (x + w) / tw, (y + h) / th);
-	}
+    public Icon withTint(Color4I color) {
+        return this;
+    }
 
-	public int hashCode() {
-		return getJson().hashCode();
-	}
+    public Icon withUV(double u0, double v0, double u1, double v1) {
+        return this;
+    }
 
-	public boolean equals(Object o) {
-		return o == this || o instanceof Icon && getJson().equals(((Icon) o).getJson());
-	}
+    public Icon withUV(double x, double y, double w, double h, double tw, double th) {
+        return withUV(x / tw, y / th, (x + w) / tw, (y + h) / th);
+    }
 
-	/**
-	 * @return false if this should be queued for rendering
-	 */
-	public boolean hasPixelBuffer() {
-		return false;
-	}
+    public int hashCode() {
+        return getJson().hashCode();
+    }
 
-	/**
-	 * @return null if failed to load
-	 */
-	@Nullable
-	public IPixelBuffer createPixelBuffer() {
-		return null;
-	}
+    public boolean equals(Object o) {
+        return o == this || o instanceof Icon && getJson().equals(((Icon) o).getJson());
+    }
 
-	@Nullable
-	public Object getIngredient() {
-		return null;
-	}
+    /**
+     * @return false if this should be queued for rendering
+     */
+    public boolean hasPixelBuffer() {
+        return false;
+    }
 
-	protected void setProperties(IconProperties properties) {
-	}
+    /**
+     * @return null if failed to load
+     */
+    @Nullable
+    public IPixelBuffer createPixelBuffer() {
+        return null;
+    }
+
+    @Nullable
+    public Object getIngredient() {
+        return null;
+    }
+
+    protected void setProperties(IconProperties properties) {}
 }

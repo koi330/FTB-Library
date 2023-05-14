@@ -1,5 +1,18 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
+
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+import net.minecraftforge.common.util.Constants;
+
 import com.feed_the_beast.ftblib.lib.data.FTBLibAPI;
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
 import com.feed_the_beast.ftblib.lib.gui.misc.GuiEditConfigList;
@@ -8,283 +21,271 @@ import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import com.google.gson.JsonElement;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.common.util.Constants;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author LatvianModder
  */
 public class ConfigList<T extends ConfigValue> extends ConfigValue implements Iterable<T> {
-	public static final String ID = "list";
-	public static final Color4I COLOR = Color4I.rgb(0xFFAA49);
 
-	public static class SimpleList<C extends ConfigValue, V> extends ConfigList<C> {
-		public final Collection<V> collection;
-		public final Function<V, C> toConfig;
-		public final Function<C, V> fromConfig;
+    public static final String ID = "list";
+    public static final Color4I COLOR = Color4I.rgb(0xFFAA49);
 
-		public SimpleList(Collection<V> c, C type, Function<V, C> to, Function<C, V> from) {
-			super(type);
-			collection = c;
-			toConfig = to;
-			fromConfig = from;
-		}
+    public static class SimpleList<C extends ConfigValue, V> extends ConfigList<C> {
 
-		@Override
-		public void readFromList() {
-			if (list.size() == collection.size() && collection instanceof List) {
-				for (int i = 0; i < list.size(); i++) {
-					((List<V>) collection).set(i, fromConfig.apply(list.get(i)));
-				}
+        public final Collection<V> collection;
+        public final Function<V, C> toConfig;
+        public final Function<C, V> fromConfig;
 
-				return;
-			}
+        public SimpleList(Collection<V> c, C type, Function<V, C> to, Function<C, V> from) {
+            super(type);
+            collection = c;
+            toConfig = to;
+            fromConfig = from;
+        }
 
-			collection.clear();
+        @Override
+        public void readFromList() {
+            if (list.size() == collection.size() && collection instanceof List) {
+                for (int i = 0; i < list.size(); i++) {
+                    ((List<V>) collection).set(i, fromConfig.apply(list.get(i)));
+                }
 
-			for (C value : list) {
-				collection.add(fromConfig.apply(value));
-			}
-		}
+                return;
+            }
 
-		@Override
-		public void writeToList() {
-			list.clear();
+            collection.clear();
 
-			for (V value : collection) {
-				list.add(toConfig.apply(value));
-			}
-		}
-	}
+            for (C value : list) {
+                collection.add(fromConfig.apply(value));
+            }
+        }
 
-	public final List<T> list;
-	public T type;
+        @Override
+        public void writeToList() {
+            list.clear();
 
-	public ConfigList(T t) {
-		list = new ArrayList<>();
-		type = t;
-	}
+            for (V value : collection) {
+                list.add(toConfig.apply(value));
+            }
+        }
+    }
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    public final List<T> list;
+    public T type;
 
-	public boolean canAdd(ConfigValue value) {
-		return !value.isNull() && type.getId().equals(value.getId());
-	}
+    public ConfigList(T t) {
+        list = new ArrayList<>();
+        type = t;
+    }
 
-	public ConfigList<T> add(ConfigValue v) {
-		if (canAdd(v)) {
-			writeToList();
-			ConfigValue v1 = type.copy();
-			v1.setValueFromOtherValue(v);
-			list.add((T) v1);
-			readFromList();
-		}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-		return this;
-	}
+    public boolean canAdd(ConfigValue value) {
+        return !value.isNull() && type.getId().equals(value.getId());
+    }
 
-	@Override
-	public void writeData(DataOut data) {
-		writeToList();
-		data.writeString(type.getId());
-		type.writeData(data);
-		data.writeVarInt(list.size());
+    public ConfigList<T> add(ConfigValue v) {
+        if (canAdd(v)) {
+            writeToList();
+            ConfigValue v1 = type.copy();
+            v1.setValueFromOtherValue(v);
+            list.add((T) v1);
+            readFromList();
+        }
 
-		for (ConfigValue s : list) {
-			s.writeData(data);
-		}
-	}
+        return this;
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		list.clear();
-		type = (T) FTBLibAPI.createConfigValueFromId(data.readString());
-		type.readData(data);
-		int s = data.readVarInt();
+    @Override
+    public void writeData(DataOut data) {
+        writeToList();
+        data.writeString(type.getId());
+        type.writeData(data);
+        data.writeVarInt(list.size());
 
-		while (--s >= 0) {
-			ConfigValue v = type.copy();
-			v.readData(data);
-			list.add((T) v);
-		}
+        for (ConfigValue s : list) {
+            s.writeData(data);
+        }
+    }
 
-		readFromList();
-	}
+    @Override
+    public void readData(DataIn data) {
+        list.clear();
+        type = (T) FTBLibAPI.createConfigValueFromId(data.readString());
+        type.readData(data);
+        int s = data.readVarInt();
 
-	@Override
-	public String getString() {
-		writeToList();
-		StringBuilder builder = new StringBuilder("[");
+        while (--s >= 0) {
+            ConfigValue v = type.copy();
+            v.readData(data);
+            list.add((T) v);
+        }
 
-		for (int i = 0; i < list.size(); i++) {
-			builder.append(list.get(i).getString());
+        readFromList();
+    }
 
-			if (i != list.size() - 1) {
-				builder.append(',');
-				builder.append(' ');
-			}
-		}
+    @Override
+    public String getString() {
+        writeToList();
+        StringBuilder builder = new StringBuilder("[");
 
-		builder.append(']');
-		return builder.toString();
-	}
+        for (int i = 0; i < list.size(); i++) {
+            builder.append(list.get(i).getString());
 
-	@Override
-	public boolean getBoolean() {
-		return !list.isEmpty();
-	}
+            if (i != list.size() - 1) {
+                builder.append(',');
+                builder.append(' ');
+            }
+        }
 
-	@Override
-	public int getInt() {
-		return list.size();
-	}
+        builder.append(']');
+        return builder.toString();
+    }
 
-	@Override
-	public ConfigList<T> copy() {
-		writeToList();
-		ConfigList<T> l = new ConfigList<>((T) type.copy());
+    @Override
+    public boolean getBoolean() {
+        return !list.isEmpty();
+    }
 
-		for (T value : list) {
-			l.list.add((T) value.copy());
-		}
+    @Override
+    public int getInt() {
+        return list.size();
+    }
 
-		return l;
-	}
+    @Override
+    public ConfigList<T> copy() {
+        writeToList();
+        ConfigList<T> l = new ConfigList<>((T) type.copy());
 
-	@Override
-	public Color4I getColor() {
-		return COLOR;
-	}
+        for (T value : list) {
+            l.list.add((T) value.copy());
+        }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		writeToList();
+        return l;
+    }
 
-		NBTTagList l = new NBTTagList();
+    @Override
+    public Color4I getColor() {
+        return COLOR;
+    }
 
-		for (T value : list) {
-			NBTTagCompound nbt1 = new NBTTagCompound();
-			value.writeToNBT(nbt1, "value");
-			l.appendTag(nbt1);
-		}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        writeToList();
 
-		nbt.setTag(key, l);
-	}
+        NBTTagList l = new NBTTagList();
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		list.clear();
+        for (T value : list) {
+            NBTTagCompound nbt1 = new NBTTagCompound();
+            value.writeToNBT(nbt1, "value");
+            l.appendTag(nbt1);
+        }
 
-		NBTTagList l = nbt.getTagList(key, Constants.NBT.TAG_COMPOUND);
+        nbt.setTag(key, l);
+    }
 
-		for (int i = 0; i < l.tagCount(); i++) {
-			ConfigValue v = type.copy();
-			v.readFromNBT(l.getCompoundTagAt(i), "value");
-			list.add((T) v);
-		}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        list.clear();
 
-		readFromList();
-	}
+        NBTTagList l = nbt.getTagList(key, Constants.NBT.TAG_COMPOUND);
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> l) {
-		l.add(EnumChatFormatting.AQUA + "Type: " + EnumChatFormatting.RESET + type.getId());
+        for (int i = 0; i < l.tagCount(); i++) {
+            ConfigValue v = type.copy();
+            v.readFromNBT(l.getCompoundTagAt(i), "value");
+            list.add((T) v);
+        }
 
-		if (list.isEmpty()) {
-			l.add(EnumChatFormatting.AQUA + "Value: []");
-		} else {
-			l.add(EnumChatFormatting.AQUA + "Value: [");
+        readFromList();
+    }
 
-			for (T value : list) {
-				l.add("  " + value.getStringForGUI().getFormattedText());
-			}
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> l) {
+        l.add(EnumChatFormatting.AQUA + "Type: " + EnumChatFormatting.RESET + type.getId());
 
-			l.add(EnumChatFormatting.AQUA + "]");
-		}
+        if (list.isEmpty()) {
+            l.add(EnumChatFormatting.AQUA + "Value: []");
+        } else {
+            l.add(EnumChatFormatting.AQUA + "Value: [");
 
-		if (inst.getCanEdit() && inst.getDefaultValue() instanceof ConfigList) {
-			ConfigList<T> val = (ConfigList<T>) inst.getDefaultValue();
+            for (T value : list) {
+                l.add("  " + value.getStringForGUI().getFormattedText());
+            }
 
-			if (val.list.isEmpty()) {
-				l.add(EnumChatFormatting.AQUA + "Default: []");
-			} else {
-				l.add(EnumChatFormatting.AQUA + "Default: [");
+            l.add(EnumChatFormatting.AQUA + "]");
+        }
 
-				for (T value : val.list) {
-					l.add("  " + value.getStringForGUI().getFormattedText());
-				}
+        if (inst.getCanEdit() && inst.getDefaultValue() instanceof ConfigList) {
+            ConfigList<T> val = (ConfigList<T>) inst.getDefaultValue();
 
-				l.add(EnumChatFormatting.AQUA + "]");
-			}
-		}
-	}
+            if (val.list.isEmpty()) {
+                l.add(EnumChatFormatting.AQUA + "Default: []");
+            } else {
+                l.add(EnumChatFormatting.AQUA + "Default: [");
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		new GuiEditConfigList(inst, callback).openGui();
-	}
+                for (T value : val.list) {
+                    l.add("  " + value.getStringForGUI().getFormattedText());
+                }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		return new ChatComponentText("...");
-	}
+                l.add(EnumChatFormatting.AQUA + "]");
+            }
+        }
+    }
 
-	@Override
-	public Iterator<T> iterator() {
-		return list.iterator();
-	}
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        new GuiEditConfigList(inst, callback).openGui();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return list.isEmpty();
-	}
+    @Override
+    public IChatComponent getStringForGUI() {
+        return new ChatComponentText("...");
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue ovalue) {
-		list.clear();
+    @Override
+    public Iterator<T> iterator() {
+        return list.iterator();
+    }
 
-		if (ovalue instanceof ConfigList && !ovalue.isEmpty() && type.equals(((ConfigList) ovalue).type)) {
-			for (ConfigValue v : (ConfigList<?>) ovalue) {
-				ConfigValue value = type.copy();
-				value.setValueFromOtherValue(v);
-				list.add((T) value);
-			}
-		}
+    @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
 
-		readFromList();
-	}
+    @Override
+    public void setValueFromOtherValue(ConfigValue ovalue) {
+        list.clear();
 
-	@Override
-	public void setValueFromJson(JsonElement json) {
-		list.clear();
+        if (ovalue instanceof ConfigList && !ovalue.isEmpty() && type.equals(((ConfigList) ovalue).type)) {
+            for (ConfigValue v : (ConfigList<?>) ovalue) {
+                ConfigValue value = type.copy();
+                value.setValueFromOtherValue(v);
+                list.add((T) value);
+            }
+        }
 
-		if (json.isJsonArray()) {
-			for (JsonElement e : json.getAsJsonArray()) {
-				ConfigValue value = type.copy();
-				value.setValueFromJson(e);
-				list.add((T) value);
-			}
-		}
+        readFromList();
+    }
 
-		readFromList();
-	}
+    @Override
+    public void setValueFromJson(JsonElement json) {
+        list.clear();
 
-	public void readFromList() {
-	}
+        if (json.isJsonArray()) {
+            for (JsonElement e : json.getAsJsonArray()) {
+                ConfigValue value = type.copy();
+                value.setValueFromJson(e);
+                list.add((T) value);
+            }
+        }
 
-	public void writeToList() {
-	}
+        readFromList();
+    }
+
+    public void readFromList() {}
+
+    public void writeToList() {}
 }

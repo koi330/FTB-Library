@@ -3,191 +3,158 @@ package com.feed_the_beast.ftblib.lib.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.item.ItemStack;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 
 import cpw.mods.fml.common.Loader;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.ItemStack;
 
 /**
  * @author LatvianModder
  */
-public class GuiWrapper extends GuiScreen implements IGuiWrapper
-{
-	private GuiBase wrappedGui;
-	private List<String> tempTextList = new ArrayList<>();
+public class GuiWrapper extends GuiScreen implements IGuiWrapper {
 
-	public GuiWrapper(GuiBase g)
-	{
-		wrappedGui = g;
-	}
+    private GuiBase wrappedGui;
+    private List<String> tempTextList = new ArrayList<>();
 
-	@Override
-	public void initGui()
-	{
-		super.initGui();
-		wrappedGui.initGui();
-	}
+    public GuiWrapper(GuiBase g) {
+        wrappedGui = g;
+    }
 
-	@Override
-	public boolean doesGuiPauseGame()
-	{
-		return wrappedGui.doesGuiPauseGame();
-	}
+    @Override
+    public void initGui() {
+        super.initGui();
+        wrappedGui.initGui();
+    }
 
-	@Override
-	protected final void mouseClicked(int mouseX, int mouseY, int button)
-	{
-		wrappedGui.updateMouseOver(mouseX, mouseY);
+    @Override
+    public boolean doesGuiPauseGame() {
+        return wrappedGui.doesGuiPauseGame();
+    }
 
-		if (button == MouseButton.BACK.id)
-		{
-			wrappedGui.onBack();
-		}
-		else
-		{
-			wrappedGui.mousePressed(MouseButton.get(button));
-			super.mouseClicked(mouseX, mouseY, button);
-		}
-	}
+    @Override
+    protected final void mouseClicked(int mouseX, int mouseY, int button) {
+        wrappedGui.updateMouseOver(mouseX, mouseY);
 
-	@Override
-	protected void mouseMovedOrUp(int mouseX, int mouseY, int button)
-	{
-		wrappedGui.updateMouseOver(mouseX, mouseY);
-		wrappedGui.mouseReleased(MouseButton.get(button));
-		super.mouseMovedOrUp(mouseX, mouseY, button);
-	}
+        if (button == MouseButton.BACK.id) {
+            wrappedGui.onBack();
+        } else {
+            wrappedGui.mousePressed(MouseButton.get(button));
+            super.mouseClicked(mouseX, mouseY, button);
+        }
+    }
 
-	@Override
-	protected void keyTyped(char keyChar, int key)
-	{
-		if (!wrappedGui.keyPressed(key, keyChar))
-		{
-			if (key == Keyboard.KEY_BACK)
-			{
-				wrappedGui.onBack();
-			}
-			else if (wrappedGui.onClosedByKey(key))
-			{
-				wrappedGui.closeGui(false);
-			}
-			else if (Loader.isModLoaded("jei"))
-			{
-				Object object = WrappedIngredient.unwrap(wrappedGui.getIngredientUnderMouse());
+    @Override
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int button) {
+        wrappedGui.updateMouseOver(mouseX, mouseY);
+        wrappedGui.mouseReleased(MouseButton.get(button));
+        super.mouseMovedOrUp(mouseX, mouseY, button);
+    }
 
-				if (object != null)
-				{
-					handleIngredientKey(key, object);
-				}
-			}
-		}
-	}
+    @Override
+    protected void keyTyped(char keyChar, int key) {
+        if (!wrappedGui.keyPressed(key, keyChar)) {
+            if (key == Keyboard.KEY_BACK) {
+                wrappedGui.onBack();
+            } else if (wrappedGui.onClosedByKey(key)) {
+                wrappedGui.closeGui(false);
+            } else if (Loader.isModLoaded("jei")) {
+                Object object = WrappedIngredient.unwrap(wrappedGui.getIngredientUnderMouse());
 
-	private void handleIngredientKey(int key, Object object)
-	{
-		//TODO: this was a hack from ftblib
-		// FTBLibJEIIntegration.handleIngredientKey(key, object);
-	}
+                if (object != null) {
+                    handleIngredientKey(key, object);
+                }
+            }
+        }
+    }
 
-	@Override
-	public void handleMouseInput()
-	{
-		super.handleMouseInput();
-		int scroll = Mouse.getEventDWheel();
+    private void handleIngredientKey(int key, Object object) {
+        // TODO: this was a hack from ftblib
+        // FTBLibJEIIntegration.handleIngredientKey(key, object);
+    }
 
-		if (scroll != 0) {
-			wrappedGui.mouseScrolled(scroll / 120);
-		}
-	}
+    @Override
+    public void handleMouseInput() {
+        super.handleMouseInput();
+        int scroll = Mouse.getEventDWheel();
 
-	@Override
-	public void handleKeyboardInput()
-	{
-		if (!(Keyboard.getEventKey() == 0 && Keyboard.getEventCharacter() >= ' ' || Keyboard.getEventKeyState())) {
-			wrappedGui.keyReleased(Keyboard.getEventKey());
-		} else {
-			super.handleKeyboardInput();
-		}
-	}
-	
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks)
-	{
-		if (wrappedGui.fixUnicode)
-		{
-			GuiHelper.setFixUnicode(true);
-		}
+        if (scroll != 0) {
+            wrappedGui.mouseScrolled(scroll / 120);
+        }
+    }
 
-		wrappedGui.updateGui(mouseX, mouseY, partialTicks);
-		drawDefaultBackground();
-		GuiHelper.setupDrawing();
-		int x = wrappedGui.getX();
-		int y = wrappedGui.getY();
-		int w = wrappedGui.width;
-		int h = wrappedGui.height;
-		Theme theme = wrappedGui.getTheme();
-		wrappedGui.draw(theme, x, y, w, h);
-		wrappedGui.drawForeground(theme, x, y, w, h);
+    @Override
+    public void handleKeyboardInput() {
+        if (!(Keyboard.getEventKey() == 0 && Keyboard.getEventCharacter() >= ' ' || Keyboard.getEventKeyState())) {
+            wrappedGui.keyReleased(Keyboard.getEventKey());
+        } else {
+            super.handleKeyboardInput();
+        }
+    }
 
-		if (wrappedGui.contextMenu != null)
-		{
-			wrappedGui.contextMenu.addMouseOverText(tempTextList);
-		}
-		else
-		{
-			wrappedGui.addMouseOverText(tempTextList);
-		}
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (wrappedGui.fixUnicode) {
+            GuiHelper.setFixUnicode(true);
+        }
 
-		if (tempTextList.isEmpty())
-		{
-			Object object = wrappedGui.getIngredientUnderMouse();
+        wrappedGui.updateGui(mouseX, mouseY, partialTicks);
+        drawDefaultBackground();
+        GuiHelper.setupDrawing();
+        int x = wrappedGui.getX();
+        int y = wrappedGui.getY();
+        int w = wrappedGui.width;
+        int h = wrappedGui.height;
+        Theme theme = wrappedGui.getTheme();
+        wrappedGui.draw(theme, x, y, w, h);
+        wrappedGui.drawForeground(theme, x, y, w, h);
 
-			if (object instanceof WrappedIngredient && ((WrappedIngredient) object).tooltip)
-			{
-				Object ingredient = WrappedIngredient.unwrap(object);
+        if (wrappedGui.contextMenu != null) {
+            wrappedGui.contextMenu.addMouseOverText(tempTextList);
+        } else {
+            wrappedGui.addMouseOverText(tempTextList);
+        }
 
-				if (ingredient instanceof ItemStack && ((ItemStack) ingredient) != null)
-				{
-					renderToolTip((ItemStack) ingredient, mouseX, mouseY);
-				}
-			}
-		}
-		else
-		{
-			drawHoveringText(tempTextList, mouseX, Math.max(mouseY, 18), theme.getFont());
-		}
+        if (tempTextList.isEmpty()) {
+            Object object = wrappedGui.getIngredientUnderMouse();
 
-		tempTextList.clear();
+            if (object instanceof WrappedIngredient && ((WrappedIngredient) object).tooltip) {
+                Object ingredient = WrappedIngredient.unwrap(object);
 
-		if (wrappedGui.fixUnicode)
-		{
-			GuiHelper.setFixUnicode(false);
-		}
-	}
+                if (ingredient instanceof ItemStack && ((ItemStack) ingredient) != null) {
+                    renderToolTip((ItemStack) ingredient, mouseX, mouseY);
+                }
+            }
+        } else {
+            drawHoveringText(tempTextList, mouseX, Math.max(mouseY, 18), theme.getFont());
+        }
 
-	@Override
-	public void drawDefaultBackground()
-	{
-		if (wrappedGui.drawDefaultBackground())
-		{
-			super.drawDefaultBackground();
-		}
-	}
+        tempTextList.clear();
 
-	@Override
-	public void updateScreen()
-	{
-		super.updateScreen();
-		wrappedGui.tick();
-	}
+        if (wrappedGui.fixUnicode) {
+            GuiHelper.setFixUnicode(false);
+        }
+    }
 
-	@Override
-	public GuiBase getGui()
-	{
-		return wrappedGui;
-	}
+    @Override
+    public void drawDefaultBackground() {
+        if (wrappedGui.drawDefaultBackground()) {
+            super.drawDefaultBackground();
+        }
+    }
+
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+        wrappedGui.tick();
+    }
+
+    @Override
+    public GuiBase getGui() {
+        return wrappedGui;
+    }
 }

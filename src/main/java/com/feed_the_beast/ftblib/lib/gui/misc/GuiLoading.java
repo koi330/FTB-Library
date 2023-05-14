@@ -1,139 +1,117 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.gui.GuiBase;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.feed_the_beast.ftblib.lib.gui.Theme;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import org.lwjgl.opengl.GL11;
 
 /**
  * @author LatvianModder
  */
-public class GuiLoading extends GuiBase
-{
-	private boolean startedLoading = false;
-	private boolean isLoading = true;
-	private String title;
-	public float timer;
+public class GuiLoading extends GuiBase {
 
-	public GuiLoading()
-	{
-		this("");
-	}
+    private boolean startedLoading = false;
+    private boolean isLoading = true;
+    private String title;
+    public float timer;
 
-	public GuiLoading(String t)
-	{
-		setSize(128, 128);
-		title = t;
-	}
+    public GuiLoading() {
+        this("");
+    }
 
-	@Override
-	public void addWidgets()
-	{
-	}
+    public GuiLoading(String t) {
+        setSize(128, 128);
+        title = t;
+    }
 
-	@Override
-	public void drawBackground(Theme theme, int x, int y, int w, int h)
-	{
-		if (!startedLoading)
-		{
-			startLoading();
-			startedLoading = true;
-		}
+    @Override
+    public void addWidgets() {}
 
-		if (isLoading())
-		{
-			GuiHelper.drawHollowRect(x + width / 2 - 48, y + height / 2 - 8, 96, 16, Color4I.WHITE, true);
+    @Override
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {
+        if (!startedLoading) {
+            startLoading();
+            startedLoading = true;
+        }
 
-			int x1 = x + width / 2 - 48;
-			int y1 = y + height / 2 - 8;
-			int w1 = 96;
-			int h1 = 16;
+        if (isLoading()) {
+            GuiHelper.drawHollowRect(x + width / 2 - 48, y + height / 2 - 8, 96, 16, Color4I.WHITE, true);
 
-			Color4I col = Color4I.WHITE;
-			GlStateManager.disableTexture2D();
-			Tessellator tessellator = Tessellator.instance;
-			tessellator.startDrawingQuads();
+            int x1 = x + width / 2 - 48;
+            int y1 = y + height / 2 - 8;
+            int w1 = 96;
+            int h1 = 16;
 
-			GuiHelper.addRectToBuffer(tessellator, x1, y1 + 1, 1, h1 - 2, col);
-			GuiHelper.addRectToBuffer(tessellator, x1 + w1 - 1, y1 + 1, 1, h1 - 2, col);
-			GuiHelper.addRectToBuffer(tessellator, x1 + 1, y1, w1 - 2, 1, col);
-			GuiHelper.addRectToBuffer(tessellator, x1 + 1, y1 + h1 - 1, w1 - 2, 1, col);
+            Color4I col = Color4I.WHITE;
+            GlStateManager.disableTexture2D();
+            Tessellator tessellator = Tessellator.instance;
+            tessellator.startDrawingQuads();
 
-			x1 += 1;
-			y1 += 1;
-			w1 -= 2;
-			h1 -= 2;
+            GuiHelper.addRectToBuffer(tessellator, x1, y1 + 1, 1, h1 - 2, col);
+            GuiHelper.addRectToBuffer(tessellator, x1 + w1 - 1, y1 + 1, 1, h1 - 2, col);
+            GuiHelper.addRectToBuffer(tessellator, x1 + 1, y1, w1 - 2, 1, col);
+            GuiHelper.addRectToBuffer(tessellator, x1 + 1, y1 + h1 - 1, w1 - 2, 1, col);
 
-			timer += Minecraft.getMinecraft().timer.ticksPerSecond;
-			timer = timer % (h1 * 2F);
+            x1 += 1;
+            y1 += 1;
+            w1 -= 2;
+            h1 -= 2;
 
-			for (int oy = 0; oy < h1; oy++)
-			{
-				for (int ox = 0; ox < w1; ox++)
-				{
-					int index = ox + oy + (int) timer;
+            timer += Minecraft.getMinecraft().timer.ticksPerSecond;
+            timer = timer % (h1 * 2F);
 
-					if (index % (h1 * 2) < h1)
-					{
-						col = Color4I.WHITE.withAlpha(200 - (index % h1) * 9);
+            for (int oy = 0; oy < h1; oy++) {
+                for (int ox = 0; ox < w1; ox++) {
+                    int index = ox + oy + (int) timer;
 
-						GuiHelper.addRectToBuffer(tessellator, x1 + ox, y1 + oy, 1, 1, col);
-					}
-				}
-			}
+                    if (index % (h1 * 2) < h1) {
+                        col = Color4I.WHITE.withAlpha(200 - (index % h1) * 9);
 
-			tessellator.draw();
-			GlStateManager.enableTexture2D();
+                        GuiHelper.addRectToBuffer(tessellator, x1 + ox, y1 + oy, 1, 1, col);
+                    }
+                }
+            }
 
-			String s = getTitle();
+            tessellator.draw();
+            GlStateManager.enableTexture2D();
 
-			if (!s.isEmpty())
-			{
-				String[] s1 = s.split("\n");
+            String s = getTitle();
 
-				for (int i = 0; i < s1.length; i++)
-				{
-					theme.drawString(s1[i], x + width / 2, y - 26 + i * 12, Theme.CENTERED);
-				}
-			}
-		}
-		else
-		{
-			closeGui();
-			finishLoading();
-		}
-	}
+            if (!s.isEmpty()) {
+                String[] s1 = s.split("\n");
 
-	@Override
-	public synchronized String getTitle()
-	{
-		return title;
-	}
+                for (int i = 0; i < s1.length; i++) {
+                    theme.drawString(s1[i], x + width / 2, y - 26 + i * 12, Theme.CENTERED);
+                }
+            }
+        } else {
+            closeGui();
+            finishLoading();
+        }
+    }
 
-	public synchronized void setTitle(String s)
-	{
-		title = s;
-	}
+    @Override
+    public synchronized String getTitle() {
+        return title;
+    }
 
-	public synchronized void setFinished()
-	{
-		isLoading = false;
-	}
+    public synchronized void setTitle(String s) {
+        title = s;
+    }
 
-	public void startLoading()
-	{
-	}
+    public synchronized void setFinished() {
+        isLoading = false;
+    }
 
-	public synchronized boolean isLoading()
-	{
-		return isLoading;
-	}
+    public void startLoading() {}
 
-	public void finishLoading()
-	{
-	}
+    public synchronized boolean isLoading() {
+        return isLoading;
+    }
+
+    public void finishLoading() {}
 }

@@ -1,30 +1,27 @@
 package com.feed_the_beast.ftblib.events.team;
 
+import javax.annotation.Nullable;
+
 import com.feed_the_beast.ftblib.events.player.ForgePlayerEvent;
 import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
-
-import javax.annotation.Nullable;
 
 /**
  * @author LatvianModder
  */
-public class ForgeTeamPlayerJoinedEvent extends ForgePlayerEvent
-{
-	private Runnable displayGui;
+public class ForgeTeamPlayerJoinedEvent extends ForgePlayerEvent {
 
-	public ForgeTeamPlayerJoinedEvent(ForgePlayer player)
-	{
-		super(player);
-	}
+    private Runnable displayGui;
 
-	public void setDisplayGui(Runnable gui)
-	{
-		displayGui = gui;
-	}
+    public ForgeTeamPlayerJoinedEvent(ForgePlayer player) {
+        super(player);
+    }
 
-	@Nullable
-	public Runnable getDisplayGui()
-	{
-		return displayGui;
-	}
+    public void setDisplayGui(Runnable gui) {
+        displayGui = gui;
+    }
+
+    @Nullable
+    public Runnable getDisplayGui() {
+        return displayGui;
+    }
 }

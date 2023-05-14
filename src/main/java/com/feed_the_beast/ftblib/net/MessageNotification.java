@@ -1,5 +1,7 @@
 package com.feed_the_beast.ftblib.net;
 
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.client.FTBLibClientEventHandler;
 import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
@@ -9,7 +11,6 @@ import com.feed_the_beast.ftblib.lib.util.text_components.Notification;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.IChatComponent;
 
 public class MessageNotification extends MessageToClient {
 

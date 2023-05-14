@@ -1,23 +1,23 @@
 /*
- * Minecraft Forge
- * Copyright (c) 2016-2020.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation version 2.1
- * of the License.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Minecraft Forge Copyright (c) 2016-2020. This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the Free Software Foundation version 2.1 of
+ * the License. This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details. You should have received a copy of the GNU Lesser General Public License along with this
+ * library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
  */
 
 package com.feed_the_beast.ftblib.lib.command;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -26,21 +26,13 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Base class for commands that has subcommands.
  * <p>
- * E.g. /team settings set [value]
- * settings is subcommand of team and set is subcommand of settings
+ * E.g. /team settings set [value] settings is subcommand of team and set is subcommand of settings
  */
 public abstract class CommandTreeBase extends CommandBase {
+
     private final Map<String, ICommand> commandMap = new HashMap<>();
     private final Map<String, ICommand> commandAliasMap = new HashMap<>();
 
@@ -127,13 +119,16 @@ public abstract class CommandTreeBase extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 1) {
             String subCommandsString = getAvailableSubCommandsString(MinecraftServer.getServer(), sender);
-            sender.addChatMessage(new ChatComponentTranslation("commands.tree_base.available_subcommands", subCommandsString));
+            sender.addChatMessage(
+                    new ChatComponentTranslation("commands.tree_base.available_subcommands", subCommandsString));
         } else {
             ICommand cmd = getSubCommand(args[0]);
 
             if (cmd == null) {
                 String subCommandsString = getAvailableSubCommandsString(MinecraftServer.getServer(), sender);
-                throw new CommandException("commands.tree_base.invalid_cmd.list_subcommands", args[0],
+                throw new CommandException(
+                        "commands.tree_base.invalid_cmd.list_subcommands",
+                        args[0],
                         subCommandsString);
             } else if (!cmd.canCommandSenderUseCommand(sender)) {
                 throw new CommandException("commands.generic.permission");

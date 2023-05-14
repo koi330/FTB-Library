@@ -1,7 +1,5 @@
 package com.feed_the_beast.ftblib.lib.util;
 
-import net.minecraft.world.storage.ThreadedFileIOBase;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,190 +10,194 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.world.storage.ThreadedFileIOBase;
+
 public class FileUtils {
-	public static final int KB = 1024;
-	public static final int MB = KB * 1024;
-	public static final int GB = MB * 1024;
 
-	public static final double KB_D = 1024D;
-	public static final double MB_D = KB_D * 1024D;
-	public static final double GB_D = MB_D * 1024D;
+    public static final int KB = 1024;
+    public static final int MB = KB * 1024;
+    public static final int GB = MB * 1024;
 
-	public static File newFile(File file) {
-		if (!file.exists()) {
-			try {
-				File parent = file.getParentFile();
-				if (!parent.exists()) {
-					parent.mkdirs();
-				}
-				file.createNewFile();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+    public static final double KB_D = 1024D;
+    public static final double MB_D = KB_D * 1024D;
+    public static final double GB_D = MB_D * 1024D;
 
-		return file;
-	}
+    public static File newFile(File file) {
+        if (!file.exists()) {
+            try {
+                File parent = file.getParentFile();
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-	public static void save(File file, List<String> list) throws Exception {
-		OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(newFile(file)), StandardCharsets.UTF_8);
-		BufferedWriter br = new BufferedWriter(fw);
+        return file;
+    }
 
-		for (String s : list) {
-			br.write(s);
-			br.write('\n');
-		}
+    public static void save(File file, List<String> list) throws Exception {
+        OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(newFile(file)), StandardCharsets.UTF_8);
+        BufferedWriter br = new BufferedWriter(fw);
 
-		br.close();
-		fw.close();
-	}
+        for (String s : list) {
+            br.write(s);
+            br.write('\n');
+        }
 
-	public static void save(File file, String string) throws Exception {
-		OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(newFile(file)), StandardCharsets.UTF_8);
-		BufferedWriter br = new BufferedWriter(fw);
-		br.write(string);
-		br.close();
-		fw.close();
-	}
+        br.close();
+        fw.close();
+    }
 
-	public static void saveSafe(final File file, final List<String> list) {
-		ThreadedFileIOBase.threadedIOInstance.queueIO(() -> {
-			try {
-				save(file, list);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+    public static void save(File file, String string) throws Exception {
+        OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(newFile(file)), StandardCharsets.UTF_8);
+        BufferedWriter br = new BufferedWriter(fw);
+        br.write(string);
+        br.close();
+        fw.close();
+    }
 
-			return false;
-		});
-	}
+    public static void saveSafe(final File file, final List<String> list) {
+        ThreadedFileIOBase.threadedIOInstance.queueIO(() -> {
+            try {
+                save(file, list);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
-	public static void saveSafe(final File file, final String string) {
-		ThreadedFileIOBase.threadedIOInstance.queueIO(() -> {
-			try {
-				save(file, string);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+            return false;
+        });
+    }
 
-			return false;
-		});
-	}
+    public static void saveSafe(final File file, final String string) {
+        ThreadedFileIOBase.threadedIOInstance.queueIO(() -> {
+            try {
+                save(file, string);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
-	public static List<File> listTree(File file) {
-		List<File> l = new ArrayList<>();
-		listTree0(l, file);
-		return l;
-	}
+            return false;
+        });
+    }
 
-	public static void listTree0(List<File> list, File file) {
-		if (file.isDirectory()) {
-			File[] fl = file.listFiles();
+    public static List<File> listTree(File file) {
+        List<File> l = new ArrayList<>();
+        listTree0(l, file);
+        return l;
+    }
 
-			if (fl != null && fl.length > 0) {
-				for (File aFl : fl) {
-					listTree0(list, aFl);
-				}
-			}
-		} else if (file.isFile()) {
-			list.add(file);
-		}
-	}
+    public static void listTree0(List<File> list, File file) {
+        if (file.isDirectory()) {
+            File[] fl = file.listFiles();
 
-	public static long getSize(File file) {
-		if (!file.exists()) {
-			return 0L;
-		} else if (file.isFile()) {
-			return file.length();
-		} else if (file.isDirectory()) {
-			long length = 0L;
-			File[] f1 = file.listFiles();
-			if (f1 != null && f1.length > 0) {
-				for (File aF1 : f1) {
-					length += getSize(aF1);
-				}
-			}
-			return length;
-		}
-		return 0L;
-	}
+            if (fl != null && fl.length > 0) {
+                for (File aFl : fl) {
+                    listTree0(list, aFl);
+                }
+            }
+        } else if (file.isFile()) {
+            list.add(file);
+        }
+    }
 
-	public static String getSizeString(double b) {
-		if (b >= GB_D) {
-			return String.format("%.1fGB", b / GB_D);
-		} else if (b >= MB_D) {
-			return String.format("%.1fMB", b / MB_D);
-		} else if (b >= KB_D) {
-			return String.format("%.1fKB", b / KB_D);
-		}
+    public static long getSize(File file) {
+        if (!file.exists()) {
+            return 0L;
+        } else if (file.isFile()) {
+            return file.length();
+        } else if (file.isDirectory()) {
+            long length = 0L;
+            File[] f1 = file.listFiles();
+            if (f1 != null && f1.length > 0) {
+                for (File aF1 : f1) {
+                    length += getSize(aF1);
+                }
+            }
+            return length;
+        }
+        return 0L;
+    }
 
-		return ((long) b) + "B";
-	}
+    public static String getSizeString(double b) {
+        if (b >= GB_D) {
+            return String.format("%.1fGB", b / GB_D);
+        } else if (b >= MB_D) {
+            return String.format("%.1fMB", b / MB_D);
+        } else if (b >= KB_D) {
+            return String.format("%.1fKB", b / KB_D);
+        }
 
-	public static String getSizeString(File file) {
-		return getSizeString(getSize(file));
-	}
+        return ((long) b) + "B";
+    }
 
-	public static void copyFile(File src, File dst) throws Exception {
-		if (src.exists() && !src.equals(dst)) {
-			if (src.isDirectory() && dst.isDirectory()) {
-				for (File f : listTree(src)) {
-					File dst1 = new File(dst.getAbsolutePath() + File.separatorChar
-							+ (f.getAbsolutePath().replace(src.getAbsolutePath(), "")));
-					copyFile(f, dst1);
-				}
-			} else {
-				dst = newFile(dst);
+    public static String getSizeString(File file) {
+        return getSizeString(getSize(file));
+    }
 
-				try (FileInputStream fis = new FileInputStream(src);
-						FileOutputStream fos = new FileOutputStream(dst);
-						FileChannel srcC = fis.getChannel();
-						FileChannel dstC = fos.getChannel()) {
-					dstC.transferFrom(srcC, 0L, srcC.size());
-				}
-			}
-		}
-	}
+    public static void copyFile(File src, File dst) throws Exception {
+        if (src.exists() && !src.equals(dst)) {
+            if (src.isDirectory() && dst.isDirectory()) {
+                for (File f : listTree(src)) {
+                    File dst1 = new File(
+                            dst.getAbsolutePath() + File.separatorChar
+                                    + (f.getAbsolutePath().replace(src.getAbsolutePath(), "")));
+                    copyFile(f, dst1);
+                }
+            } else {
+                dst = newFile(dst);
 
-	public static boolean delete(File file) {
-		if (!file.exists()) {
-			return false;
-		} else if (file.isFile()) {
-			return file.delete();
-		}
+                try (FileInputStream fis = new FileInputStream(src);
+                        FileOutputStream fos = new FileOutputStream(dst);
+                        FileChannel srcC = fis.getChannel();
+                        FileChannel dstC = fos.getChannel()) {
+                    dstC.transferFrom(srcC, 0L, srcC.size());
+                }
+            }
+        }
+    }
 
-		String[] files = file.list();
+    public static boolean delete(File file) {
+        if (!file.exists()) {
+            return false;
+        } else if (file.isFile()) {
+            return file.delete();
+        }
 
-		if (files != null) {
-			for (String s : files) {
-				delete(new File(file, s));
-			}
-		}
+        String[] files = file.list();
 
-		return file.delete();
-	}
+        if (files != null) {
+            for (String s : files) {
+                delete(new File(file, s));
+            }
+        }
 
-	public static void deleteSafe(File file) {
-		ThreadedFileIOBase.threadedIOInstance.queueIO(() -> {
-			try {
-				if (file.exists() && !delete(file)) {
-					System.err.println("Failed to safely delete " + file.getAbsolutePath());
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+        return file.delete();
+    }
 
-			return false;
-		});
-	}
+    public static void deleteSafe(File file) {
+        ThreadedFileIOBase.threadedIOInstance.queueIO(() -> {
+            try {
+                if (file.exists() && !delete(file)) {
+                    System.err.println("Failed to safely delete " + file.getAbsolutePath());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
-	public static String getBaseName(File file) {
-		if (file.isDirectory()) {
-			return file.getName();
-		} else {
-			String name = file.getName();
-			int index = name.lastIndexOf('.');
-			return index == -1 ? name : name.substring(0, index);
-		}
-	}
+            return false;
+        });
+    }
+
+    public static String getBaseName(File file) {
+        if (file.isDirectory()) {
+            return file.getName();
+        } else {
+            String name = file.getName();
+            int index = name.lastIndexOf('.');
+            return index == -1 ? name : name.substring(0, index);
+        }
+    }
 }

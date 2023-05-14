@@ -7,50 +7,44 @@ import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 /**
  * @author LatvianModder
  */
-public enum EnumIO implements IStringSerializable
-{
-	IO("io"),
-	IN("in"),
-	OUT("out"),
-	NONE("none");
+public enum EnumIO implements IStringSerializable {
 
-	public static final NameMap<EnumIO> NAME_MAP = NameMap.createWithBaseTranslationKey(IO, "io_mode", values());
+    IO("io"),
+    IN("in"),
+    OUT("out"),
+    NONE("none");
 
-	private final String name;
+    public static final NameMap<EnumIO> NAME_MAP = NameMap.createWithBaseTranslationKey(IO, "io_mode", values());
 
-	EnumIO(String n)
-	{
-		name = n;
-	}
+    private final String name;
 
-	@Override
-	public String getName()
-	{
-		return name;
-	}
+    EnumIO(String n) {
+        name = n;
+    }
 
-	public Icon getIcon()
-	{
-		switch (this)
-		{
-			case IO:
-				return GuiIcons.INV_IO;
-			case IN:
-				return GuiIcons.INV_IN;
-			case OUT:
-				return GuiIcons.INV_OUT;
-			default:
-				return GuiIcons.INV_NONE;
-		}
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	public boolean canInsert()
-	{
-		return this == IO || this == IN;
-	}
+    public Icon getIcon() {
+        switch (this) {
+            case IO:
+                return GuiIcons.INV_IO;
+            case IN:
+                return GuiIcons.INV_IN;
+            case OUT:
+                return GuiIcons.INV_OUT;
+            default:
+                return GuiIcons.INV_NONE;
+        }
+    }
 
-	public boolean canExtract()
-	{
-		return this == IO || this == OUT;
-	}
+    public boolean canInsert() {
+        return this == IO || this == IN;
+    }
+
+    public boolean canExtract() {
+        return this == IO || this == OUT;
+    }
 }

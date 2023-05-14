@@ -1,108 +1,111 @@
 package com.feed_the_beast.ftblib.lib.icon;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public class IconAnimation extends Icon {
-	public static Icon fromList(List<Icon> icons, boolean includeEmpty) {
-		List<Icon> list = new ArrayList<>(icons.size());
 
-		for (Icon icon : icons) {
-			if (icon instanceof IconAnimation) {
-				for (Icon icon1 : ((IconAnimation) icon).list) {
-					if (includeEmpty || !icon1.isEmpty()) {
-						list.add(icon1);
-					}
-				}
-			} else if (includeEmpty || !icon.isEmpty()) {
-				list.add(icon);
-			}
-		}
+    public static Icon fromList(List<Icon> icons, boolean includeEmpty) {
+        List<Icon> list = new ArrayList<>(icons.size());
 
-		if (list.isEmpty()) {
-			return EMPTY;
-		} else if (list.size() == 1) {
-			return list.get(0);
-		}
+        for (Icon icon : icons) {
+            if (icon instanceof IconAnimation) {
+                for (Icon icon1 : ((IconAnimation) icon).list) {
+                    if (includeEmpty || !icon1.isEmpty()) {
+                        list.add(icon1);
+                    }
+                }
+            } else if (includeEmpty || !icon.isEmpty()) {
+                list.add(icon);
+            }
+        }
 
-		return new IconAnimation(list);
-	}
+        if (list.isEmpty()) {
+            return EMPTY;
+        } else if (list.size() == 1) {
+            return list.get(0);
+        }
 
-	public final List<Icon> list;
+        return new IconAnimation(list);
+    }
 
-	private IconAnimation(List<Icon> l) {
-		list = l;
-	}
+    public final List<Icon> list;
 
-	@Override
-	public boolean isEmpty() {
-		return list.isEmpty();
-	}
+    private IconAnimation(List<Icon> l) {
+        list = l;
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void draw(int x, int y, int w, int h) {
-		if (!list.isEmpty()) {
-			list.get((int) ((System.currentTimeMillis() / 1000L) % list.size())).draw(x, y, w, h);
-		}
-	}
+    @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void drawStatic(int x, int y, int w, int h) {
-		if (!list.isEmpty()) {
-			list.get(0).drawStatic(x, y, w, h);
-		}
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void draw(int x, int y, int w, int h) {
+        if (!list.isEmpty()) {
+            list.get((int) ((System.currentTimeMillis() / 1000L) % list.size())).draw(x, y, w, h);
+        }
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void draw3D() {
-		if (!list.isEmpty()) {
-			list.get((int) ((System.currentTimeMillis() / 1000L) % list.size())).draw3D();
-		}
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void drawStatic(int x, int y, int w, int h) {
+        if (!list.isEmpty()) {
+            list.get(0).drawStatic(x, y, w, h);
+        }
+    }
 
-	@Override
-	public JsonElement getJson() {
-		JsonObject json = new JsonObject();
-		json.addProperty("id", "animation");
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void draw3D() {
+        if (!list.isEmpty()) {
+            list.get((int) ((System.currentTimeMillis() / 1000L) % list.size())).draw3D();
+        }
+    }
 
-		JsonArray array = new JsonArray();
+    @Override
+    public JsonElement getJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", "animation");
 
-		for (Icon icon : list) {
-			array.add(icon.getJson());
-		}
+        JsonArray array = new JsonArray();
 
-		json.add("icons", array);
-		return json;
-	}
+        for (Icon icon : list) {
+            array.add(icon.getJson());
+        }
 
-	public int hashCode() {
-		return list.hashCode();
-	}
+        json.add("icons", array);
+        return json;
+    }
 
-	public boolean equals(Object o) {
-		return o == this || o instanceof IconAnimation && list.equals(((IconAnimation) o).list);
-	}
+    public int hashCode() {
+        return list.hashCode();
+    }
 
-	@Override
-	@Nullable
-	public Object getIngredient() {
-		if (!list.isEmpty()) {
-			return list.get((int) ((System.currentTimeMillis() / 1000L) % list.size())).getIngredient();
-		}
+    public boolean equals(Object o) {
+        return o == this || o instanceof IconAnimation && list.equals(((IconAnimation) o).list);
+    }
 
-		return null;
-	}
+    @Override
+    @Nullable
+    public Object getIngredient() {
+        if (!list.isEmpty()) {
+            return list.get((int) ((System.currentTimeMillis() / 1000L) % list.size())).getIngredient();
+        }
+
+        return null;
+    }
 }

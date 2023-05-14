@@ -6,202 +6,168 @@ import java.util.function.Function;
 /**
  * @author LatvianModder
  */
-public abstract class StringJoiner
-{
-	private static final Function<Object, String> DEFAULT_STRING_GETTER = String::valueOf;
+public abstract class StringJoiner {
 
-	public static StringJoiner with(String string)
-	{
-		if (string.isEmpty())
-		{
-			return WithString.WITH_NOTHING;
-		}
-		else if (string.length() == 1)
-		{
-			return with(string.charAt(0));
-		}
-		else if (string.equals(WithString.WITH_COMMA_AND_SPACE.s))
-		{
-			return WithString.WITH_COMMA_AND_SPACE;
-		}
+    private static final Function<Object, String> DEFAULT_STRING_GETTER = String::valueOf;
 
-		return new WithString(string);
-	}
+    public static StringJoiner with(String string) {
+        if (string.isEmpty()) {
+            return WithString.WITH_NOTHING;
+        } else if (string.length() == 1) {
+            return with(string.charAt(0));
+        } else if (string.equals(WithString.WITH_COMMA_AND_SPACE.s)) {
+            return WithString.WITH_COMMA_AND_SPACE;
+        }
 
-	public static StringJoiner with(char character)
-	{
-		switch (character)
-		{
-			case ',':
-				return WithChar.WITH_COMMA;
-			case '.':
-				return WithChar.WITH_PERIOD;
-			case ' ':
-				return WithChar.WITH_SPACE;
-			default:
-				return new WithChar(character);
-		}
-	}
+        return new WithString(string);
+    }
 
-	public static StringJoiner properties()
-	{
-		return new PropertiesJoiner();
-	}
+    public static StringJoiner with(char character) {
+        switch (character) {
+            case ',':
+                return WithChar.WITH_COMMA;
+            case '.':
+                return WithChar.WITH_PERIOD;
+            case ' ':
+                return WithChar.WITH_SPACE;
+            default:
+                return new WithChar(character);
+        }
+    }
 
-	private static class WithString extends StringJoiner
-	{
-		private static final WithString WITH_NOTHING = new WithString("");
-		private static final WithString WITH_COMMA_AND_SPACE = new WithString(", ");
+    public static StringJoiner properties() {
+        return new PropertiesJoiner();
+    }
 
-		private final String s;
+    private static class WithString extends StringJoiner {
 
-		private WithString(String _s)
-		{
-			s = _s;
-		}
+        private static final WithString WITH_NOTHING = new WithString("");
+        private static final WithString WITH_COMMA_AND_SPACE = new WithString(", ");
 
-		@Override
-		protected void append(StringBuilder builder)
-		{
-			builder.append(s);
-		}
-	}
+        private final String s;
 
-	private static class WithChar extends StringJoiner
-	{
-		private static final WithChar WITH_COMMA = new WithChar(',');
-		private static final WithChar WITH_PERIOD = new WithChar('.');
-		private static final WithChar WITH_SPACE = new WithChar(' ');
+        private WithString(String _s) {
+            s = _s;
+        }
 
-		private final char c;
+        @Override
+        protected void append(StringBuilder builder) {
+            builder.append(s);
+        }
+    }
 
-		private WithChar(char _c)
-		{
-			c = _c;
-		}
+    private static class WithChar extends StringJoiner {
 
-		@Override
-		protected void append(StringBuilder builder)
-		{
-			builder.append(c);
-		}
-	}
+        private static final WithChar WITH_COMMA = new WithChar(',');
+        private static final WithChar WITH_PERIOD = new WithChar('.');
+        private static final WithChar WITH_SPACE = new WithChar(' ');
 
-	private static class PropertiesJoiner extends StringJoiner
-	{
-		private int index = 0;
+        private final char c;
 
-		@Override
-		protected void append(StringBuilder builder)
-		{
-			if (index % 2 == 0)
-			{
-				builder.append(", ");
-			}
-			else
-			{
-				builder.append('=');
-			}
+        private WithChar(char _c) {
+            c = _c;
+        }
 
-			index++;
-		}
-	}
+        @Override
+        protected void append(StringBuilder builder) {
+            builder.append(c);
+        }
+    }
 
-	protected abstract void append(StringBuilder builder);
+    private static class PropertiesJoiner extends StringJoiner {
 
-	public String joinObjects(Object... objects)
-	{
-		if (objects.length == 0)
-		{
-			return "";
-		}
-		else if (objects.length == 1)
-		{
-			return String.valueOf(objects[0]);
-		}
+        private int index = 0;
 
-		StringBuilder builder = new StringBuilder();
-		boolean first = true;
+        @Override
+        protected void append(StringBuilder builder) {
+            if (index % 2 == 0) {
+                builder.append(", ");
+            } else {
+                builder.append('=');
+            }
 
-		for (Object object : objects)
-		{
-			if (first)
-			{
-				first = false;
-			}
-			else
-			{
-				append(builder);
-			}
+            index++;
+        }
+    }
 
-			builder.append(object);
-		}
+    protected abstract void append(StringBuilder builder);
 
-		return builder.toString();
-	}
+    public String joinObjects(Object... objects) {
+        if (objects.length == 0) {
+            return "";
+        } else if (objects.length == 1) {
+            return String.valueOf(objects[0]);
+        }
 
-	public String joinStrings(String[] strings, int start, int end)
-	{
-		if (strings.length == 0)
-		{
-			return "";
-		}
-		else if (strings.length == 1 && start == 0)
-		{
-			return strings[0];
-		}
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
 
-		StringBuilder builder = new StringBuilder();
+        for (Object object : objects) {
+            if (first) {
+                first = false;
+            } else {
+                append(builder);
+            }
 
-		for (int i = start; i < end; i++)
-		{
-			if (i > start)
-			{
-				append(builder);
-			}
+            builder.append(object);
+        }
 
-			builder.append(strings[i]);
-		}
+        return builder.toString();
+    }
 
-		return builder.toString();
-	}
+    public String joinStrings(String[] strings, int start, int end) {
+        if (strings.length == 0) {
+            return "";
+        } else if (strings.length == 1 && start == 0) {
+            return strings[0];
+        }
 
-	public String joinStrings(String[] strings)
-	{
-		return joinStrings(strings, 0, strings.length);
-	}
+        StringBuilder builder = new StringBuilder();
 
-	public <T> String join(Iterable<T> objects, Function<T, String> stringGetter)
-	{
-		if (objects instanceof Collection) {
-			Collection<T> c = (Collection<T>) objects;
+        for (int i = start; i < end; i++) {
+            if (i > start) {
+                append(builder);
+            }
 
-			if (c.isEmpty()) {
-				return "";
-			} else if (c.size() == 1) {
-				return stringGetter.apply(c.iterator().next());
-			}
-		}
+            builder.append(strings[i]);
+        }
 
-		StringBuilder builder = new StringBuilder();
-		boolean first = true;
+        return builder.toString();
+    }
 
-		for (T object : objects) {
-			if (first) {
-				first = false;
-			} else {
-				append(builder);
-			}
+    public String joinStrings(String[] strings) {
+        return joinStrings(strings, 0, strings.length);
+    }
 
-			builder.append(stringGetter.apply(object));
-		}
+    public <T> String join(Iterable<T> objects, Function<T, String> stringGetter) {
+        if (objects instanceof Collection) {
+            Collection<T> c = (Collection<T>) objects;
 
-		return builder.toString();
-	}
+            if (c.isEmpty()) {
+                return "";
+            } else if (c.size() == 1) {
+                return stringGetter.apply(c.iterator().next());
+            }
+        }
 
-	@SuppressWarnings("unchecked")
-	public String join(Iterable iterable)
-	{
-		return join(iterable, DEFAULT_STRING_GETTER);
-	}
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+
+        for (T object : objects) {
+            if (first) {
+                first = false;
+            } else {
+                append(builder);
+            }
+
+            builder.append(stringGetter.apply(object));
+        }
+
+        return builder.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    public String join(Iterable iterable) {
+        return join(iterable, DEFAULT_STRING_GETTER);
+    }
 }

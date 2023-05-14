@@ -3,93 +3,75 @@ package com.feed_the_beast.ftblib.lib.gui;
 /**
  * @author LatvianModder
  */
-public class PanelScrollBar extends ScrollBar
-{
-	public final Panel panel;
+public class PanelScrollBar extends ScrollBar {
 
-	public PanelScrollBar(Panel parent, Plane plane, Panel p)
-	{
-		super(parent, plane, 0);
-		panel = p;
-		panel.attachedScrollbar = this;
-	}
+    public final Panel panel;
 
-	public PanelScrollBar(Panel parent, Panel panel)
-	{
-		this(parent, Plane.VERTICAL, panel);
-	}
+    public PanelScrollBar(Panel parent, Plane plane, Panel p) {
+        super(parent, plane, 0);
+        panel = p;
+        panel.attachedScrollbar = this;
+    }
 
-	@Override
-	public void setMinValue(int min)
-	{
-	}
+    public PanelScrollBar(Panel parent, Panel panel) {
+        this(parent, Plane.VERTICAL, panel);
+    }
 
-	@Override
-	public int getMinValue()
-	{
-		return 0;
-	}
+    @Override
+    public void setMinValue(int min) {}
 
-	@Override
-	public void setMaxValue(int max)
-	{
-		super.setMaxValue(max - (plane.isVertical ? panel.height : panel.width));
-	}
+    @Override
+    public int getMinValue() {
+        return 0;
+    }
 
-	@Override
-	public void setScrollStep(int s)
-	{
-		panel.setScrollStep(s);
-	}
+    @Override
+    public void setMaxValue(int max) {
+        super.setMaxValue(max - (plane.isVertical ? panel.height : panel.width));
+    }
 
-	@Override
-	public int getScrollStep()
-	{
-		return panel.getScrollStep();
-	}
+    @Override
+    public void setScrollStep(int s) {
+        panel.setScrollStep(s);
+    }
 
-	@Override
-	public int getScrollBarSize()
-	{
-		int max = getMaxValue();
+    @Override
+    public int getScrollStep() {
+        return panel.getScrollStep();
+    }
 
-		if (max <= 0)
-		{
-			return 0;
-		}
+    @Override
+    public int getScrollBarSize() {
+        int max = getMaxValue();
 
-		int size;
+        if (max <= 0) {
+            return 0;
+        }
 
-		if (plane.isVertical)
-		{
-			size = (int) (panel.height / (double) (max + panel.height) * height);
-		}
-		else
-		{
-			size = (int) (panel.width / (double) (max + panel.width) * width);
-		}
+        int size;
 
-		return size < 10 ? 10 : size;
-	}
+        if (plane.isVertical) {
+            size = (int) (panel.height / (double) (max + panel.height) * height);
+        } else {
+            size = (int) (panel.width / (double) (max + panel.width) * width);
+        }
 
-	@Override
-	public void onMoved()
-	{
-		int value = getMaxValue() <= 0 ? 0 : getValue();
+        return size < 10 ? 10 : size;
+    }
 
-		if (plane.isVertical)
-		{
-			panel.setScrollY(value);
-		}
-		else
-		{
-			panel.setScrollX(value);
-		}
-	}
+    @Override
+    public void onMoved() {
+        int value = getMaxValue() <= 0 ? 0 : getValue();
 
-	@Override
-	public boolean canMouseScroll()
-	{
-		return super.canMouseScroll() || panel.isMouseOver();
-	}
+        if (plane.isVertical) {
+            panel.setScrollY(value);
+        } else {
+            panel.setScrollX(value);
+        }
+    }
+
+    @Override
+    public boolean canMouseScroll() {
+        return super.canMouseScroll() || panel.isMouseOver();
+    }
 }

@@ -3,21 +3,20 @@ package com.feed_the_beast.ftblib.lib.tile;
 /**
  * @author LatvianModder
  */
-public enum EnumSaveType
-{
-	SAVE(true, true, false),
-	NET_FULL(false, true, false),
-	NET_UPDATE(false, false, false),
-	ITEM(true, true, true);
+public enum EnumSaveType {
 
-	public final boolean save;
-	public final boolean full;
-	public final boolean item;
+    SAVE(true, true, false),
+    NET_FULL(false, true, false),
+    NET_UPDATE(false, false, false),
+    ITEM(true, true, true);
 
-	EnumSaveType(boolean s, boolean f, boolean i)
-	{
-		save = s;
-		full = f;
-		item = i;
-	}
+    public final boolean save;
+    public final boolean full;
+    public final boolean item;
+
+    EnumSaveType(boolean s, boolean f, boolean i) {
+        save = s;
+        full = f;
+        item = i;
+    }
 }

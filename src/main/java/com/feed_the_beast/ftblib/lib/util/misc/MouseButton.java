@@ -3,58 +3,49 @@ package com.feed_the_beast.ftblib.lib.util.misc;
 /**
  * @author LatvianModder
  */
-public class MouseButton
-{
-	private static final MouseButton[] BUTTONS = new MouseButton[16];
+public class MouseButton {
 
-	static
-	{
-		for (int i = 0; i < BUTTONS.length; i++)
-		{
-			BUTTONS[i] = new MouseButton(i);
-		}
-	}
+    private static final MouseButton[] BUTTONS = new MouseButton[16];
 
-	public static MouseButton get(int i)
-	{
-		return i >= 0 && i < BUTTONS.length ? BUTTONS[i] : BUTTONS[BUTTONS.length - 1];
-	}
+    static {
+        for (int i = 0; i < BUTTONS.length; i++) {
+            BUTTONS[i] = new MouseButton(i);
+        }
+    }
 
-	public static final MouseButton LEFT = get(0);
-	public static final MouseButton RIGHT = get(1);
-	public static final MouseButton MIDDLE = get(2);
-	public static final MouseButton BACK = get(3);
-	public static final MouseButton NEXT = get(4);
+    public static MouseButton get(int i) {
+        return i >= 0 && i < BUTTONS.length ? BUTTONS[i] : BUTTONS[BUTTONS.length - 1];
+    }
 
-	public final int id;
+    public static final MouseButton LEFT = get(0);
+    public static final MouseButton RIGHT = get(1);
+    public static final MouseButton MIDDLE = get(2);
+    public static final MouseButton BACK = get(3);
+    public static final MouseButton NEXT = get(4);
 
-	private MouseButton(int b)
-	{
-		id = b;
-	}
+    public final int id;
 
-	public int hashCode()
-	{
-		return id;
-	}
+    private MouseButton(int b) {
+        id = b;
+    }
 
-	public boolean isLeft()
-	{
-		return id == LEFT.id;
-	}
+    public int hashCode() {
+        return id;
+    }
 
-	public boolean isRight()
-	{
-		return id == RIGHT.id;
-	}
+    public boolean isLeft() {
+        return id == LEFT.id;
+    }
 
-	public boolean isMiddle()
-	{
-		return id == MIDDLE.id;
-	}
+    public boolean isRight() {
+        return id == RIGHT.id;
+    }
 
-	public int getId()
-	{
-		return id;
-	}
+    public boolean isMiddle() {
+        return id == MIDDLE.id;
+    }
+
+    public int getId() {
+        return id;
+    }
 }

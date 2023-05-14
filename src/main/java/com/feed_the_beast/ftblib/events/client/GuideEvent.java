@@ -8,33 +8,29 @@ import cpw.mods.fml.common.eventhandler.Cancelable;
  * @author LatvianModder
  */
 @Cancelable
-public class GuideEvent extends FTBLibEvent
-{
-	private final String path;
+public class GuideEvent extends FTBLibEvent {
 
-	private GuideEvent(String p)
-	{
-		path = p;
-	}
+    private final String path;
 
-	public static class Check extends GuideEvent
-	{
-		private Check(String path)
-		{
-			super(path);
-		}
-	}
+    private GuideEvent(String p) {
+        path = p;
+    }
 
-	public static class Open extends GuideEvent
-	{
-		private Open(String path)
-		{
-			super(path);
-		}
-	}
+    public static class Check extends GuideEvent {
 
-	public String getPath()
-	{
-		return path;
-	}
+        private Check(String path) {
+            super(path);
+        }
+    }
+
+    public static class Open extends GuideEvent {
+
+        private Open(String path) {
+            super(path);
+        }
+    }
+
+    public String getPath() {
+        return path;
+    }
 }

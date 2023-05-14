@@ -1,25 +1,23 @@
 package com.feed_the_beast.ftblib.events.team;
 
+import java.util.function.Consumer;
+
 import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 import com.feed_the_beast.ftblib.lib.data.NBTDataStorage;
-
-import java.util.function.Consumer;
 
 /**
  * @author LatvianModder
  */
-public class ForgeTeamDataEvent extends ForgeTeamEvent
-{
-	private final Consumer<NBTDataStorage.Data> callback;
+public class ForgeTeamDataEvent extends ForgeTeamEvent {
 
-	public ForgeTeamDataEvent(ForgeTeam team, Consumer<NBTDataStorage.Data> c)
-	{
-		super(team);
-		callback = c;
-	}
+    private final Consumer<NBTDataStorage.Data> callback;
 
-	public void register(NBTDataStorage.Data data)
-	{
-		callback.accept(data);
-	}
+    public ForgeTeamDataEvent(ForgeTeam team, Consumer<NBTDataStorage.Data> c) {
+        super(team);
+        callback = c;
+    }
+
+    public void register(NBTDataStorage.Data data) {
+        callback.accept(data);
+    }
 }

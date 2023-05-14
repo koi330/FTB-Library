@@ -1,166 +1,142 @@
 package com.feed_the_beast.ftblib.lib.util.misc;
 
-import com.feed_the_beast.ftblib.lib.util.CommonUtils;
-
 import javax.annotation.Nullable;
+
+import com.feed_the_beast.ftblib.lib.util.CommonUtils;
 
 /**
  * @author LatvianModder
  */
-public abstract class NullableOptional<T>
-{
-	private static final NullableOptional<?> EMPTY = new NullableOptional<Object>()
-	{
-		@Override
-		public boolean isPresent()
-		{
-			return false;
-		}
+public abstract class NullableOptional<T> {
 
-		@Override
-		public boolean isNonNull()
-		{
-			return false;
-		}
+    private static final NullableOptional<?> EMPTY = new NullableOptional<Object>() {
 
-		@Nullable
-		@Override
-		public Object get()
-		{
-			throw new IllegalStateException();
-		}
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
 
-		@Override
-		public Object getNonNull()
-		{
-			throw new NullPointerException();
-		}
+        @Override
+        public boolean isNonNull() {
+            return false;
+        }
 
-		@Override
-		public int hashCode()
-		{
-			return 0;
-		}
+        @Nullable
+        @Override
+        public Object get() {
+            throw new IllegalStateException();
+        }
 
-		@Override
-		public String toString()
-		{
-			return "empty";
-		}
-	};
+        @Override
+        public Object getNonNull() {
+            throw new NullPointerException();
+        }
 
-	private static final NullableOptional<?> NULL = new NullableOptional<Object>()
-	{
-		@Override
-		public boolean isPresent()
-		{
-			return true;
-		}
+        @Override
+        public int hashCode() {
+            return 0;
+        }
 
-		@Override
-		public boolean isNonNull()
-		{
-			return false;
-		}
+        @Override
+        public String toString() {
+            return "empty";
+        }
+    };
 
-		@Nullable
-		@Override
-		public Object get()
-		{
-			return null;
-		}
+    private static final NullableOptional<?> NULL = new NullableOptional<Object>() {
 
-		@Override
-		public Object getNonNull()
-		{
-			throw new NullPointerException();
-		}
+        @Override
+        public boolean isPresent() {
+            return true;
+        }
 
-		@Override
-		public int hashCode()
-		{
-			return 0;
-		}
+        @Override
+        public boolean isNonNull() {
+            return false;
+        }
 
-		@Override
-		public String toString()
-		{
-			return "null";
-		}
-	};
+        @Nullable
+        @Override
+        public Object get() {
+            return null;
+        }
 
-	private static class Value<E> extends NullableOptional<E>
-	{
-		private final E value;
+        @Override
+        public Object getNonNull() {
+            throw new NullPointerException();
+        }
 
-		private Value(E v)
-		{
-			value = v;
-		}
+        @Override
+        public int hashCode() {
+            return 0;
+        }
 
-		@Override
-		public boolean isPresent()
-		{
-			return true;
-		}
+        @Override
+        public String toString() {
+            return "null";
+        }
+    };
 
-		@Override
-		public boolean isNonNull()
-		{
-			return true;
-		}
+    private static class Value<E> extends NullableOptional<E> {
 
-		@Override
-		public E get()
-		{
-			return value;
-		}
+        private final E value;
 
-		@Override
-		public E getNonNull()
-		{
-			return value;
-		}
+        private Value(E v) {
+            value = v;
+        }
 
-		@Override
-		public int hashCode()
-		{
-			return value.hashCode();
-		}
+        @Override
+        public boolean isPresent() {
+            return true;
+        }
 
-		@Override
-		public boolean equals(Object obj)
-		{
-			return obj instanceof Value && value.equals(((Value) obj).value);
-		}
+        @Override
+        public boolean isNonNull() {
+            return true;
+        }
 
-		@Override
-		public String toString()
-		{
-			return value.toString();
-		}
-	}
+        @Override
+        public E get() {
+            return value;
+        }
 
-	public static NullableOptional empty()
-	{
-		return EMPTY;
-	}
+        @Override
+        public E getNonNull() {
+            return value;
+        }
 
-	public static <E> NullableOptional<E> of(@Nullable E object)
-	{
-		return object == null ? CommonUtils.cast(NULL) : new Value<>(object);
-	}
+        @Override
+        public int hashCode() {
+            return value.hashCode();
+        }
 
-	private NullableOptional()
-	{
-	}
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Value && value.equals(((Value) obj).value);
+        }
 
-	public abstract boolean isPresent();
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+    }
 
-	public abstract boolean isNonNull();
+    public static NullableOptional empty() {
+        return EMPTY;
+    }
 
-	@Nullable
-	public abstract T get();
+    public static <E> NullableOptional<E> of(@Nullable E object) {
+        return object == null ? CommonUtils.cast(NULL) : new Value<>(object);
+    }
 
-	public abstract T getNonNull();
+    private NullableOptional() {}
+
+    public abstract boolean isPresent();
+
+    public abstract boolean isNonNull();
+
+    @Nullable
+    public abstract T get();
+
+    public abstract T getNonNull();
 }

@@ -1,158 +1,161 @@
 package com.feed_the_beast.ftblib.lib.config;
 
-import com.feed_the_beast.ftblib.lib.icon.Color4I;
-import com.feed_the_beast.ftblib.lib.io.DataIn;
-import com.feed_the_beast.ftblib.lib.io.DataOut;
-import com.feed_the_beast.ftblib.lib.math.Ticks;
+import java.util.List;
+import java.util.function.LongSupplier;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.function.LongSupplier;
+import com.feed_the_beast.ftblib.lib.icon.Color4I;
+import com.feed_the_beast.ftblib.lib.io.DataIn;
+import com.feed_the_beast.ftblib.lib.io.DataOut;
+import com.feed_the_beast.ftblib.lib.math.Ticks;
 
 /**
  * @author LatvianModder
  */
 public class ConfigTimer extends ConfigValue implements LongSupplier {
-	public static final String ID = "timer";
 
-	private Ticks value;
-	private Ticks maxValue = Ticks.NO_TICKS;
+    public static final String ID = "timer";
 
-	public ConfigTimer(Ticks v) {
-		value = v;
-	}
+    private Ticks value;
+    private Ticks maxValue = Ticks.NO_TICKS;
 
-	public ConfigTimer(Ticks v, Ticks max) {
-		this(v);
-		maxValue = max;
-	}
+    public ConfigTimer(Ticks v) {
+        value = v;
+    }
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    public ConfigTimer(Ticks v, Ticks max) {
+        this(v);
+        maxValue = max;
+    }
 
-	public ConfigTimer setMax(Ticks v) {
-		maxValue = v;
-		return this;
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	public Ticks getMax() {
-		return maxValue;
-	}
+    public ConfigTimer setMax(Ticks v) {
+        maxValue = v;
+        return this;
+    }
 
-	@Override
-	public Ticks getTimer() {
-		return value;
-	}
+    public Ticks getMax() {
+        return maxValue;
+    }
 
-	public void setTimer(Ticks v) {
-		Ticks max = getMax();
-		value = max.hasTicks() && v.ticks() >= max.ticks() ? max : v;
-	}
+    @Override
+    public Ticks getTimer() {
+        return value;
+    }
 
-	@Override
-	public String getString() {
-		return getTimer().toString();
-	}
+    public void setTimer(Ticks v) {
+        Ticks max = getMax();
+        value = max.hasTicks() && v.ticks() >= max.ticks() ? max : v;
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return getTimer().hasTicks();
-	}
+    @Override
+    public String getString() {
+        return getTimer().toString();
+    }
 
-	@Override
-	public int getInt() {
-		return (int) getTimer().ticks();
-	}
+    @Override
+    public boolean getBoolean() {
+        return getTimer().hasTicks();
+    }
 
-	@Override
-	public long getLong() {
-		return getTimer().ticks();
-	}
+    @Override
+    public int getInt() {
+        return (int) getTimer().ticks();
+    }
 
-	@Override
-	public ConfigTimer copy() {
-		return new ConfigTimer(getTimer(), getMax());
-	}
+    @Override
+    public long getLong() {
+        return getTimer().ticks();
+    }
 
-	@Override
-	public boolean equalsValue(ConfigValue value) {
-		return value instanceof ConfigTimer && getTimer().equalsTimer(value.getTimer());
-	}
+    @Override
+    public ConfigTimer copy() {
+        return new ConfigTimer(getTimer(), getMax());
+    }
 
-	@Override
-	public Color4I getColor() {
-		return ConfigInt.COLOR;
-	}
+    @Override
+    public boolean equalsValue(ConfigValue value) {
+        return value instanceof ConfigTimer && getTimer().equalsTimer(value.getTimer());
+    }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		super.addInfo(inst, list);
+    @Override
+    public Color4I getColor() {
+        return ConfigInt.COLOR;
+    }
 
-		Ticks max = getMax();
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        super.addInfo(inst, list);
 
-		if (max.hasTicks()) {
-			list.add(EnumChatFormatting.AQUA + "Max: " + EnumChatFormatting.RESET + max);
-		}
-	}
+        Ticks max = getMax();
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		if (string.length() > 2 && string.startsWith("\"") && string.endsWith("\"")) {
-			string = string.substring(1, string.length() - 1);
-		}
+        if (max.hasTicks()) {
+            list.add(EnumChatFormatting.AQUA + "Max: " + EnumChatFormatting.RESET + max);
+        }
+    }
 
-		if (string.isEmpty()) {
-			return false;
-		}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        if (string.length() > 2 && string.startsWith("\"") && string.endsWith("\"")) {
+            string = string.substring(1, string.length() - 1);
+        }
 
-		try {
-			value = Ticks.get(string);
+        if (string.isEmpty()) {
+            return false;
+        }
 
-			if (!simulate) {
-				setTimer(value);
-			}
+        try {
+            value = Ticks.get(string);
 
-			return true;
-		} catch (Exception ex) {
-			return false;
-		}
-	}
+            if (!simulate) {
+                setTimer(value);
+            }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		nbt.setString(key, getTimer().toString());
-	}
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		setTimer(Ticks.NO_TICKS);
-		setValueFromString(null, nbt.getString(key), false);
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        nbt.setString(key, getTimer().toString());
+    }
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeVarLong(getTimer().ticks());
-		data.writeVarLong(getMax().ticks());
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        setTimer(Ticks.NO_TICKS);
+        setValueFromString(null, nbt.getString(key), false);
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		setTimer(Ticks.get(data.readVarLong()));
-		setMax(Ticks.get(data.readVarLong()));
-	}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeVarLong(getTimer().ticks());
+        data.writeVarLong(getMax().ticks());
+    }
 
-	@Override
-	public long getAsLong() {
-		return getTimer().ticks();
-	}
+    @Override
+    public void readData(DataIn data) {
+        setTimer(Ticks.get(data.readVarLong()));
+        setMax(Ticks.get(data.readVarLong()));
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		setTimer(value.getTimer());
-	}
+    @Override
+    public long getAsLong() {
+        return getTimer().ticks();
+    }
+
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        setTimer(value.getTimer());
+    }
 }

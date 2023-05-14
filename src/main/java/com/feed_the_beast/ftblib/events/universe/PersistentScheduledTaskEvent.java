@@ -1,34 +1,32 @@
 package com.feed_the_beast.ftblib.events.universe;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+
 import com.feed_the_beast.ftblib.lib.data.Universe;
 
 import cpw.mods.fml.common.eventhandler.Cancelable;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 /**
  * @author LatvianModder
  */
 @Cancelable
-public class PersistentScheduledTaskEvent extends UniverseEvent
-{
-	private final ResourceLocation id;
-	private final NBTTagCompound data;
+public class PersistentScheduledTaskEvent extends UniverseEvent {
 
-	public PersistentScheduledTaskEvent(Universe universe, ResourceLocation i, NBTTagCompound d)
-	{
-		super(universe);
-		id = i;
-		data = d;
-	}
+    private final ResourceLocation id;
+    private final NBTTagCompound data;
 
-	public ResourceLocation getID()
-	{
-		return id;
-	}
+    public PersistentScheduledTaskEvent(Universe universe, ResourceLocation i, NBTTagCompound d) {
+        super(universe);
+        id = i;
+        data = d;
+    }
 
-	public NBTTagCompound getData()
-	{
-		return data;
-	}
+    public ResourceLocation getID() {
+        return id;
+    }
+
+    public NBTTagCompound getData() {
+        return data;
+    }
 }

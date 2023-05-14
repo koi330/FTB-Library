@@ -1,53 +1,42 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
-import com.feed_the_beast.ftblib.lib.client.ClientUtils;
-
 import javax.annotation.Nullable;
+
+import com.feed_the_beast.ftblib.lib.client.ClientUtils;
 
 /**
  * @author LatvianModder
  */
-public interface IOpenableGui extends Runnable
-{
-	void openGui();
+public interface IOpenableGui extends Runnable {
 
-	default void openGuiLater()
-	{
-		ClientUtils.runLater(this);
-	}
+    void openGui();
 
-	default void closeGui()
-	{
-		closeGui(true);
-	}
+    default void openGuiLater() {
+        ClientUtils.runLater(this);
+    }
 
-	default void closeGui(boolean openPrevScreen)
-	{
-	}
+    default void closeGui() {
+        closeGui(true);
+    }
 
-	default void openContextMenu(@Nullable Panel panel)
-	{
-		if (this instanceof Widget)
-		{
-			((Widget) this).getGui().openContextMenu(panel);
-		}
-	}
+    default void closeGui(boolean openPrevScreen) {}
 
-	default void closeContextMenu()
-	{
-		if (this instanceof Widget)
-		{
-			((Widget) this).getGui().closeContextMenu();
-		}
-		else
-		{
-			openContextMenu(null);
-		}
-	}
+    default void openContextMenu(@Nullable Panel panel) {
+        if (this instanceof Widget) {
+            ((Widget) this).getGui().openContextMenu(panel);
+        }
+    }
 
-	@Override
-	default void run()
-	{
-		openGui();
-	}
+    default void closeContextMenu() {
+        if (this instanceof Widget) {
+            ((Widget) this).getGui().closeContextMenu();
+        } else {
+            openContextMenu(null);
+        }
+    }
+
+    @Override
+    default void run() {
+        openGui();
+    }
 }

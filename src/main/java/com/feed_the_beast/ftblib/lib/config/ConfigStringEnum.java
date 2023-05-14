@@ -1,5 +1,16 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.gui.GuiBase;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
@@ -12,237 +23,238 @@ import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public class ConfigStringEnum extends ConfigValue implements IIteratingConfig {
-	public static final class StringEnumValue {
-		public final int index;
-		public final String id;
-		public IChatComponent customName = null;
-		public Color4I customColor = Icon.EMPTY;
 
-		public StringEnumValue(int idx, String i) {
-			index = idx;
-			id = i;
-		}
+    public static final class StringEnumValue {
 
-		public int hashCode() {
-			return index;
-		}
+        public final int index;
+        public final String id;
+        public IChatComponent customName = null;
+        public Color4I customColor = Icon.EMPTY;
 
-		public boolean equals(Object o) {
-			return o == this || index == o.hashCode();
-		}
+        public StringEnumValue(int idx, String i) {
+            index = idx;
+            id = i;
+        }
 
-		public String toString() {
-			return id;
-		}
-	}
+        public int hashCode() {
+            return index;
+        }
 
-	private final List<StringEnumValue> values;
-	private StringEnumValue value;
+        public boolean equals(Object o) {
+            return o == this || index == o.hashCode();
+        }
 
-	public ConfigStringEnum(List<String> k, String v) {
-		values = new ArrayList<>(k.size());
+        public String toString() {
+            return id;
+        }
+    }
 
-		for (int i = 0; i < k.size(); i++) {
-			values.add(new StringEnumValue(i, k.get(i)));
-		}
+    private final List<StringEnumValue> values;
+    private StringEnumValue value;
 
-		value = get(v);
-	}
+    public ConfigStringEnum(List<String> k, String v) {
+        values = new ArrayList<>(k.size());
 
-	private ConfigStringEnum(ConfigStringEnum copyFrom) {
-		values = new ArrayList<>(copyFrom.values.size());
+        for (int i = 0; i < k.size(); i++) {
+            values.add(new StringEnumValue(i, k.get(i)));
+        }
 
-		for (int i = 0; i < copyFrom.values.size(); i++) {
-			StringEnumValue v0 = copyFrom.values.get(i);
-			StringEnumValue v = new StringEnumValue(i, v0.id);
-			v.customName = v0.customName == null ? null : v0.customName.createCopy();
-			v.customColor = v0.customColor.copy();
-			values.add(v);
-		}
+        value = get(v);
+    }
 
-		setString(copyFrom.getString());
-	}
+    private ConfigStringEnum(ConfigStringEnum copyFrom) {
+        values = new ArrayList<>(copyFrom.values.size());
 
-	@Nullable
-	public StringEnumValue get(String v) {
-		if (v.isEmpty()) {
-			return null;
-		}
+        for (int i = 0; i < copyFrom.values.size(); i++) {
+            StringEnumValue v0 = copyFrom.values.get(i);
+            StringEnumValue v = new StringEnumValue(i, v0.id);
+            v.customName = v0.customName == null ? null : v0.customName.createCopy();
+            v.customColor = v0.customColor.copy();
+            values.add(v);
+        }
 
-		for (StringEnumValue value : values) {
-			if (value.id.equals(v)) {
-				return value;
-			}
-		}
+        setString(copyFrom.getString());
+    }
 
-		return null;
-	}
+    @Nullable
+    public StringEnumValue get(String v) {
+        if (v.isEmpty()) {
+            return null;
+        }
 
-	@Override
-	public String getId() {
-		return ConfigEnum.ID;
-	}
+        for (StringEnumValue value : values) {
+            if (value.id.equals(v)) {
+                return value;
+            }
+        }
 
-	public void setString(String v) {
-		value = get(v);
-	}
+        return null;
+    }
 
-	@Override
-	public String getString() {
-		return value == null ? "" : value.id;
-	}
+    @Override
+    public String getId() {
+        return ConfigEnum.ID;
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		return value == null ? new ChatComponentText("null")
-				: value.customName == null ? new ChatComponentText(getString()) : value.customName.createCopy();
-	}
+    public void setString(String v) {
+        value = get(v);
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return true;
-	}
+    @Override
+    public String getString() {
+        return value == null ? "" : value.id;
+    }
 
-	@Override
-	public int getInt() {
-		return value == null ? -1 : value.index;
-	}
+    @Override
+    public IChatComponent getStringForGUI() {
+        return value == null ? new ChatComponentText("null")
+                : value.customName == null ? new ChatComponentText(getString()) : value.customName.createCopy();
+    }
 
-	@Override
-	public ConfigStringEnum copy() {
-		return new ConfigStringEnum(this);
-	}
+    @Override
+    public boolean getBoolean() {
+        return true;
+    }
 
-	@Override
-	public Color4I getColor() {
-		return value == null || value.customColor.isEmpty() ? ConfigEnum.COLOR : value.customColor;
-	}
+    @Override
+    public int getInt() {
+        return value == null ? -1 : value.index;
+    }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		if (inst.getCanEdit() && !inst.getDefaultValue().isNull()) {
-			StringEnumValue value = get(inst.getDefaultValue().getString());
-			IChatComponent component = value == null ? null : value.customName;
-			list.add(EnumChatFormatting.AQUA + "Default: " + EnumChatFormatting.RESET
-					+ (component == null ? inst.getDefaultValue() : component.getFormattedText()));
-		}
+    @Override
+    public ConfigStringEnum copy() {
+        return new ConfigStringEnum(this);
+    }
 
-		list.add("");
+    @Override
+    public Color4I getColor() {
+        return value == null || value.customColor.isEmpty() ? ConfigEnum.COLOR : value.customColor;
+    }
 
-		for (StringEnumValue v : values) {
-			list.add((v == value ? (EnumChatFormatting.AQUA + "+ ") : (EnumChatFormatting.DARK_GRAY + "- "))
-					+ (v.customName == null ? v.id : v.customName.getUnformattedText()));
-		}
-	}
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        if (inst.getCanEdit() && !inst.getDefaultValue().isNull()) {
+            StringEnumValue value = get(inst.getDefaultValue().getString());
+            IChatComponent component = value == null ? null : value.customName;
+            list.add(
+                    EnumChatFormatting.AQUA + "Default: "
+                            + EnumChatFormatting.RESET
+                            + (component == null ? inst.getDefaultValue() : component.getFormattedText()));
+        }
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		if (values.size() > 16 || GuiBase.isCtrlKeyDown()) {
-			GuiButtonListBase g = new GuiButtonListBase() {
-				@Override
-				public void addButtons(Panel panel) {
-					for (StringEnumValue v : values) {
-						panel.add(new SimpleTextButton(panel,
-								v.customName == null ? getString() : v.customName.getUnformattedText(), Icon.EMPTY) {
-							@Override
-							public void onClicked(MouseButton button) {
-								GuiHelper.playClickSound();
-								setString(v.id);
-								gui.openGui();
-								callback.run();
-							}
-						});
-					}
-				}
-			};
+        list.add("");
 
-			g.setHasSearchBox(true);
-			g.openGui();
-			return;
-		}
+        for (StringEnumValue v : values) {
+            list.add(
+                    (v == value ? (EnumChatFormatting.AQUA + "+ ") : (EnumChatFormatting.DARK_GRAY + "- "))
+                            + (v.customName == null ? v.id : v.customName.getUnformattedText()));
+        }
+    }
 
-		super.onClicked(gui, inst, button, callback);
-	}
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        if (values.size() > 16 || GuiBase.isCtrlKeyDown()) {
+            GuiButtonListBase g = new GuiButtonListBase() {
 
-	@Override
-	public List<String> getVariants() {
-		List<String> l = new ArrayList<>(values.size());
+                @Override
+                public void addButtons(Panel panel) {
+                    for (StringEnumValue v : values) {
+                        panel.add(
+                                new SimpleTextButton(
+                                        panel,
+                                        v.customName == null ? getString() : v.customName.getUnformattedText(),
+                                        Icon.EMPTY) {
 
-		for (StringEnumValue v : values) {
-			l.add(v.id);
-		}
+                                    @Override
+                                    public void onClicked(MouseButton button) {
+                                        GuiHelper.playClickSound();
+                                        setString(v.id);
+                                        gui.openGui();
+                                        callback.run();
+                                    }
+                                });
+                    }
+                }
+            };
 
-		return l;
-	}
+            g.setHasSearchBox(true);
+            g.openGui();
+            return;
+        }
 
-	@Override
-	public ConfigValue getIteration(boolean next) {
-		ConfigStringEnum c = copy();
-		c.setString(
-				value == null ? "" : c.values.get(MathUtils.mod(c.value.index + (next ? 1 : -1), c.values.size())).id);
-		return c;
-	}
+        super.onClicked(gui, inst, button, callback);
+    }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		nbt.setString(key, getString());
-	}
+    @Override
+    public List<String> getVariants() {
+        List<String> l = new ArrayList<>(values.size());
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		setString(nbt.getString(key));
-	}
+        for (StringEnumValue v : values) {
+            l.add(v.id);
+        }
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeVarInt(values.size());
+        return l;
+    }
 
-		for (StringEnumValue v : values) {
-			data.writeString(v.id);
-			data.writeTextComponent(v.customName);
-			data.writeInt(v.customColor.rgba());
-		}
+    @Override
+    public ConfigValue getIteration(boolean next) {
+        ConfigStringEnum c = copy();
+        c.setString(
+                value == null ? "" : c.values.get(MathUtils.mod(c.value.index + (next ? 1 : -1), c.values.size())).id);
+        return c;
+    }
 
-		data.writeString(getString());
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        nbt.setString(key, getString());
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		values.clear();
-		int s = data.readVarInt();
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        setString(nbt.getString(key));
+    }
 
-		for (int i = 0; i < s; i++) {
-			StringEnumValue v = new StringEnumValue(i, data.readString());
-			v.customName = data.readTextComponent();
-			v.customColor = Color4I.rgba(data.readInt());
-			values.add(v);
-		}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeVarInt(values.size());
 
-		setString(data.readString());
-	}
+        for (StringEnumValue v : values) {
+            data.writeString(v.id);
+            data.writeTextComponent(v.customName);
+            data.writeInt(v.customColor.rgba());
+        }
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		setString(string);
-		return true;
-	}
+        data.writeString(getString());
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		setString(value.getString());
-	}
+    @Override
+    public void readData(DataIn data) {
+        values.clear();
+        int s = data.readVarInt();
+
+        for (int i = 0; i < s; i++) {
+            StringEnumValue v = new StringEnumValue(i, data.readString());
+            v.customName = data.readTextComponent();
+            v.customColor = Color4I.rgba(data.readInt());
+            values.add(v);
+        }
+
+        setString(data.readString());
+    }
+
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        setString(string);
+        return true;
+    }
+
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        setString(value.getString());
+    }
 }

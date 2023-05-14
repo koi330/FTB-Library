@@ -4,6 +4,11 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+
 import com.feed_the_beast.ftblib.lib.util.InvUtils;
 import com.feed_the_beast.ftblib.lib.util.JsonUtils;
 import com.google.gson.JsonElement;
@@ -11,185 +16,184 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import cpw.mods.fml.common.registry.GameData;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 /**
  * @author LatvianModder
  */
 public final class ItemEntry {
-	public static final ItemEntry EMPTY = new ItemEntry(null, 0, null, null);
 
-	public static ItemEntry get(ItemStack stack) {
-		if (stack == null) {
-			return EMPTY;
-		}
+    public static final ItemEntry EMPTY = new ItemEntry(null, 0, null, null);
 
-		Item item = stack.getItem();
-		int metadata = stack.getItemDamage();
-		NBTTagCompound nbt0 = stack.writeToNBT(new NBTTagCompound());
-		NBTTagCompound nbt = (NBTTagCompound) nbt0.getTag("tag");
-		NBTTagCompound caps = (NBTTagCompound) nbt0.getTag("ForgeCaps");
-		return new ItemEntry(item, metadata, nbt, caps);
-	}
+    public static ItemEntry get(ItemStack stack) {
+        if (stack == null) {
+            return EMPTY;
+        }
 
-	public static ItemEntry fromJson(@Nullable JsonElement json0) {
-		if (!JsonUtils.isNull(json0) && json0.isJsonObject()) {
-			JsonObject json = json0.getAsJsonObject();
+        Item item = stack.getItem();
+        int metadata = stack.getItemDamage();
+        NBTTagCompound nbt0 = stack.writeToNBT(new NBTTagCompound());
+        NBTTagCompound nbt = (NBTTagCompound) nbt0.getTag("tag");
+        NBTTagCompound caps = (NBTTagCompound) nbt0.getTag("ForgeCaps");
+        return new ItemEntry(item, metadata, nbt, caps);
+    }
 
-			Item item = null;
+    public static ItemEntry fromJson(@Nullable JsonElement json0) {
+        if (!JsonUtils.isNull(json0) && json0.isJsonObject()) {
+            JsonObject json = json0.getAsJsonObject();
 
-			if (json.has("item")) {
-				item = (Item) GameData.getItemRegistry().getObject(new ResourceLocation(json.get("item").getAsString()));
-			}
+            Item item = null;
 
-			if (item == null || item == null) {
-				return EMPTY;
-			}
+            if (json.has("item")) {
+                item = (Item) GameData.getItemRegistry()
+                        .getObject(new ResourceLocation(json.get("item").getAsString()));
+            }
 
-			int meta = 0;
+            if (item == null || item == null) {
+                return EMPTY;
+            }
 
-			if (json.has("data") && item.getHasSubtypes()) {
-				meta = json.get("data").getAsInt();
-			}
+            int meta = 0;
 
-			NBTTagCompound nbt = null;
+            if (json.has("data") && item.getHasSubtypes()) {
+                meta = json.get("data").getAsInt();
+            }
 
-			if (json.has("nbt")) {
-				nbt = (NBTTagCompound) JsonUtils.toNBT(json.get("nbt"));
-			}
+            NBTTagCompound nbt = null;
 
-			NBTTagCompound caps = null;
+            if (json.has("nbt")) {
+                nbt = (NBTTagCompound) JsonUtils.toNBT(json.get("nbt"));
+            }
 
-			if (json.has("caps")) {
-				caps = (NBTTagCompound) JsonUtils.toNBT(json.get("caps"));
-			}
+            NBTTagCompound caps = null;
 
-			return new ItemEntry(item, meta, nbt, caps);
-		}
+            if (json.has("caps")) {
+                caps = (NBTTagCompound) JsonUtils.toNBT(json.get("caps"));
+            }
 
-		return EMPTY;
-	}
+            return new ItemEntry(item, meta, nbt, caps);
+        }
 
-	public final Item item;
-	public final int metadata;
-	public final NBTTagCompound nbt;
-	public final NBTTagCompound caps;
-	private int hashCode;
-	private ItemStack stack = null;
+        return EMPTY;
+    }
 
-	public ItemEntry(Item i, int m, @Nullable NBTTagCompound n, @Nullable NBTTagCompound c) {
-		item = i;
-		metadata = m;
-		nbt = n;
-		caps = c;
-		hashCode = 0;
-	}
+    public final Item item;
+    public final int metadata;
+    public final NBTTagCompound nbt;
+    public final NBTTagCompound caps;
+    private int hashCode;
+    private ItemStack stack = null;
 
-	public boolean isEmpty() {
-		return this == EMPTY;
-	}
+    public ItemEntry(Item i, int m, @Nullable NBTTagCompound n, @Nullable NBTTagCompound c) {
+        item = i;
+        metadata = m;
+        nbt = n;
+        caps = c;
+        hashCode = 0;
+    }
 
-	public int hashCode() {
-		if (isEmpty()) {
-			return 0;
-		} else if (hashCode == 0) {
-			hashCode = Objects.hash(item, metadata, nbt, caps);
+    public boolean isEmpty() {
+        return this == EMPTY;
+    }
 
-			if (hashCode == 0) {
-				hashCode = 1;
-			}
-		}
+    public int hashCode() {
+        if (isEmpty()) {
+            return 0;
+        } else if (hashCode == 0) {
+            hashCode = Objects.hash(item, metadata, nbt, caps);
 
-		return hashCode;
-	}
+            if (hashCode == 0) {
+                hashCode = 1;
+            }
+        }
 
-	public boolean equalsEntry(ItemEntry entry) {
-		if (entry == this) {
-			return true;
-		}
+        return hashCode;
+    }
 
-		return item == entry.item && metadata == entry.metadata && Objects.equals(nbt, entry.nbt)
-				&& Objects.equals(caps, entry.caps);
-	}
+    public boolean equalsEntry(ItemEntry entry) {
+        if (entry == this) {
+            return true;
+        }
 
-	public boolean equals(Object o) {
-		return o == this || o != null && o.getClass() == ItemEntry.class && equalsEntry((ItemEntry) o);
-	}
+        return item == entry.item && metadata == entry.metadata
+                && Objects.equals(nbt, entry.nbt)
+                && Objects.equals(caps, entry.caps);
+    }
 
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		toString(builder);
-		return builder.toString();
-	}
+    public boolean equals(Object o) {
+        return o == this || o != null && o.getClass() == ItemEntry.class && equalsEntry((ItemEntry) o);
+    }
 
-	public void toString(StringBuilder builder) {
-		builder.append(GameData.getItemRegistry().getNameForObject(item));
-		builder.append(' ');
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        toString(builder);
+        return builder.toString();
+    }
 
-		if (metadata == 32767) {
-			builder.append('*');
-		} else {
-			builder.append(metadata);
-		}
+    public void toString(StringBuilder builder) {
+        builder.append(GameData.getItemRegistry().getNameForObject(item));
+        builder.append(' ');
 
-		if (nbt != null || caps != null) {
-			builder.append(' ');
-			builder.append(nbt);
-		}
+        if (metadata == 32767) {
+            builder.append('*');
+        } else {
+            builder.append(metadata);
+        }
 
-		if (caps != null) {
-			builder.append(' ');
-			builder.append(caps);
-		}
-	}
+        if (nbt != null || caps != null) {
+            builder.append(' ');
+            builder.append(nbt);
+        }
 
-	public ItemStack getStack(int count, boolean copy) {
-		if (count <= 0 || isEmpty()) {
-			return InvUtils.EMPTY_STACK;
-		}
+        if (caps != null) {
+            builder.append(' ');
+            builder.append(caps);
+        }
+    }
 
-		if (stack == null) {
-			stack = new ItemStack(item, 1, metadata);
-			stack.setTagCompound(nbt);
-		}
+    public ItemStack getStack(int count, boolean copy) {
+        if (count <= 0 || isEmpty()) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-		ItemStack stack1;
+        if (stack == null) {
+            stack = new ItemStack(item, 1, metadata);
+            stack.setTagCompound(nbt);
+        }
 
-		if (copy) {
-			stack1 = stack.copy();
-		} else {
-			stack1 = stack;
-		}
+        ItemStack stack1;
 
-		stack1.stackSize = count;
-		return stack1;
-	}
+        if (copy) {
+            stack1 = stack.copy();
+        } else {
+            stack1 = stack;
+        }
 
-	public JsonElement toJson() {
-		ResourceLocation id = new ResourceLocation(GameData.getItemRegistry().getNameForObject(item));
+        stack1.stackSize = count;
+        return stack1;
+    }
 
-		if (nbt == null && caps == null && (metadata == 0 || !item.getHasSubtypes())) {
-			return new JsonPrimitive(id == null ? "minecraft:air" : id.toString());
-		}
+    public JsonElement toJson() {
+        ResourceLocation id = new ResourceLocation(GameData.getItemRegistry().getNameForObject(item));
 
-		JsonObject json = new JsonObject();
-		json.addProperty("item", id == null ? "minecraft:air" : id.toString());
+        if (nbt == null && caps == null && (metadata == 0 || !item.getHasSubtypes())) {
+            return new JsonPrimitive(id == null ? "minecraft:air" : id.toString());
+        }
 
-		if (item.getHasSubtypes()) {
-			json.addProperty("data", metadata);
-		}
+        JsonObject json = new JsonObject();
+        json.addProperty("item", id == null ? "minecraft:air" : id.toString());
 
-		if (nbt != null) {
-			json.add("nbt", JsonUtils.toJson(nbt));
-		}
+        if (item.getHasSubtypes()) {
+            json.addProperty("data", metadata);
+        }
 
-		if (caps != null) {
-			json.add("caps", JsonUtils.toJson(caps));
-		}
+        if (nbt != null) {
+            json.add("nbt", JsonUtils.toJson(nbt));
+        }
 
-		return json;
-	}
+        if (caps != null) {
+            json.add("caps", JsonUtils.toJson(caps));
+        }
+
+        return json;
+    }
 }

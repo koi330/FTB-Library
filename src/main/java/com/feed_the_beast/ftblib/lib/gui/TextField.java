@@ -1,185 +1,187 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.icon.Icon;
 import com.feed_the_beast.ftblib.lib.io.Bits;
 import com.feed_the_beast.ftblib.lib.util.StringUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.util.IChatComponent;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public class TextField extends Widget {
-	public String[] text;
-	public int textFlags = 0;
-	public int maxWidth = 0;
-	public int textSpacing = 10;
-	public float scale = 1F;
-	public Color4I textColor = Icon.EMPTY;
-	private List<GuiBase.PositionedTextData> textData;
 
-	public TextField(Panel panel) {
-		super(panel);
-	}
+    public String[] text;
+    public int textFlags = 0;
+    public int maxWidth = 0;
+    public int textSpacing = 10;
+    public float scale = 1F;
+    public Color4I textColor = Icon.EMPTY;
+    private List<GuiBase.PositionedTextData> textData;
 
-	public TextField addFlags(int flags) {
-		textFlags |= flags;
-		return this;
-	}
+    public TextField(Panel panel) {
+        super(panel);
+    }
 
-	public TextField setMaxWidth(int width) {
-		maxWidth = width;
-		return this;
-	}
+    public TextField addFlags(int flags) {
+        textFlags |= flags;
+        return this;
+    }
 
-	public TextField setColor(Color4I color) {
-		textColor = color;
-		return this;
-	}
+    public TextField setMaxWidth(int width) {
+        maxWidth = width;
+        return this;
+    }
 
-	public TextField setScale(float s) {
-		scale = s;
-		return this;
-	}
+    public TextField setColor(Color4I color) {
+        textColor = color;
+        return this;
+    }
 
-	public TextField setSpacing(int s) {
-		textSpacing = s;
-		return this;
-	}
+    public TextField setScale(float s) {
+        scale = s;
+        return this;
+    }
 
-	public TextField setText(String txt) {
-		text = null;
-		textData = null;
-		txt = txt.trim();
-		Theme theme = getGui().getTheme();
+    public TextField setSpacing(int s) {
+        textSpacing = s;
+        return this;
+    }
 
-		if (!txt.isEmpty()) {
-			if (maxWidth == 0) {
-				text = txt.split("\n");
-			} else {
-				text = theme.listFormattedStringToWidth(txt, maxWidth).toArray(StringUtils.EMPTY_ARRAY);
-			}
-		}
+    public TextField setText(String txt) {
+        text = null;
+        textData = null;
+        txt = txt.trim();
+        Theme theme = getGui().getTheme();
 
-		if (text == null || text.length == 0) {
-			text = StringUtils.EMPTY_ARRAY;
-		}
+        if (!txt.isEmpty()) {
+            if (maxWidth == 0) {
+                text = txt.split("\n");
+            } else {
+                text = theme.listFormattedStringToWidth(txt, maxWidth).toArray(StringUtils.EMPTY_ARRAY);
+            }
+        }
 
-		return resize(theme);
-	}
+        if (text == null || text.length == 0) {
+            text = StringUtils.EMPTY_ARRAY;
+        }
 
-	public TextField resize(Theme theme) {
-		if (maxWidth == 0) {
-			setWidth(0);
+        return resize(theme);
+    }
 
-			for (String s : text) {
-				setWidth(Math.max(width, (int) (theme.getStringWidth(s) * scale)));
-			}
-		} else {
-			setWidth(maxWidth);
-		}
+    public TextField resize(Theme theme) {
+        if (maxWidth == 0) {
+            setWidth(0);
 
-		setHeight((int) ((Math.max(1, text.length) * textSpacing - (textSpacing - theme.getFontHeight() + 1)) * scale));
-		return this;
-	}
+            for (String s : text) {
+                setWidth(Math.max(width, (int) (theme.getStringWidth(s) * scale)));
+            }
+        } else {
+            setWidth(maxWidth);
+        }
 
-	public TextField setText(IChatComponent component) {
-		setText(component.getFormattedText());
+        setHeight((int) ((Math.max(1, text.length) * textSpacing - (textSpacing - theme.getFontHeight() + 1)) * scale));
+        return this;
+    }
 
-		textData = getGui().getTheme().createDataFrom(component, width);
+    public TextField setText(IChatComponent component) {
+        setText(component.getFormattedText());
 
-		if (textData.isEmpty()) {
-			textData = null;
-		}
+        textData = getGui().getTheme().createDataFrom(component, width);
 
-		return this;
-	}
+        if (textData.isEmpty()) {
+            textData = null;
+        }
 
-	@Nullable
-	private GuiBase.PositionedTextData getDataAtMouse() {
-		if (textData == null) {
-			return null;
-		}
+        return this;
+    }
 
-		int x = getX();
-		int y = getY();
+    @Nullable
+    private GuiBase.PositionedTextData getDataAtMouse() {
+        if (textData == null) {
+            return null;
+        }
 
-		for (GuiBase.PositionedTextData data : textData) {
-			if (getGui().isMouseOver(data.posX + x, data.posY + y, data.width, data.height)) {
-				return data;
-			}
-		}
+        int x = getX();
+        int y = getY();
 
-		return null;
-	}
+        for (GuiBase.PositionedTextData data : textData) {
+            if (getGui().isMouseOver(data.posX + x, data.posY + y, data.width, data.height)) {
+                return data;
+            }
+        }
 
-	@Override
-	public void addMouseOverText(List<String> list) {
-		GuiBase.PositionedTextData data = getDataAtMouse();
+        return null;
+    }
 
-		if (data != null && data.hoverEvent != null) // TODO: Special handling for each data.hoverEvent.getAction()
-		{
-			Collections.addAll(list, data.hoverEvent.getValue().getFormattedText().split("\n"));
-		}
-	}
+    @Override
+    public void addMouseOverText(List<String> list) {
+        GuiBase.PositionedTextData data = getDataAtMouse();
 
-	@Override
-	public boolean mousePressed(MouseButton button) {
-		if (isMouseOver()) {
-			GuiBase.PositionedTextData data = getDataAtMouse();
+        if (data != null && data.hoverEvent != null) // TODO: Special handling for each data.hoverEvent.getAction()
+        {
+            Collections.addAll(list, data.hoverEvent.getValue().getFormattedText().split("\n"));
+        }
+    }
 
-			if (data != null && data.clickEvent != null && handleClick(GuiHelper.clickEventToString(data.clickEvent))) {
-				GuiHelper.playClickSound();
-				return true;
-			}
-		}
+    @Override
+    public boolean mousePressed(MouseButton button) {
+        if (isMouseOver()) {
+            GuiBase.PositionedTextData data = getDataAtMouse();
 
-		return false;
-	}
+            if (data != null && data.clickEvent != null && handleClick(GuiHelper.clickEventToString(data.clickEvent))) {
+                GuiHelper.playClickSound();
+                return true;
+            }
+        }
 
-	public void drawBackground(Theme theme, int x, int y, int w, int h) {
-	}
+        return false;
+    }
 
-	@Override
-	public void draw(Theme theme, int x, int y, int w, int h) {
-		drawBackground(theme, x, y, w, h);
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {}
 
-		if (text.length == 0) {
-			return;
-		}
+    @Override
+    public void draw(Theme theme, int x, int y, int w, int h) {
+        drawBackground(theme, x, y, w, h);
 
-		boolean centered = Bits.getFlag(textFlags, Theme.CENTERED);
-		boolean centeredV = Bits.getFlag(textFlags, Theme.CENTERED_V);
+        if (text.length == 0) {
+            return;
+        }
 
-		Color4I col = textColor;
+        boolean centered = Bits.getFlag(textFlags, Theme.CENTERED);
+        boolean centeredV = Bits.getFlag(textFlags, Theme.CENTERED_V);
 
-		if (col.isEmpty()) {
-			col = theme.getContentColor(WidgetType.mouseOver(Bits.getFlag(textFlags, Theme.MOUSE_OVER)));
-		}
+        Color4I col = textColor;
 
-		int tx = x + (centered ? (w / 2) : 0);
-		int ty = y + (centeredV ? ((h - theme.getFontHeight()) / 2) : 0);
+        if (col.isEmpty()) {
+            col = theme.getContentColor(WidgetType.mouseOver(Bits.getFlag(textFlags, Theme.MOUSE_OVER)));
+        }
 
-		if (scale == 1F) {
-			for (int i = 0; i < text.length; i++) {
-				theme.drawString(text[i], tx, ty + i * textSpacing, col, textFlags);
-			}
-		} else {
-			GlStateManager.pushMatrix();
-			GlStateManager.translate(tx, ty, 0);
-			GlStateManager.scale(scale, scale, 1F);
+        int tx = x + (centered ? (w / 2) : 0);
+        int ty = y + (centeredV ? ((h - theme.getFontHeight()) / 2) : 0);
 
-			for (int i = 0; i < text.length; i++) {
-				theme.drawString(text[i], 0, i * textSpacing, col, textFlags);
-			}
+        if (scale == 1F) {
+            for (int i = 0; i < text.length; i++) {
+                theme.drawString(text[i], tx, ty + i * textSpacing, col, textFlags);
+            }
+        } else {
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(tx, ty, 0);
+            GlStateManager.scale(scale, scale, 1F);
 
-			GlStateManager.popMatrix();
-		}
-	}
+            for (int i = 0; i < text.length; i++) {
+                theme.drawString(text[i], 0, i * textSpacing, col, textFlags);
+            }
+
+            GlStateManager.popMatrix();
+        }
+    }
 }

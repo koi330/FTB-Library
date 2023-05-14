@@ -5,33 +5,29 @@ import com.feed_the_beast.ftblib.lib.icon.Color4I;
 /**
  * @author LatvianModder
  */
-public class ConfigRGB
-{
-	public int red;
-	public int green;
-	public int blue;
+public class ConfigRGB {
 
-	public ConfigRGB(int r, int g, int b)
-	{
-		red = r & 0xFF;
-		green = g & 0xFF;
-		blue = b & 0xFF;
-	}
+    public int red;
+    public int green;
+    public int blue;
 
-	public ConfigRGB(Color4I col)
-	{
-		red = col.redi();
-		green = col.greeni();
-		blue = col.bluei();
-	}
+    public ConfigRGB(int r, int g, int b) {
+        red = r & 0xFF;
+        green = g & 0xFF;
+        blue = b & 0xFF;
+    }
 
-	public Color4I createColor(int a)
-	{
-		return Color4I.rgba(red, green, blue, a);
-	}
+    public ConfigRGB(Color4I col) {
+        red = col.redi();
+        green = col.greeni();
+        blue = col.bluei();
+    }
 
-	public Color4I createColor()
-	{
-		return createColor(255);
-	}
+    public Color4I createColor(int a) {
+        return Color4I.rgba(red, green, blue, a);
+    }
+
+    public Color4I createColor() {
+        return createColor(255);
+    }
 }

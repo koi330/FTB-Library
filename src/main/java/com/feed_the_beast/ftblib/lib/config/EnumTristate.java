@@ -1,88 +1,96 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentTranslation;
+
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
 
 import cpw.mods.fml.common.eventhandler.Event;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentTranslation;
 
 /**
  * @author LatvianModder
  */
 public enum EnumTristate implements IStringSerializable {
-	TRUE("true", Event.Result.ALLOW, ConfigBoolean.COLOR_TRUE, 1),
-	FALSE("false", Event.Result.DENY, ConfigBoolean.COLOR_FALSE, 0),
-	DEFAULT("default", Event.Result.DEFAULT, ConfigEnum.COLOR, 2);
 
-	public static final NameMap<EnumTristate> NAME_MAP = NameMap.createWithNameAndColor(DEFAULT,
-			(sender, value) -> new ChatComponentTranslation(value.getName()), EnumTristate::getColor, values());
+    TRUE("true", Event.Result.ALLOW, ConfigBoolean.COLOR_TRUE, 1),
+    FALSE("false", Event.Result.DENY, ConfigBoolean.COLOR_FALSE, 0),
+    DEFAULT("default", Event.Result.DEFAULT, ConfigEnum.COLOR, 2);
 
-	public static EnumTristate read(NBTTagCompound nbt, String key) {
-		return nbt.hasKey(key) ? nbt.getBoolean(key) ? TRUE : FALSE : DEFAULT;
-	}
+    public static final NameMap<EnumTristate> NAME_MAP = NameMap.createWithNameAndColor(
+            DEFAULT,
+            (sender, value) -> new ChatComponentTranslation(value.getName()),
+            EnumTristate::getColor,
+            values());
 
-	public static EnumTristate string2tristate(String tristate) {
-		switch (tristate) {
-			case "true": return TRUE;
-			case "false": return FALSE;
-			default: return DEFAULT;
-		}
-	}
+    public static EnumTristate read(NBTTagCompound nbt, String key) {
+        return nbt.hasKey(key) ? nbt.getBoolean(key) ? TRUE : FALSE : DEFAULT;
+    }
 
-	private final String name;
-	private final Event.Result result;
-	private final Color4I color;
-	private final int opposite;
+    public static EnumTristate string2tristate(String tristate) {
+        switch (tristate) {
+            case "true":
+                return TRUE;
+            case "false":
+                return FALSE;
+            default:
+                return DEFAULT;
+        }
+    }
 
-	EnumTristate(String s, Event.Result r, Color4I c, int o) {
-		name = s;
-		result = r;
-		color = c;
-		opposite = o;
-	}
+    private final String name;
+    private final Event.Result result;
+    private final Color4I color;
+    private final int opposite;
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    EnumTristate(String s, Event.Result r, Color4I c, int o) {
+        name = s;
+        result = r;
+        color = c;
+        opposite = o;
+    }
 
-	public Event.Result getResult() {
-		return result;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	public Color4I getColor() {
-		return color;
-	}
+    public Event.Result getResult() {
+        return result;
+    }
 
-	public boolean isTrue() {
-		return this == TRUE;
-	}
+    public Color4I getColor() {
+        return color;
+    }
 
-	public boolean isFalse() {
-		return this == FALSE;
-	}
+    public boolean isTrue() {
+        return this == TRUE;
+    }
 
-	public boolean isDefault() {
-		return this == DEFAULT;
-	}
+    public boolean isFalse() {
+        return this == FALSE;
+    }
 
-	public boolean get(boolean def) {
-		return isDefault() ? def : isTrue();
-	}
+    public boolean isDefault() {
+        return this == DEFAULT;
+    }
 
-	public EnumTristate getOpposite() {
-		return NAME_MAP.get(opposite);
-	}
+    public boolean get(boolean def) {
+        return isDefault() ? def : isTrue();
+    }
 
-	public String toString() {
-		return name;
-	}
+    public EnumTristate getOpposite() {
+        return NAME_MAP.get(opposite);
+    }
 
-	public void write(NBTTagCompound nbt, String key) {
-		if (!isDefault()) {
-			nbt.setBoolean(key, isTrue());
-		}
-	}
+    public String toString() {
+        return name;
+    }
+
+    public void write(NBTTagCompound nbt, String key) {
+        if (!isDefault()) {
+            nbt.setBoolean(key, isTrue());
+        }
+    }
 }

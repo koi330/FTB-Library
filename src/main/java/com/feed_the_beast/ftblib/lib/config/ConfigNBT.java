@@ -1,152 +1,159 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.JsonUtils;
 import com.feed_the_beast.ftblib.lib.util.NBTUtils;
 import com.google.gson.JsonElement;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public class ConfigNBT extends ConfigValue {
-	public static final String ID = "nbt";
 
-	private NBTTagCompound value;
+    public static final String ID = "nbt";
 
-	public ConfigNBT(@Nullable NBTTagCompound nbt) {
-		value = nbt;
-	}
+    private NBTTagCompound value;
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    public ConfigNBT(@Nullable NBTTagCompound nbt) {
+        value = nbt;
+    }
 
-	@Override
-	public String getString() {
-		return value == null ? "null" : value.toString();
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	@Nullable
-	public NBTTagCompound getNBT() {
-		return value;
-	}
+    @Override
+    public String getString() {
+        return value == null ? "null" : value.toString();
+    }
 
-	public void setNBT(@Nullable NBTTagCompound nbt) {
-		value = nbt;
-	}
+    @Nullable
+    public NBTTagCompound getNBT() {
+        return value;
+    }
 
-	@Override
-	public boolean getBoolean() {
-		value = getNBT();
-		return value != null && !value.hasNoTags();
-	}
+    public void setNBT(@Nullable NBTTagCompound nbt) {
+        value = nbt;
+    }
 
-	@Override
-	public int getInt() {
-		value = getNBT();
-		return value == null ? 0 : value.hashCode();
-	}
+    @Override
+    public boolean getBoolean() {
+        value = getNBT();
+        return value != null && !value.hasNoTags();
+    }
 
-	@Override
-	public ConfigNBT copy() {
-		value = getNBT();
-		return new ConfigNBT(value == null ? null : (NBTTagCompound) value.copy());
-	}
+    @Override
+    public int getInt() {
+        value = getNBT();
+        return value == null ? 0 : value.hashCode();
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		return new ChatComponentText(getNBT() == null ? "null" : "{...}");
-	}
+    @Override
+    public ConfigNBT copy() {
+        value = getNBT();
+        return new ConfigNBT(value == null ? null : (NBTTagCompound) value.copy());
+    }
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		if (string.equals("null")) {
-			if (!simulate) {
-				setNBT(null);
-			}
+    @Override
+    public IChatComponent getStringForGUI() {
+        return new ChatComponentText(getNBT() == null ? "null" : "{...}");
+    }
 
-			return true;
-		}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        if (string.equals("null")) {
+            if (!simulate) {
+                setNBT(null);
+            }
 
-		try {
-			value = (NBTTagCompound) JsonToNBT.func_150315_a(string);
+            return true;
+        }
 
-			if (!simulate) {
-				setNBT(value);
-			}
+        try {
+            value = (NBTTagCompound) JsonToNBT.func_150315_a(string);
 
-			return true;
-		} catch (Exception ex) {
-			return false;
-		}
-	}
+            if (!simulate) {
+                setNBT(value);
+            }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		list.add(EnumChatFormatting.AQUA + "Value: " + EnumChatFormatting.RESET
-				+ NBTUtils.getColoredNBTString(getNBT()));
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
-		if (inst.getCanEdit() && inst.getDefaultValue() instanceof ConfigNBT) {
-			list.add(EnumChatFormatting.AQUA + "Default: " + EnumChatFormatting.RESET
-					+ NBTUtils.getColoredNBTString(((ConfigNBT) inst.getDefaultValue()).getNBT()));
-		}
-	}
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        list.add(
+                EnumChatFormatting.AQUA + "Value: "
+                        + EnumChatFormatting.RESET
+                        + NBTUtils.getColoredNBTString(getNBT()));
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		value = getNBT();
+        if (inst.getCanEdit() && inst.getDefaultValue() instanceof ConfigNBT) {
+            list.add(
+                    EnumChatFormatting.AQUA + "Default: "
+                            + EnumChatFormatting.RESET
+                            + NBTUtils.getColoredNBTString(((ConfigNBT) inst.getDefaultValue()).getNBT()));
+        }
+    }
 
-		if (value != null) {
-			nbt.setTag(key, value);
-		}
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        value = getNBT();
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		value = nbt.hasKey(key) ? nbt.getCompoundTag(key) : null;
-	}
+        if (value != null) {
+            nbt.setTag(key, value);
+        }
+    }
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeNBT(getNBT());
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        value = nbt.hasKey(key) ? nbt.getCompoundTag(key) : null;
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		setNBT(data.readNBT());
-	}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeNBT(getNBT());
+    }
 
-	@Override
-	public boolean isEmpty() {
-		value = getNBT();
-		return value == null || value.hasNoTags();
-	}
+    @Override
+    public void readData(DataIn data) {
+        setNBT(data.readNBT());
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		if (value instanceof ConfigNBT) {
-			NBTTagCompound nbt = ((ConfigNBT) value).getNBT();
-			setNBT(nbt == null ? null : (NBTTagCompound) nbt.copy());
-		} else {
-			super.setValueFromOtherValue(value);
-		}
-	}
+    @Override
+    public boolean isEmpty() {
+        value = getNBT();
+        return value == null || value.hasNoTags();
+    }
 
-	@Override
-	public void setValueFromJson(JsonElement json) {
-		if (json.isJsonObject()) {
-			setNBT((NBTTagCompound) JsonUtils.toNBT(json));
-		}
-	}
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        if (value instanceof ConfigNBT) {
+            NBTTagCompound nbt = ((ConfigNBT) value).getNBT();
+            setNBT(nbt == null ? null : (NBTTagCompound) nbt.copy());
+        } else {
+            super.setValueFromOtherValue(value);
+        }
+    }
+
+    @Override
+    public void setValueFromJson(JsonElement json) {
+        if (json.isJsonObject()) {
+            setNBT((NBTTagCompound) JsonUtils.toNBT(json));
+        }
+    }
 }

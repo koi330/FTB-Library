@@ -1,5 +1,9 @@
 package com.feed_the_beast.ftblib.command.team;
 
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.lib.command.CmdEditConfigBase;
 import com.feed_the_beast.ftblib.lib.command.CommandUtils;
@@ -7,43 +11,34 @@ import com.feed_the_beast.ftblib.lib.config.ConfigGroup;
 import com.feed_the_beast.ftblib.lib.config.IConfigCallback;
 import com.feed_the_beast.ftblib.lib.data.FTBLibAPI;
 import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * @author LatvianModder
  */
-public class CmdSettings extends CmdEditConfigBase
-{
-	public CmdSettings()
-	{
-		super("settings", Level.ALL);
-	}
+public class CmdSettings extends CmdEditConfigBase {
 
-	@Override
-	public ConfigGroup getGroup(ICommandSender sender) throws CommandException
-	{
-		EntityPlayerMP player = getCommandSenderAsPlayer(sender);
-		ForgePlayer p = CommandUtils.getForgePlayer(player);
+    public CmdSettings() {
+        super("settings", Level.ALL);
+    }
 
-		if (!p.hasTeam())
-		{
-			FTBLibAPI.sendCloseGuiPacket(player);
-			throw FTBLib.error(sender, "ftblib.lang.team.error.no_team");
-		}
-		else if (!p.team.isModerator(p))
-		{
-			FTBLibAPI.sendCloseGuiPacket(player);
-			throw new CommandException("commands.generic.permission");
-		}
+    @Override
+    public ConfigGroup getGroup(ICommandSender sender) throws CommandException {
+        EntityPlayerMP player = getCommandSenderAsPlayer(sender);
+        ForgePlayer p = CommandUtils.getForgePlayer(player);
 
-		return p.team.getSettings();
-	}
+        if (!p.hasTeam()) {
+            FTBLibAPI.sendCloseGuiPacket(player);
+            throw FTBLib.error(sender, "ftblib.lang.team.error.no_team");
+        } else if (!p.team.isModerator(p)) {
+            FTBLibAPI.sendCloseGuiPacket(player);
+            throw new CommandException("commands.generic.permission");
+        }
 
-	@Override
-	public IConfigCallback getCallback(ICommandSender sender) throws CommandException
-	{
-		return CommandUtils.getForgePlayer(sender).team;
-	}
+        return p.team.getSettings();
+    }
+
+    @Override
+    public IConfigCallback getCallback(ICommandSender sender) throws CommandException {
+        return CommandUtils.getForgePlayer(sender).team;
+    }
 }

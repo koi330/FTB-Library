@@ -1,10 +1,9 @@
 package com.feed_the_beast.ftblib.lib.command;
 
-import com.feed_the_beast.ftblib.lib.EnumTeamStatus;
-import com.feed_the_beast.ftblib.lib.util.FinalIDObject;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -13,90 +12,97 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
+import com.google.common.collect.Iterables;
 
 public abstract class CmdBase extends CommandBase implements ICommandWithParent {
-	public static class Level {
-		public static final Level ALL = new Level(0, (server, sender, command) -> true);
-		public static final Level OP_OR_SP = new Level(2,
-				(server, sender, command) -> server.isSinglePlayer() || sender.canCommandSenderUseCommand(2, command.getCommandName()));
-		public static final Level OP = new Level(2,
-				(server, sender, command) -> sender.canCommandSenderUseCommand(2, command.getCommandName()));
-		public static final Level STRONG_OP_OR_SP = new Level(4,
-				(server, sender, command) -> server.isSinglePlayer() || sender.canCommandSenderUseCommand(4, command.getCommandName()));
-		public static final Level STRONG_OP = new Level(4,
-				(server, sender, command) -> sender.canCommandSenderUseCommand(4, command.getCommandName()));
-		public static final Level SERVER = new Level(4, (server, sender, command) -> sender instanceof MinecraftServer);
 
-		public interface PermissionChecker {
-			boolean checkPermission(MinecraftServer server, ICommandSender sender, ICommand command);
-		}
+    public static class Level {
 
-		public final int requiredPermissionLevel;
-		public final PermissionChecker permissionChecker;
+        public static final Level ALL = new Level(0, (server, sender, command) -> true);
+        public static final Level OP_OR_SP = new Level(
+                2,
+                (server, sender, command) -> server.isSinglePlayer()
+                        || sender.canCommandSenderUseCommand(2, command.getCommandName()));
+        public static final Level OP = new Level(
+                2,
+                (server, sender, command) -> sender.canCommandSenderUseCommand(2, command.getCommandName()));
+        public static final Level STRONG_OP_OR_SP = new Level(
+                4,
+                (server, sender, command) -> server.isSinglePlayer()
+                        || sender.canCommandSenderUseCommand(4, command.getCommandName()));
+        public static final Level STRONG_OP = new Level(
+                4,
+                (server, sender, command) -> sender.canCommandSenderUseCommand(4, command.getCommandName()));
+        public static final Level SERVER = new Level(4, (server, sender, command) -> sender instanceof MinecraftServer);
 
-		public Level(int l, PermissionChecker p) {
-			requiredPermissionLevel = l;
-			permissionChecker = p;
-		}
-	}
+        public interface PermissionChecker {
 
-	private final String name;
-	public final Level level;
-	private ICommand parent;
+            boolean checkPermission(MinecraftServer server, ICommandSender sender, ICommand command);
+        }
 
-	public CmdBase(String n, Level l) {
-		name = n;
-		level = l;
-	}
+        public final int requiredPermissionLevel;
+        public final PermissionChecker permissionChecker;
 
-	@Override
-	public final String getCommandName() {
-		return name;
-	}
+        public Level(int l, PermissionChecker p) {
+            requiredPermissionLevel = l;
+            permissionChecker = p;
+        }
+    }
 
-	@Override
-	public int getRequiredPermissionLevel() {
-		return level.requiredPermissionLevel;
-	}
+    private final String name;
+    public final Level level;
+    private ICommand parent;
 
-	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender sender) {
-		return level.permissionChecker.checkPermission(MinecraftServer.getServer(), sender, this);
-	}
+    public CmdBase(String n, Level l) {
+        name = n;
+        level = l;
+    }
 
-	public void checkArgs(ICommandSender sender, String[] args, int i) throws CommandException {
-		if (args.length < i) {
-			throw new WrongUsageException(getCommandUsage(sender));
-		}
-	}
+    @Override
+    public final String getCommandName() {
+        return name;
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
-		if (args.length == 0) {
-			return Collections.emptyList();
-		} else if (isUsernameIndex(args, args.length - 1)) {
-			return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
-		}
+    @Override
+    public int getRequiredPermissionLevel() {
+        return level.requiredPermissionLevel;
+    }
 
-		return super.addTabCompletionOptions(sender, args);
-	}
+    @Override
+    public boolean canCommandSenderUseCommand(ICommandSender sender) {
+        return level.permissionChecker.checkPermission(MinecraftServer.getServer(), sender, this);
+    }
 
-	@Override
-	public ICommand getParent() {
-		return parent;
-	}
+    public void checkArgs(ICommandSender sender, String[] args, int i) throws CommandException {
+        if (args.length < i) {
+            throw new WrongUsageException(getCommandUsage(sender));
+        }
+    }
 
-	@Override
-	public void setParent(@Nullable ICommand c) {
-		parent = c;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (args.length == 0) {
+            return Collections.emptyList();
+        } else if (isUsernameIndex(args, args.length - 1)) {
+            return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
+        }
 
-	@SuppressWarnings("unchecked")
-	public static List<String> matchFromIterable(String[] args, Iterable<?> possibilities) {
-		return getListOfStringsFromIterableMatchingLastWord(args, Iterables.transform(possibilities, Object::toString));
-	}
+        return super.addTabCompletionOptions(sender, args);
+    }
+
+    @Override
+    public ICommand getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(@Nullable ICommand c) {
+        parent = c;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> matchFromIterable(String[] args, Iterable<?> possibilities) {
+        return getListOfStringsFromIterableMatchingLastWord(args, Iterables.transform(possibilities, Object::toString));
+    }
 }

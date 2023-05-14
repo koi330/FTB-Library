@@ -1,45 +1,46 @@
 package com.feed_the_beast.ftblib.command.team;
 
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.lib.EnumTeamStatus;
 import com.feed_the_beast.ftblib.lib.command.CmdBase;
 import com.feed_the_beast.ftblib.lib.command.CommandUtils;
 import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 
 /**
  * @author LatvianModder
  */
 public class CmdTransferOwnership extends CmdBase {
-	public CmdTransferOwnership() {
-		super("transfer_ownership", Level.ALL);
-	}
 
-	@Override
-	public boolean isUsernameIndex(String[] args, int index) {
-		return index == 0;
-	}
+    public CmdTransferOwnership() {
+        super("transfer_ownership", Level.ALL);
+    }
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-		ForgePlayer p = CommandUtils.getForgePlayer(getCommandSenderAsPlayer(sender));
+    @Override
+    public boolean isUsernameIndex(String[] args, int index) {
+        return index == 0;
+    }
 
-		if (!p.hasTeam()) {
-			throw FTBLib.error(sender, "ftblib.lang.team.error.no_team");
-		} else if (!p.team.isOwner(p)) {
-			throw FTBLib.error(sender, "ftblib.lang.team.error.not_owner");
-		}
+    @Override
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        ForgePlayer p = CommandUtils.getForgePlayer(getCommandSenderAsPlayer(sender));
 
-		checkArgs(sender, args, 1);
+        if (!p.hasTeam()) {
+            throw FTBLib.error(sender, "ftblib.lang.team.error.no_team");
+        } else if (!p.team.isOwner(p)) {
+            throw FTBLib.error(sender, "ftblib.lang.team.error.not_owner");
+        }
 
-		ForgePlayer p1 = CommandUtils.getForgePlayer(sender, args[0]);
+        checkArgs(sender, args, 1);
 
-		if (!p.team.equalsTeam(p1.team)) {
-			throw FTBLib.error(sender, "ftblib.lang.team.error.not_member", p1.getDisplayName());
-		}
+        ForgePlayer p1 = CommandUtils.getForgePlayer(sender, args[0]);
 
-		p.team.setStatus(p1, EnumTeamStatus.OWNER);
-	}
+        if (!p.team.equalsTeam(p1.team)) {
+            throw FTBLib.error(sender, "ftblib.lang.team.error.not_member", p1.getDisplayName());
+        }
+
+        p.team.setStatus(p1, EnumTeamStatus.OWNER);
+    }
 }

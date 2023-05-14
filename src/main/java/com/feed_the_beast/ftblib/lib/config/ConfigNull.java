@@ -1,121 +1,96 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.nbt.NBTTagCompound;
+
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import com.google.gson.JsonElement;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.nbt.NBTTagCompound;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
-public class ConfigNull extends ConfigValue
-{
-	public static final String ID = "null";
-	public static final ConfigNull INSTANCE = new ConfigNull();
-	public static final Color4I COLOR = Color4I.rgb(0x333333);
+public class ConfigNull extends ConfigValue {
 
-	private ConfigNull()
-	{
-	}
+    public static final String ID = "null";
+    public static final ConfigNull INSTANCE = new ConfigNull();
+    public static final Color4I COLOR = Color4I.rgb(0x333333);
 
-	@Override
-	public String getId()
-	{
-		return ID;
-	}
+    private ConfigNull() {}
 
-	@Override
-	public String getString()
-	{
-		return "null";
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	@Override
-	public boolean getBoolean()
-	{
-		return false;
-	}
+    @Override
+    public String getString() {
+        return "null";
+    }
 
-	@Override
-	public int getInt()
-	{
-		return 0;
-	}
+    @Override
+    public boolean getBoolean() {
+        return false;
+    }
 
-	@Override
-	public ConfigNull copy()
-	{
-		return this;
-	}
+    @Override
+    public int getInt() {
+        return 0;
+    }
 
-	@Override
-	public boolean equalsValue(ConfigValue value)
-	{
-		return value == this;
-	}
+    @Override
+    public ConfigNull copy() {
+        return this;
+    }
 
-	@Override
-	public Color4I getColor()
-	{
-		return COLOR;
-	}
+    @Override
+    public boolean equalsValue(ConfigValue value) {
+        return value == this;
+    }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list)
-	{
-	}
+    @Override
+    public Color4I getColor() {
+        return COLOR;
+    }
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback)
-	{
-	}
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {}
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key)
-	{
-	}
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {}
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key)
-	{
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {}
 
-	@Override
-	public void writeData(DataOut data)
-	{
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {}
 
-	@Override
-	public void readData(DataIn data)
-	{
-	}
+    @Override
+    public void writeData(DataOut data) {}
 
-	@Override
-	public boolean isNull()
-	{
-		return true;
-	}
+    @Override
+    public void readData(DataIn data) {}
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate)
-	{
-		return false;
-	}
+    @Override
+    public boolean isNull() {
+        return true;
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value)
-	{
-	}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        return false;
+    }
 
-	@Override
-	public void setValueFromJson(JsonElement json)
-	{
-	}
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {}
+
+    @Override
+    public void setValueFromJson(JsonElement json) {}
 }

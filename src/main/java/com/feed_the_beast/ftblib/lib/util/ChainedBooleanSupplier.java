@@ -6,28 +6,24 @@ import java.util.function.BooleanSupplier;
  * @author LatvianModder
  */
 @FunctionalInterface
-public interface ChainedBooleanSupplier extends BooleanSupplier
-{
-	ChainedBooleanSupplier TRUE = () -> true;
-	ChainedBooleanSupplier FALSE = () -> false;
+public interface ChainedBooleanSupplier extends BooleanSupplier {
 
-	default ChainedBooleanSupplier not()
-	{
-		return () -> !getAsBoolean();
-	}
+    ChainedBooleanSupplier TRUE = () -> true;
+    ChainedBooleanSupplier FALSE = () -> false;
 
-	default ChainedBooleanSupplier or(BooleanSupplier supplier)
-	{
-		return () -> getAsBoolean() || supplier.getAsBoolean();
-	}
+    default ChainedBooleanSupplier not() {
+        return () -> !getAsBoolean();
+    }
 
-	default ChainedBooleanSupplier and(BooleanSupplier supplier)
-	{
-		return () -> getAsBoolean() && supplier.getAsBoolean();
-	}
+    default ChainedBooleanSupplier or(BooleanSupplier supplier) {
+        return () -> getAsBoolean() || supplier.getAsBoolean();
+    }
 
-	default ChainedBooleanSupplier xor(BooleanSupplier supplier)
-	{
-		return () -> getAsBoolean() != supplier.getAsBoolean();
-	}
+    default ChainedBooleanSupplier and(BooleanSupplier supplier) {
+        return () -> getAsBoolean() && supplier.getAsBoolean();
+    }
+
+    default ChainedBooleanSupplier xor(BooleanSupplier supplier) {
+        return () -> getAsBoolean() != supplier.getAsBoolean();
+    }
 }

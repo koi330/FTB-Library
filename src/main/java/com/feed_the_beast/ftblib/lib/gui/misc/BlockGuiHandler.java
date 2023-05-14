@@ -1,64 +1,57 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import javax.annotation.Nullable;
 
-import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
+import cpw.mods.fml.common.network.IGuiHandler;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * @author LatvianModder
  */
-public class BlockGuiHandler implements IGuiHandler
-{
-	private final Int2ObjectMap<BlockGuiSupplier> map = new Int2ObjectOpenHashMap<>();
+public class BlockGuiHandler implements IGuiHandler {
 
-	public void add(BlockGuiSupplier h)
-	{
-		map.put(h.id, h);
-	}
+    private final Int2ObjectMap<BlockGuiSupplier> map = new Int2ObjectOpenHashMap<>();
 
-	@Nullable
-	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		BlockGuiSupplier supplier = map.get(ID);
+    public void add(BlockGuiSupplier h) {
+        map.put(h.id, h);
+    }
 
-		if (supplier != null)
-		{
-			TileEntity tileEntity = world.getTileEntity(x, y, z);
+    @Nullable
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        BlockGuiSupplier supplier = map.get(ID);
 
-			if (tileEntity != null)
-			{
-				return supplier.getContainer(player, tileEntity);
-			}
-		}
+        if (supplier != null) {
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
 
-		return null;
-	}
+            if (tileEntity != null) {
+                return supplier.getContainer(player, tileEntity);
+            }
+        }
 
-	@Nullable
-	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		BlockGuiSupplier supplier = map.get(ID);
+        return null;
+    }
 
-		if (supplier != null)
-		{
-			TileEntity tileEntity = world.getTileEntity(x, y, z);
+    @Nullable
+    @Override
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        BlockGuiSupplier supplier = map.get(ID);
 
-			if (tileEntity != null)
-			{
-				Container container = supplier.getContainer(player, tileEntity);
-				return container == null ? null : supplier.getGui(container);
-			}
-		}
+        if (supplier != null) {
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
 
-		return null;
-	}
+            if (tileEntity != null) {
+                Container container = supplier.getContainer(player, tileEntity);
+                return container == null ? null : supplier.getGui(container);
+            }
+        }
+
+        return null;
+    }
 }

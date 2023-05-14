@@ -1,178 +1,182 @@
 package com.feed_the_beast.ftblib.lib.config;
 
-import com.feed_the_beast.ftblib.lib.icon.Color4I;
-import com.feed_the_beast.ftblib.lib.io.DataIn;
-import com.feed_the_beast.ftblib.lib.io.DataOut;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+
+import com.feed_the_beast.ftblib.lib.icon.Color4I;
+import com.feed_the_beast.ftblib.lib.io.DataIn;
+import com.feed_the_beast.ftblib.lib.io.DataOut;
+
 /**
  * @author LatvianModder
  */
 public class ConfigString extends ConfigValue {
-	public static final String ID = "string";
-	public static final Color4I COLOR = Color4I.rgb(0xFFAA49);
 
-	public static class SimpleString extends ConfigString {
-		private final Supplier<String> get;
-		private final Consumer<String> set;
+    public static final String ID = "string";
+    public static final Color4I COLOR = Color4I.rgb(0xFFAA49);
 
-		public SimpleString(Supplier<String> g, Consumer<String> s, @Nullable Pattern pattern) {
-			super("", pattern);
-			get = g;
-			set = s;
-		}
+    public static class SimpleString extends ConfigString {
 
-		@Override
-		public String getString() {
-			return get.get();
-		}
+        private final Supplier<String> get;
+        private final Consumer<String> set;
 
-		@Override
-		public void setString(String v) {
-			set.accept(v);
-		}
-	}
+        public SimpleString(Supplier<String> g, Consumer<String> s, @Nullable Pattern pattern) {
+            super("", pattern);
+            get = g;
+            set = s;
+        }
 
-	private String value;
-	private Pattern pattern;
+        @Override
+        public String getString() {
+            return get.get();
+        }
 
-	public ConfigString(String v) {
-		this(v, null);
-	}
+        @Override
+        public void setString(String v) {
+            set.accept(v);
+        }
+    }
 
-	public ConfigString(String v, @Nullable Pattern p) {
-		value = v;
-		pattern = p;
-	}
+    private String value;
+    private Pattern pattern;
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    public ConfigString(String v) {
+        this(v, null);
+    }
 
-	@Override
-	public String getString() {
-		return value;
-	}
+    public ConfigString(String v, @Nullable Pattern p) {
+        value = v;
+        pattern = p;
+    }
 
-	public void setString(String v) {
-		value = v;
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	@Nullable
-	public Pattern getPattern() {
-		return pattern;
-	}
+    @Override
+    public String getString() {
+        return value;
+    }
 
-	public void setPattern(@Nullable Pattern p) {
-		pattern = p;
-	}
+    public void setString(String v) {
+        value = v;
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return getString().equals("true");
-	}
+    @Nullable
+    public Pattern getPattern() {
+        return pattern;
+    }
 
-	@Override
-	public int getInt() {
-		return Integer.parseInt(getString());
-	}
+    public void setPattern(@Nullable Pattern p) {
+        pattern = p;
+    }
 
-	@Override
-	public double getDouble() {
-		return Double.parseDouble(getString());
-	}
+    @Override
+    public boolean getBoolean() {
+        return getString().equals("true");
+    }
 
-	@Override
-	public long getLong() {
-		return Long.parseLong(getString());
-	}
+    @Override
+    public int getInt() {
+        return Integer.parseInt(getString());
+    }
 
-	@Override
-	public ConfigString copy() {
-		return new ConfigString(getString(), getPattern());
-	}
+    @Override
+    public double getDouble() {
+        return Double.parseDouble(getString());
+    }
 
-	@Override
-	public Color4I getColor() {
-		return COLOR;
-	}
+    @Override
+    public long getLong() {
+        return Long.parseLong(getString());
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		return new ChatComponentText('"' + getString() + '"');
-	}
+    @Override
+    public ConfigString copy() {
+        return new ConfigString(getString(), getPattern());
+    }
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		if (string.length() >= 2 && string.charAt(0) == '"' && string.charAt(string.length() - 1) == '"') {
-			return setValueFromString(sender, string.substring(1, string.length() - 1), simulate);
-		}
+    @Override
+    public Color4I getColor() {
+        return COLOR;
+    }
 
-		if (getPattern() != null && !getPattern().matcher(string).matches()) {
-			return false;
-		}
+    @Override
+    public IChatComponent getStringForGUI() {
+        return new ChatComponentText('"' + getString() + '"');
+    }
 
-		if (!simulate) {
-			setString(string);
-		}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        if (string.length() >= 2 && string.charAt(0) == '"' && string.charAt(string.length() - 1) == '"') {
+            return setValueFromString(sender, string.substring(1, string.length() - 1), simulate);
+        }
 
-		return true;
-	}
+        if (getPattern() != null && !getPattern().matcher(string).matches()) {
+            return false;
+        }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		super.addInfo(inst, list);
+        if (!simulate) {
+            setString(string);
+        }
 
-		if (getPattern() != null) {
-			list.add(EnumChatFormatting.AQUA + "Regex: " + EnumChatFormatting.RESET + getPattern().pattern());
-		}
-	}
+        return true;
+    }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		value = getString();
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        super.addInfo(inst, list);
 
-		if (!value.isEmpty()) {
-			nbt.setString(key, value);
-		}
-	}
+        if (getPattern() != null) {
+            list.add(EnumChatFormatting.AQUA + "Regex: " + EnumChatFormatting.RESET + getPattern().pattern());
+        }
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		setString(nbt.getString(key));
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        value = getString();
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeString(getString());
-		data.writeString(getPattern() == null ? "" : getPattern().pattern());
-	}
+        if (!value.isEmpty()) {
+            nbt.setString(key, value);
+        }
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		setString(data.readString());
-		String p = data.readString();
-		setPattern(p.isEmpty() ? null : Pattern.compile(p));
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        setString(nbt.getString(key));
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return getString().isEmpty();
-	}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeString(getString());
+        data.writeString(getPattern() == null ? "" : getPattern().pattern());
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		setString(value.getString());
-	}
+    @Override
+    public void readData(DataIn data) {
+        setString(data.readString());
+        String p = data.readString();
+        setPattern(p.isEmpty() ? null : Pattern.compile(p));
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getString().isEmpty();
+    }
+
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        setString(value.getString());
+    }
 }

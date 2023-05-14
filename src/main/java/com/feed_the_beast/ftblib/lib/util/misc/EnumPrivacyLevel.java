@@ -7,43 +7,39 @@ import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 /**
  * @author LatvianModder
  */
-public enum EnumPrivacyLevel implements IStringSerializable
-{
-	PUBLIC("public"),
-	PRIVATE("private"),
-	TEAM("team");
+public enum EnumPrivacyLevel implements IStringSerializable {
 
-	public static final EnumPrivacyLevel[] VALUES = values();
-	public static final NameMap<EnumPrivacyLevel> NAME_MAP = NameMap.createWithBaseTranslationKey(PUBLIC, "ftblib.privacy", VALUES);
+    PUBLIC("public"),
+    PRIVATE("private"),
+    TEAM("team");
 
-	private final String name;
+    public static final EnumPrivacyLevel[] VALUES = values();
+    public static final NameMap<EnumPrivacyLevel> NAME_MAP = NameMap
+            .createWithBaseTranslationKey(PUBLIC, "ftblib.privacy", VALUES);
 
-	EnumPrivacyLevel(String n)
-	{
-		name = n;
-	}
+    private final String name;
 
-	@Override
-	public String getName()
-	{
-		return name;
-	}
+    EnumPrivacyLevel(String n) {
+        name = n;
+    }
 
-	public Icon getIcon()
-	{
-		switch (this)
-		{
-			case PRIVATE:
-				return GuiIcons.SECURITY_PRIVATE;
-			case TEAM:
-				return GuiIcons.SECURITY_TEAM;
-			default:
-				return GuiIcons.SECURITY_PUBLIC;
-		}
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	public boolean isPublic()
-	{
-		return this == PUBLIC;
-	}
+    public Icon getIcon() {
+        switch (this) {
+            case PRIVATE:
+                return GuiIcons.SECURITY_PRIVATE;
+            case TEAM:
+                return GuiIcons.SECURITY_TEAM;
+            default:
+                return GuiIcons.SECURITY_PUBLIC;
+        }
+    }
+
+    public boolean isPublic() {
+        return this == PUBLIC;
+    }
 }

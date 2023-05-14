@@ -1,44 +1,39 @@
 package com.feed_the_beast.ftblib.client;
 
-import net.minecraft.util.ResourceLocation;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.util.ResourceLocation;
 
 /**
  * @author LatvianModder
  */
-public class SidebarButtonGroup implements Comparable<SidebarButtonGroup>
-{
-	private final ResourceLocation id;
-	private final int y;
-	private final List<SidebarButton> buttons;
+public class SidebarButtonGroup implements Comparable<SidebarButtonGroup> {
 
-	public SidebarButtonGroup(ResourceLocation _id, int _y)
-	{
-		id = _id;
-		y = _y;
-		buttons = new ArrayList<>();
-	}
+    private final ResourceLocation id;
+    private final int y;
+    private final List<SidebarButton> buttons;
 
-	public ResourceLocation getId()
-	{
-		return id;
-	}
+    public SidebarButtonGroup(ResourceLocation _id, int _y) {
+        id = _id;
+        y = _y;
+        buttons = new ArrayList<>();
+    }
 
-	public int getY()
-	{
-		return y;
-	}
+    public ResourceLocation getId() {
+        return id;
+    }
 
-	public List<SidebarButton> getButtons()
-	{
-		return buttons;
-	}
+    public int getY() {
+        return y;
+    }
 
-	@Override
-	public int compareTo(SidebarButtonGroup group)
-	{
-		return getY() - group.getY();
-	}
+    public List<SidebarButton> getButtons() {
+        return buttons;
+    }
+
+    @Override
+    public int compareTo(SidebarButtonGroup group) {
+        return getY() - group.getY();
+    }
 }

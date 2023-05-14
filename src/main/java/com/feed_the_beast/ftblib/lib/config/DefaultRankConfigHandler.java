@@ -1,58 +1,55 @@
 package com.feed_the_beast.ftblib.lib.config;
 
-import com.feed_the_beast.ftblib.lib.util.ServerUtils;
-import com.google.common.base.Preconditions;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.server.MinecraftServer;
-
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.server.MinecraftServer;
+
+import com.feed_the_beast.ftblib.lib.util.ServerUtils;
+import com.google.common.base.Preconditions;
+import com.mojang.authlib.GameProfile;
+
 /**
  * @author LatvianModder
  */
-public enum DefaultRankConfigHandler implements IRankConfigHandler
-{
-	INSTANCE;
+public enum DefaultRankConfigHandler implements IRankConfigHandler {
 
-	private static final Map<String, RankConfigValueInfo> MAP = new HashMap<>();
-	private static Collection<RankConfigValueInfo> VALUES = Collections.unmodifiableCollection(MAP.values());
+    INSTANCE;
 
-	@Override
-	public void registerRankConfig(RankConfigValueInfo info)
-	{
-		Preconditions.checkNotNull(info, "RankConfigValueInfo can't be null!");
-		Preconditions.checkArgument(!MAP.containsKey(info.node), "Duplicate rank config ID found: " + info.node);
-		MAP.put(info.node, info);
-	}
+    private static final Map<String, RankConfigValueInfo> MAP = new HashMap<>();
+    private static Collection<RankConfigValueInfo> VALUES = Collections.unmodifiableCollection(MAP.values());
 
-	@Override
-	public Collection<RankConfigValueInfo> getRegisteredConfigs()
-	{
-		return VALUES;
-	}
+    @Override
+    public void registerRankConfig(RankConfigValueInfo info) {
+        Preconditions.checkNotNull(info, "RankConfigValueInfo can't be null!");
+        Preconditions.checkArgument(!MAP.containsKey(info.node), "Duplicate rank config ID found: " + info.node);
+        MAP.put(info.node, info);
+    }
 
-	@Override
-	public ConfigValue getConfigValue(MinecraftServer server, GameProfile profile, String node)
-	{
-		RankConfigValueInfo info = RankConfigAPI.getHandler().getInfo(node);
+    @Override
+    public Collection<RankConfigValueInfo> getRegisteredConfigs() {
+        return VALUES;
+    }
 
-		if (info != null)
-		{
-			return ServerUtils.isOP(server, profile) ? info.defaultOPValue : info.defaultValue;
-		}
+    @Override
+    public ConfigValue getConfigValue(MinecraftServer server, GameProfile profile, String node) {
+        RankConfigValueInfo info = RankConfigAPI.getHandler().getInfo(node);
 
-		return ConfigNull.INSTANCE;
-	}
+        if (info != null) {
+            return ServerUtils.isOP(server, profile) ? info.defaultOPValue : info.defaultValue;
+        }
 
-	@Override
-	@Nullable
-	public RankConfigValueInfo getInfo(String node)
-	{
-		Preconditions.checkNotNull(node, "Config node can't be null!");
-		return MAP.get(node);
-	}
+        return ConfigNull.INSTANCE;
+    }
+
+    @Override
+    @Nullable
+    public RankConfigValueInfo getInfo(String node) {
+        Preconditions.checkNotNull(node, "Config node can't be null!");
+        return MAP.get(node);
+    }
 }

@@ -4,75 +4,67 @@ package com.feed_the_beast.ftblib.lib.gui;
  * @author LatvianModder
  */
 @FunctionalInterface
-public interface WidgetLayout
-{
-	int align(Panel panel);
+public interface WidgetLayout {
 
-	class Vertical implements WidgetLayout
-	{
-		private final int pre, spacing, post;
+    int align(Panel panel);
 
-		public Vertical(int _pre, int _spacing, int _post)
-		{
-			pre = _pre;
-			spacing = _spacing;
-			post = _post;
-		}
+    class Vertical implements WidgetLayout {
 
-		@Override
-		public int align(Panel panel)
-		{
-			int i = pre;
+        private final int pre, spacing, post;
 
-			if (!panel.widgets.isEmpty())
-			{
-				for (Widget widget : panel.widgets)
-				{
-					widget.setY(i);
-					i += widget.height + spacing;
-				}
+        public Vertical(int _pre, int _spacing, int _post) {
+            pre = _pre;
+            spacing = _spacing;
+            post = _post;
+        }
 
-				i -= spacing;
-			}
+        @Override
+        public int align(Panel panel) {
+            int i = pre;
 
-			return i + post;
-		}
-	}
+            if (!panel.widgets.isEmpty()) {
+                for (Widget widget : panel.widgets) {
+                    widget.setY(i);
+                    i += widget.height + spacing;
+                }
 
-	class Horizontal implements WidgetLayout
-	{
-		private final int pre, spacing, post;
+                i -= spacing;
+            }
 
-		public Horizontal(int _pre, int _spacing, int _post)
-		{
-			pre = _pre;
-			spacing = _spacing;
-			post = _post;
-		}
+            return i + post;
+        }
+    }
 
-		@Override
-		public int align(Panel panel)
-		{
-			int i = pre;
+    class Horizontal implements WidgetLayout {
 
-			if (!panel.widgets.isEmpty())
-			{
-				for (Widget widget : panel.widgets)
-				{
-					widget.setX(i);
-					i += widget.width + spacing;
-				}
+        private final int pre, spacing, post;
 
-				i -= spacing;
-			}
+        public Horizontal(int _pre, int _spacing, int _post) {
+            pre = _pre;
+            spacing = _spacing;
+            post = _post;
+        }
 
-			return i + post;
-		}
-	}
+        @Override
+        public int align(Panel panel) {
+            int i = pre;
 
-	WidgetLayout NONE = panel -> 0;
+            if (!panel.widgets.isEmpty()) {
+                for (Widget widget : panel.widgets) {
+                    widget.setX(i);
+                    i += widget.width + spacing;
+                }
 
-	WidgetLayout VERTICAL = new Vertical(0, 0, 0);
+                i -= spacing;
+            }
 
-	WidgetLayout HORIZONTAL = new Horizontal(0, 0, 0);
+            return i + post;
+        }
+    }
+
+    WidgetLayout NONE = panel -> 0;
+
+    WidgetLayout VERTICAL = new Vertical(0, 0, 0);
+
+    WidgetLayout HORIZONTAL = new Horizontal(0, 0, 0);
 }

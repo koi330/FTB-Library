@@ -1,71 +1,73 @@
 package com.feed_the_beast.ftblib.events;
 
-import com.feed_the_beast.ftblib.events.universe.UniverseEvent;
-import com.feed_the_beast.ftblib.lib.EnumReloadType;
-import com.feed_the_beast.ftblib.lib.data.Universe;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import com.feed_the_beast.ftblib.events.universe.UniverseEvent;
+import com.feed_the_beast.ftblib.lib.EnumReloadType;
+import com.feed_the_beast.ftblib.lib.data.Universe;
 
 /**
  * @author LatvianModder
  */
 public class ServerReloadEvent extends UniverseEvent {
-	public static final ResourceLocation ALL = new ResourceLocation("*:*");
 
-	private final ICommandSender sender;
-	private final EnumReloadType type;
-	private final ResourceLocation reloadId;
-	private final Collection<ResourceLocation> failed;
-	private boolean clientReloadRequired;
-	private final Collection<EntityPlayerMP> onlinePlayers;
+    public static final ResourceLocation ALL = new ResourceLocation("*:*");
 
-	@SuppressWarnings("unchecked")
-	public ServerReloadEvent(Universe u, ICommandSender c, EnumReloadType t, ResourceLocation id,
-			Collection<ResourceLocation> f) {
-		super(u);
-		sender = c;
-		type = t;
-		reloadId = id;
-		failed = f;
-		clientReloadRequired = false;
-		onlinePlayers = u.server.getConfigurationManager() != null
-				? (List<EntityPlayerMP>) u.server.getConfigurationManager().playerEntityList
-				: Collections.emptyList();
-	}
+    private final ICommandSender sender;
+    private final EnumReloadType type;
+    private final ResourceLocation reloadId;
+    private final Collection<ResourceLocation> failed;
+    private boolean clientReloadRequired;
+    private final Collection<EntityPlayerMP> onlinePlayers;
 
-	public ICommandSender getSender() {
-		return sender;
-	}
+    @SuppressWarnings("unchecked")
+    public ServerReloadEvent(Universe u, ICommandSender c, EnumReloadType t, ResourceLocation id,
+            Collection<ResourceLocation> f) {
+        super(u);
+        sender = c;
+        type = t;
+        reloadId = id;
+        failed = f;
+        clientReloadRequired = false;
+        onlinePlayers = u.server.getConfigurationManager() != null
+                ? (List<EntityPlayerMP>) u.server.getConfigurationManager().playerEntityList
+                : Collections.emptyList();
+    }
 
-	public EnumReloadType getType() {
-		return type;
-	}
+    public ICommandSender getSender() {
+        return sender;
+    }
 
-	public void setClientReloadRequired() {
-		clientReloadRequired = true;
-	}
+    public EnumReloadType getType() {
+        return type;
+    }
 
-	public boolean isClientReloadRequired() {
-		return clientReloadRequired;
-	}
+    public void setClientReloadRequired() {
+        clientReloadRequired = true;
+    }
 
-	public Collection<EntityPlayerMP> getOnlinePlayers() {
-		return onlinePlayers;
-	}
+    public boolean isClientReloadRequired() {
+        return clientReloadRequired;
+    }
 
-	public boolean reload(ResourceLocation id) {
-		String ridd = reloadId.getResourceDomain();
-		String ridp = reloadId.getResourcePath();
-		return ridd.equals("*")
-				|| ridd.equals(reloadId.getResourceDomain()) && (ridp.equals("*") || ridp.equals(id.getResourcePath()));
-	}
+    public Collection<EntityPlayerMP> getOnlinePlayers() {
+        return onlinePlayers;
+    }
 
-	public void failedToReload(ResourceLocation id) {
-		failed.add(id);
-	}
+    public boolean reload(ResourceLocation id) {
+        String ridd = reloadId.getResourceDomain();
+        String ridp = reloadId.getResourcePath();
+        return ridd.equals("*")
+                || ridd.equals(reloadId.getResourceDomain()) && (ridp.equals("*") || ridp.equals(id.getResourcePath()));
+    }
+
+    public void failedToReload(ResourceLocation id) {
+        failed.add(id);
+    }
 }

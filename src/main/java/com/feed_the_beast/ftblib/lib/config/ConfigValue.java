@@ -1,5 +1,17 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
 import com.feed_the_beast.ftblib.lib.gui.misc.GuiEditConfigValue;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
@@ -11,138 +23,131 @@ import com.feed_the_beast.ftblib.lib.util.IWithID;
 import com.feed_the_beast.ftblib.lib.util.JsonUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import com.google.gson.JsonElement;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public abstract class ConfigValue implements IWithID {
-	public abstract String getString();
 
-	public abstract boolean getBoolean();
+    public abstract String getString();
 
-	public abstract int getInt();
+    public abstract boolean getBoolean();
 
-	public double getDouble() {
-		return getLong();
-	}
+    public abstract int getInt();
 
-	public long getLong() {
-		return getInt();
-	}
+    public double getDouble() {
+        return getLong();
+    }
 
-	public Ticks getTimer() {
-		return Ticks.get(getLong());
-	}
+    public long getLong() {
+        return getInt();
+    }
 
-	public abstract ConfigValue copy();
+    public Ticks getTimer() {
+        return Ticks.get(getLong());
+    }
 
-	public boolean equalsValue(ConfigValue value) {
-		return value == this || getString().equals(value.getString());
-	}
+    public abstract ConfigValue copy();
 
-	public Color4I getColor() {
-		return Color4I.GRAY;
-	}
+    public boolean equalsValue(ConfigValue value) {
+        return value == this || getString().equals(value.getString());
+    }
 
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		if (inst.getCanEdit() && !inst.getDefaultValue().isNull()) {
-			list.add(EnumChatFormatting.AQUA + "Default: " + EnumChatFormatting.RESET
-					+ inst.getDefaultValue().getStringForGUI().getFormattedText());
-		}
-	}
+    public Color4I getColor() {
+        return Color4I.GRAY;
+    }
 
-	public List<String> getVariants() {
-		return Collections.emptyList();
-	}
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        if (inst.getCanEdit() && !inst.getDefaultValue().isNull()) {
+            list.add(
+                    EnumChatFormatting.AQUA + "Default: "
+                            + EnumChatFormatting.RESET
+                            + inst.getDefaultValue().getStringForGUI().getFormattedText());
+        }
+    }
 
-	public boolean isNull() {
-		return false;
-	}
+    public List<String> getVariants() {
+        return Collections.emptyList();
+    }
 
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		if (this instanceof IIteratingConfig) {
-			if (inst.getCanEdit()) {
-				setValueFromOtherValue(((IIteratingConfig) this).getIteration(button.isLeft()));
-				callback.run();
-			}
+    public boolean isNull() {
+        return false;
+    }
 
-			return;
-		}
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        if (this instanceof IIteratingConfig) {
+            if (inst.getCanEdit()) {
+                setValueFromOtherValue(((IIteratingConfig) this).getIteration(button.isLeft()));
+                callback.run();
+            }
 
-		new GuiEditConfigValue(inst, (value, set) -> {
-			if (set) {
-				setValueFromOtherValue(value);
-				callback.run();
-			}
+            return;
+        }
 
-			gui.openGui();
-		}).openGui();
-	}
+        new GuiEditConfigValue(inst, (value, set) -> {
+            if (set) {
+                setValueFromOtherValue(value);
+                callback.run();
+            }
 
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		JsonElement json = DataReader.get(string).safeJson();
+            gui.openGui();
+        }).openGui();
+    }
 
-		if (!json.isJsonNull()) {
-			if (!simulate) {
-				NBTTagCompound nbt = new NBTTagCompound();
-				NBTBase nbt1 = JsonUtils.toNBT(json);
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        JsonElement json = DataReader.get(string).safeJson();
 
-				if (nbt1 != null) {
-					nbt.setTag("x", nbt1);
-				}
+        if (!json.isJsonNull()) {
+            if (!simulate) {
+                NBTTagCompound nbt = new NBTTagCompound();
+                NBTBase nbt1 = JsonUtils.toNBT(json);
 
-				readFromNBT(nbt, "x");
-			}
+                if (nbt1 != null) {
+                    nbt.setTag("x", nbt1);
+                }
 
-			return true;
-		}
+                readFromNBT(nbt, "x");
+            }
 
-		return false;
-	}
+            return true;
+        }
 
-	public void setValueFromOtherValue(ConfigValue value) {
-		setValueFromString(null, value.getString(), false);
-	}
+        return false;
+    }
 
-	public void setValueFromJson(JsonElement json) {
-		if (json.isJsonPrimitive()) {
-			setValueFromString(null, json.getAsString(), false);
-		}
-	}
+    public void setValueFromOtherValue(ConfigValue value) {
+        setValueFromString(null, value.getString(), false);
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		return o instanceof ConfigValue && equalsValue((ConfigValue) o);
-	}
+    public void setValueFromJson(JsonElement json) {
+        if (json.isJsonPrimitive()) {
+            setValueFromString(null, json.getAsString(), false);
+        }
+    }
 
-	@Override
-	public final String toString() {
-		return getString();
-	}
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof ConfigValue && equalsValue((ConfigValue) o);
+    }
 
-	public IChatComponent getStringForGUI() {
-		return new ChatComponentText(getString());
-	}
+    @Override
+    public final String toString() {
+        return getString();
+    }
 
-	public abstract void writeToNBT(NBTTagCompound nbt, String key);
+    public IChatComponent getStringForGUI() {
+        return new ChatComponentText(getString());
+    }
 
-	public abstract void readFromNBT(NBTTagCompound nbt, String key);
+    public abstract void writeToNBT(NBTTagCompound nbt, String key);
 
-	public abstract void writeData(DataOut data);
+    public abstract void readFromNBT(NBTTagCompound nbt, String key);
 
-	public abstract void readData(DataIn data);
+    public abstract void writeData(DataOut data);
 
-	public boolean isEmpty() {
-		return !getBoolean();
-	}
+    public abstract void readData(DataIn data);
+
+    public boolean isEmpty() {
+        return !getBoolean();
+    }
 }

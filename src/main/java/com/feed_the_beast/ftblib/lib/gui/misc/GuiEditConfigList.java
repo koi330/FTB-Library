@@ -1,5 +1,10 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import java.util.List;
+
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.config.ConfigGroup;
 import com.feed_the_beast.ftblib.lib.config.ConfigList;
@@ -18,222 +23,229 @@ import com.feed_the_beast.ftblib.lib.gui.WidgetLayout;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.icon.MutableColor4I;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.IChatComponent;
-
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public class GuiEditConfigList extends GuiBase {
-	public class ButtonConfigValue extends Button {
-		public final int index;
-		public final ConfigValueInstance inst;
-		private String valueString = null;
 
-		public ButtonConfigValue(Panel panel, int i, ConfigValueInstance v) {
-			super(panel);
-			index = i;
-			setHeight(12);
-			inst = v;
-		}
+    public class ButtonConfigValue extends Button {
 
-		public String getValueString() {
-			if (valueString == null) {
-				valueString = getGui().getTheme()
-						.trimStringToWidth(inst.getValue().getStringForGUI().getFormattedText(), width);
-			}
+        public final int index;
+        public final ConfigValueInstance inst;
+        private String valueString = null;
 
-			return valueString;
-		}
+        public ButtonConfigValue(Panel panel, int i, ConfigValueInstance v) {
+            super(panel);
+            index = i;
+            setHeight(12);
+            inst = v;
+        }
 
-		@Override
-		public void draw(Theme theme, int x, int y, int w, int h) {
-			boolean mouseOver = getMouseY() >= 20 && isMouseOver();
+        public String getValueString() {
+            if (valueString == null) {
+                valueString = getGui().getTheme()
+                        .trimStringToWidth(inst.getValue().getStringForGUI().getFormattedText(), width);
+            }
 
-			MutableColor4I textCol = inst.getValue().getColor().mutable();
-			textCol.setAlpha(255);
+            return valueString;
+        }
 
-			if (mouseOver) {
-				textCol.addBrightness(60);
+        @Override
+        public void draw(Theme theme, int x, int y, int w, int h) {
+            boolean mouseOver = getMouseY() >= 20 && isMouseOver();
 
-				Color4I.WHITE.withAlpha(33).draw(x, y, w, h);
+            MutableColor4I textCol = inst.getValue().getColor().mutable();
+            textCol.setAlpha(255);
 
-				if (getMouseX() >= x + w - 19) {
-					Color4I.WHITE.withAlpha(33).draw(x + w - 19, y, 19, h);
-				}
-			}
+            if (mouseOver) {
+                textCol.addBrightness(60);
 
-			theme.drawString(getValueString(), x + 4, y + 2, textCol, 0);
+                Color4I.WHITE.withAlpha(33).draw(x, y, w, h);
 
-			if (mouseOver) {
-				theme.drawString("[-]", x + w - 16, y + 2, Color4I.WHITE, 0);
-			}
+                if (getMouseX() >= x + w - 19) {
+                    Color4I.WHITE.withAlpha(33).draw(x + w - 19, y, 19, h);
+                }
+            }
 
-			GlStateManager.color(1F, 1F, 1F, 1F);
-		}
+            theme.drawString(getValueString(), x + 4, y + 2, textCol, 0);
 
-		@Override
-		public void onClicked(MouseButton button) {
-			GuiHelper.playClickSound();
+            if (mouseOver) {
+                theme.drawString("[-]", x + w - 16, y + 2, Color4I.WHITE, 0);
+            }
 
-			if (getMouseX() >= getX() + width - 19) {
-				if (originalConfigList.getCanEdit()) {
-					configList.list.remove(index);
-					parent.refreshWidgets();
-				}
-			} else {
-				inst.getValue().onClicked(getGui(), inst, button, () -> {
-				});
-			}
-		}
+            GlStateManager.color(1F, 1F, 1F, 1F);
+        }
 
-		@Override
-		public void addMouseOverText(List<String> list) {
-			if (getMouseX() >= getX() + width - 19) {
-				list.add(I18n.format("selectServer.delete"));
-			} else {
-				inst.getValue().addInfo(inst, list);
-			}
-		}
-	}
+        @Override
+        public void onClicked(MouseButton button) {
+            GuiHelper.playClickSound();
 
-	public class ButtonAddValue extends Button {
-		public ButtonAddValue(Panel panel) {
-			super(panel);
-			setHeight(12);
-			setTitle("+ " + I18n.format("gui.add"));
-		}
+            if (getMouseX() >= getX() + width - 19) {
+                if (originalConfigList.getCanEdit()) {
+                    configList.list.remove(index);
+                    parent.refreshWidgets();
+                }
+            } else {
+                inst.getValue().onClicked(getGui(), inst, button, () -> {});
+            }
+        }
 
-		@Override
-		public void draw(Theme theme, int x, int y, int w, int h) {
-			boolean mouseOver = getMouseY() >= 20 && isMouseOver();
+        @Override
+        public void addMouseOverText(List<String> list) {
+            if (getMouseX() >= getX() + width - 19) {
+                list.add(I18n.format("selectServer.delete"));
+            } else {
+                inst.getValue().addInfo(inst, list);
+            }
+        }
+    }
 
-			if (mouseOver) {
-				Color4I.WHITE.withAlpha(33).draw(x, y, w, h);
-			}
+    public class ButtonAddValue extends Button {
 
-			theme.drawString(getTitle(), x + 4, y + 2, theme.getContentColor(getWidgetType()), Theme.SHADOW);
-			GlStateManager.color(1F, 1F, 1F, 1F);
-		}
+        public ButtonAddValue(Panel panel) {
+            super(panel);
+            setHeight(12);
+            setTitle("+ " + I18n.format("gui.add"));
+        }
 
-		@Override
-		public void onClicked(MouseButton button) {
-			GuiHelper.playClickSound();
-			configList.add(configList.type);
-			parent.refreshWidgets();
-		}
+        @Override
+        public void draw(Theme theme, int x, int y, int w, int h) {
+            boolean mouseOver = getMouseY() >= 20 && isMouseOver();
 
-		@Override
-		public void addMouseOverText(List<String> list) {
-		}
-	}
+            if (mouseOver) {
+                Color4I.WHITE.withAlpha(33).draw(x, y, w, h);
+            }
 
-	private final ConfigValueInstance originalConfigList;
-	private final Runnable callback;
-	private final ConfigList<ConfigValue> configList;
+            theme.drawString(getTitle(), x + 4, y + 2, theme.getContentColor(getWidgetType()), Theme.SHADOW);
+            GlStateManager.color(1F, 1F, 1F, 1F);
+        }
 
-	private final String title;
-	private final Panel configPanel;
-	private final Button buttonAccept, buttonCancel;
-	private final PanelScrollBar scroll;
+        @Override
+        public void onClicked(MouseButton button) {
+            GuiHelper.playClickSound();
+            configList.add(configList.type);
+            parent.refreshWidgets();
+        }
 
-	public GuiEditConfigList(ConfigValueInstance c, Runnable cb) {
-		originalConfigList = c;
-		callback = cb;
-		configList = (ConfigList<ConfigValue>) originalConfigList.getValue().copy();
+        @Override
+        public void addMouseOverText(List<String> list) {}
+    }
 
-		IChatComponent title0 = originalConfigList.getDisplayName().createCopy();
-		title0.getChatStyle().setBold(true);
-		title = title0.getFormattedText();
+    private final ConfigValueInstance originalConfigList;
+    private final Runnable callback;
+    private final ConfigList<ConfigValue> configList;
 
-		configPanel = new Panel(this) {
-			@Override
-			public void addWidgets() {
-				for (int i = 0; i < configList.list.size(); i++) {
-					add(new ButtonConfigValue(this, i,
-							new ConfigValueInstance(Integer.toString(i), ConfigGroup.DEFAULT, configList.list.get(i))));
-				}
+    private final String title;
+    private final Panel configPanel;
+    private final Button buttonAccept, buttonCancel;
+    private final PanelScrollBar scroll;
 
-				if (originalConfigList.getCanEdit()) {
-					add(new ButtonAddValue(this));
-				}
-			}
+    public GuiEditConfigList(ConfigValueInstance c, Runnable cb) {
+        originalConfigList = c;
+        callback = cb;
+        configList = (ConfigList<ConfigValue>) originalConfigList.getValue().copy();
 
-			@Override
-			public void alignWidgets() {
-				for (Widget w : widgets) {
-					w.setWidth(width - 16);
-				}
+        IChatComponent title0 = originalConfigList.getDisplayName().createCopy();
+        title0.getChatStyle().setBold(true);
+        title = title0.getFormattedText();
 
-				scroll.setMaxValue(align(WidgetLayout.VERTICAL));
-			}
-		};
+        configPanel = new Panel(this) {
 
-		scroll = new PanelScrollBar(this, configPanel);
+            @Override
+            public void addWidgets() {
+                for (int i = 0; i < configList.list.size(); i++) {
+                    add(
+                            new ButtonConfigValue(
+                                    this,
+                                    i,
+                                    new ConfigValueInstance(
+                                            Integer.toString(i),
+                                            ConfigGroup.DEFAULT,
+                                            configList.list.get(i))));
+                }
 
-		buttonAccept = new SimpleButton(this, I18n.format("gui.accept"), GuiIcons.ACCEPT, (widget, button) -> {
-			widget.getGui().closeGui();
-			originalConfigList.getValue().setValueFromOtherValue(configList);
-			callback.run();
-		});
+                if (originalConfigList.getCanEdit()) {
+                    add(new ButtonAddValue(this));
+                }
+            }
 
-		buttonCancel = new SimpleButton(this, I18n.format("gui.cancel"), GuiIcons.CANCEL,
-				(widget, button) -> widget.getGui().closeGui());
-	}
+            @Override
+            public void alignWidgets() {
+                for (Widget w : widgets) {
+                    w.setWidth(width - 16);
+                }
 
-	@Override
-	public boolean onInit() {
-		for (Widget widget : configPanel.widgets) {
-			if (widget instanceof ButtonConfigValue) {
-				((ButtonConfigValue) widget).valueString = null;
-			}
-		}
+                scroll.setMaxValue(align(WidgetLayout.VERTICAL));
+            }
+        };
 
-		return setFullscreen();
-	}
+        scroll = new PanelScrollBar(this, configPanel);
 
-	@Override
-	public void addWidgets() {
-		add(buttonAccept);
-		add(buttonCancel);
-		add(configPanel);
-		add(scroll);
-	}
+        buttonAccept = new SimpleButton(this, I18n.format("gui.accept"), GuiIcons.ACCEPT, (widget, button) -> {
+            widget.getGui().closeGui();
+            originalConfigList.getValue().setValueFromOtherValue(configList);
+            callback.run();
+        });
 
-	@Override
-	public void alignWidgets() {
-		configPanel.setPosAndSize(0, 20, width, height - 20);
-		configPanel.alignWidgets();
-		scroll.setPosAndSize(width - 16, 20, 16, height - 20);
+        buttonCancel = new SimpleButton(
+                this,
+                I18n.format("gui.cancel"),
+                GuiIcons.CANCEL,
+                (widget, button) -> widget.getGui().closeGui());
+    }
 
-		buttonAccept.setPos(width - 18, 2);
-		buttonCancel.setPos(width - 38, 2);
-	}
+    @Override
+    public boolean onInit() {
+        for (Widget widget : configPanel.widgets) {
+            if (widget instanceof ButtonConfigValue) {
+                ((ButtonConfigValue) widget).valueString = null;
+            }
+        }
 
-	@Override
-	public boolean onClosedByKey(int key) {
-		if (super.onClosedByKey(key)) {
-			buttonCancel.onClicked(MouseButton.LEFT);
-		}
+        return setFullscreen();
+    }
 
-		return false;
-	}
+    @Override
+    public void addWidgets() {
+        add(buttonAccept);
+        add(buttonCancel);
+        add(configPanel);
+        add(scroll);
+    }
 
-	@Override
-	public void drawBackground(Theme theme, int x, int y, int w, int h) {
-		GuiEditConfig.COLOR_BACKGROUND.draw(0, 0, w, 20);
-		theme.drawString(getTitle(), 6, 6, Theme.SHADOW);
-	}
+    @Override
+    public void alignWidgets() {
+        configPanel.setPosAndSize(0, 20, width, height - 20);
+        configPanel.alignWidgets();
+        scroll.setPosAndSize(width - 16, 20, 16, height - 20);
 
-	@Override
-	public String getTitle() {
-		return title;
-	}
+        buttonAccept.setPos(width - 18, 2);
+        buttonCancel.setPos(width - 38, 2);
+    }
 
-	@Override
-	public Theme getTheme() {
-		return GuiEditConfig.THEME;
-	}
+    @Override
+    public boolean onClosedByKey(int key) {
+        if (super.onClosedByKey(key)) {
+            buttonCancel.onClicked(MouseButton.LEFT);
+        }
+
+        return false;
+    }
+
+    @Override
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {
+        GuiEditConfig.COLOR_BACKGROUND.draw(0, 0, w, 20);
+        theme.drawString(getTitle(), 6, 6, Theme.SHADOW);
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public Theme getTheme() {
+        return GuiEditConfig.THEME;
+    }
 }

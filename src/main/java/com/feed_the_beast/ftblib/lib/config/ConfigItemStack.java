@@ -1,5 +1,16 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
 import com.feed_the_beast.ftblib.lib.gui.misc.GuiSelectItemStack;
 import com.feed_the_beast.ftblib.lib.io.DataIn;
@@ -7,195 +18,188 @@ import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.item.ItemStackSerializer;
 import com.feed_the_beast.ftblib.lib.util.InvUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ChatComponentText;
-
-import javax.annotation.Nullable;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * @author LatvianModder
  */
 public class ConfigItemStack extends ConfigValue {
-	public static final String ID = "item_stack";
 
-	public static class SimpleStack extends ConfigItemStack {
-		private final Supplier<ItemStack> get;
-		private final Consumer<ItemStack> set;
+    public static final String ID = "item_stack";
 
-		public SimpleStack(boolean single, Supplier<ItemStack> g, Consumer<ItemStack> s) {
-			super(InvUtils.EMPTY_STACK, single);
-			get = g;
-			set = s;
-		}
+    public static class SimpleStack extends ConfigItemStack {
 
-		public SimpleStack(Supplier<ItemStack> g, Consumer<ItemStack> s) {
-			this(false, g, s);
-		}
+        private final Supplier<ItemStack> get;
+        private final Consumer<ItemStack> set;
 
-		@Override
-		public ItemStack getStack() {
-			return get.get();
-		}
+        public SimpleStack(boolean single, Supplier<ItemStack> g, Consumer<ItemStack> s) {
+            super(InvUtils.EMPTY_STACK, single);
+            get = g;
+            set = s;
+        }
 
-		@Override
-		public void setStack(ItemStack v) {
-			set.accept(v);
-		}
-	}
+        public SimpleStack(Supplier<ItemStack> g, Consumer<ItemStack> s) {
+            this(false, g, s);
+        }
 
-	private ItemStack value;
-	private boolean singleItemOnly;
+        @Override
+        public ItemStack getStack() {
+            return get.get();
+        }
 
-	public ConfigItemStack(ItemStack is, boolean b) {
-		value = is;
-		singleItemOnly = b;
+        @Override
+        public void setStack(ItemStack v) {
+            set.accept(v);
+        }
+    }
 
-		if (singleItemOnly && value != null && value.stackSize > 1) {
-			value.stackSize = 1;
-		}
-	}
+    private ItemStack value;
+    private boolean singleItemOnly;
 
-	public ConfigItemStack(ItemStack is) {
-		this(is, false);
-	}
+    public ConfigItemStack(ItemStack is, boolean b) {
+        value = is;
+        singleItemOnly = b;
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+        if (singleItemOnly && value != null && value.stackSize > 1) {
+            value.stackSize = 1;
+        }
+    }
 
-	public ItemStack getStack() {
-		return value;
-	}
+    public ConfigItemStack(ItemStack is) {
+        this(is, false);
+    }
 
-	public void setStack(ItemStack is) {
-		value = is;
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-		if (getSingleItemOnly() && value != null && value.stackSize > 1) {
-			value.stackSize = 1;
-		}
-	}
+    public ItemStack getStack() {
+        return value;
+    }
 
-	public boolean getSingleItemOnly() {
-		return singleItemOnly;
-	}
+    public void setStack(ItemStack is) {
+        value = is;
 
-	public void setSingleItemOnly(boolean v) {
-		singleItemOnly = v;
-	}
+        if (getSingleItemOnly() && value != null && value.stackSize > 1) {
+            value.stackSize = 1;
+        }
+    }
 
-	@Override
-	public String getString() {
-		return getStack().writeToNBT(new NBTTagCompound()).toString();
-	}
+    public boolean getSingleItemOnly() {
+        return singleItemOnly;
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return getInt() > 0;
-	}
+    public void setSingleItemOnly(boolean v) {
+        singleItemOnly = v;
+    }
 
-	@Override
-	public int getInt() {
-		return getStack().stackSize;
-	}
+    @Override
+    public String getString() {
+        return getStack().writeToNBT(new NBTTagCompound()).toString();
+    }
 
-	@Override
-	public ConfigItemStack copy() {
-		return new ConfigItemStack(getStack(), getSingleItemOnly());
-	}
+    @Override
+    public boolean getBoolean() {
+        return getInt() > 0;
+    }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		value = getStack();
+    @Override
+    public int getInt() {
+        return getStack().stackSize;
+    }
 
-		if (value != null) {
-			nbt.setTag(key, value.writeToNBT(new NBTTagCompound()));
-		}
-	}
+    @Override
+    public ConfigItemStack copy() {
+        return new ConfigItemStack(getStack(), getSingleItemOnly());
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		NBTTagCompound nbt1 = nbt.getCompoundTag(key);
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        value = getStack();
 
-		if (nbt1.hasNoTags()) {
-			setStack(InvUtils.EMPTY_STACK);
-		} else {
-			setStack(ItemStack.loadItemStackFromNBT(nbt1));
-		}
-	}
+        if (value != null) {
+            nbt.setTag(key, value.writeToNBT(new NBTTagCompound()));
+        }
+    }
 
-	@Override
-	public void writeData(DataOut data) {
-		data.writeItemStack(getStack());
-		data.writeBoolean(getSingleItemOnly());
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        NBTTagCompound nbt1 = nbt.getCompoundTag(key);
 
-	@Override
-	public void readData(DataIn data) {
-		setStack(data.readItemStack());
-		setSingleItemOnly(data.readBoolean());
-	}
+        if (nbt1.hasNoTags()) {
+            setStack(InvUtils.EMPTY_STACK);
+        } else {
+            setStack(ItemStack.loadItemStackFromNBT(nbt1));
+        }
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return getStack() == null;
-	}
+    @Override
+    public void writeData(DataOut data) {
+        data.writeItemStack(getStack());
+        data.writeBoolean(getSingleItemOnly());
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		value = getStack();
+    @Override
+    public void readData(DataIn data) {
+        setStack(data.readItemStack());
+        setSingleItemOnly(data.readBoolean());
+    }
 
-		if (value.stackSize <= 1) {
-			return new ChatComponentText(value.getDisplayName());
-		}
+    @Override
+    public boolean isEmpty() {
+        return getStack() == null;
+    }
 
-		return new ChatComponentText(value.stackSize + "x " + value.getDisplayName());
-	}
+    @Override
+    public IChatComponent getStringForGUI() {
+        value = getStack();
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		if (inst.getCanEdit()) {
-			new GuiSelectItemStack(gui, getStack().copy(), getSingleItemOnly(), stack -> {
-				setStack(stack);
-				callback.run();
-			}).openGui();
-		}
-	}
+        if (value.stackSize <= 1) {
+            return new ChatComponentText(value.getDisplayName());
+        }
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		if (string.isEmpty()) {
-			return false;
-		}
+        return new ChatComponentText(value.stackSize + "x " + value.getDisplayName());
+    }
 
-		try {
-			ItemStack stack = ItemStackSerializer.parseItemThrowingException(string);
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        if (inst.getCanEdit()) {
+            new GuiSelectItemStack(gui, getStack().copy(), getSingleItemOnly(), stack -> {
+                setStack(stack);
+                callback.run();
+            }).openGui();
+        }
+    }
 
-			if (stack.stackSize > 1 && getSingleItemOnly()) {
-				return false;
-			}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        if (string.isEmpty()) {
+            return false;
+        }
 
-			if (!simulate) {
-				setStack(stack);
-			}
+        try {
+            ItemStack stack = ItemStackSerializer.parseItemThrowingException(string);
 
-			return true;
-		} catch (Exception ex) {
-			return false;
-		}
-	}
+            if (stack.stackSize > 1 && getSingleItemOnly()) {
+                return false;
+            }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		if (value instanceof ConfigItemStack) {
-			setStack(((ConfigItemStack) value).getStack().copy());
-		} else {
-			super.setValueFromOtherValue(value);
-		}
-	}
+            if (!simulate) {
+                setStack(stack);
+            }
+
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        if (value instanceof ConfigItemStack) {
+            setStack(((ConfigItemStack) value).getStack().copy());
+        } else {
+            super.setValueFromOtherValue(value);
+        }
+    }
 }

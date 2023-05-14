@@ -6,31 +6,23 @@ import com.feed_the_beast.ftblib.lib.io.DataOut;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 
-public abstract class MessageBase implements IMessage
-{
-	MessageBase()
-	{
-	}
+public abstract class MessageBase implements IMessage {
 
-	public abstract NetworkWrapper getWrapper();
+    MessageBase() {}
 
-	@Override
-	public final void toBytes(ByteBuf buf)
-	{
-		writeData(new DataOut(buf));
-	}
+    public abstract NetworkWrapper getWrapper();
 
-	@Override
-	public final void fromBytes(ByteBuf buf)
-	{
-		readData(new DataIn(buf));
-	}
+    @Override
+    public final void toBytes(ByteBuf buf) {
+        writeData(new DataOut(buf));
+    }
 
-	public void writeData(DataOut data)
-	{
-	}
+    @Override
+    public final void fromBytes(ByteBuf buf) {
+        readData(new DataIn(buf));
+    }
 
-	public void readData(DataIn data)
-	{
-	}
+    public void writeData(DataOut data) {}
+
+    public void readData(DataIn data) {}
 }

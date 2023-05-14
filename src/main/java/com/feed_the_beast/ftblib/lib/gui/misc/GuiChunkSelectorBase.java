@@ -1,5 +1,17 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.world.ChunkCoordIntPair;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+
 import com.feed_the_beast.ftblib.lib.client.CachedVertexData;
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.gui.Button;
@@ -12,280 +24,282 @@ import com.feed_the_beast.ftblib.lib.gui.WidgetLayout;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.ChunkCoordIntPair;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
-public class GuiChunkSelectorBase extends GuiBase
-{
-	protected enum Corner {
-		BOTTOM_LEFT,
-		BOTTOM_RIGHT,
-		TOP_LEFT
-	}
+public class GuiChunkSelectorBase extends GuiBase {
 
-	public static final int TILE_SIZE = 12;
-	private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, false, true, false);
+    protected enum Corner {
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        TOP_LEFT
+    }
 
-	static {
-		GRID.color.set(128, 128, 128, 50);
+    public static final int TILE_SIZE = 12;
+    private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, false, true, false);
 
-		for (int x = 0; x <= ChunkSelectorMap.TILES_GUI; x++) {
-			GRID.pos(x * TILE_SIZE, 0D);
-			GRID.pos(x * TILE_SIZE, ChunkSelectorMap.TILES_GUI * TILE_SIZE, 0D);
-		}
+    static {
+        GRID.color.set(128, 128, 128, 50);
 
-		for (int y = 0; y <= ChunkSelectorMap.TILES_GUI; y++) {
-			GRID.pos(0D, y * TILE_SIZE, 0D);
-			GRID.pos(ChunkSelectorMap.TILES_GUI * TILE_SIZE, y * TILE_SIZE, 0D);
-		}
-	}
+        for (int x = 0; x <= ChunkSelectorMap.TILES_GUI; x++) {
+            GRID.pos(x * TILE_SIZE, 0D);
+            GRID.pos(x * TILE_SIZE, ChunkSelectorMap.TILES_GUI * TILE_SIZE, 0D);
+        }
 
-	public static class MapButton extends Button {
-		public final GuiChunkSelectorBase gui;
-		public final ChunkCoordIntPair chunkPos;
-		public final int index;
-		private boolean isSelected = false;
+        for (int y = 0; y <= ChunkSelectorMap.TILES_GUI; y++) {
+            GRID.pos(0D, y * TILE_SIZE, 0D);
+            GRID.pos(ChunkSelectorMap.TILES_GUI * TILE_SIZE, y * TILE_SIZE, 0D);
+        }
+    }
 
-		private MapButton(GuiChunkSelectorBase g, int i) {
-			super(g);
-			gui = g;
-			index = i;
-			setPosAndSize((index % ChunkSelectorMap.TILES_GUI) * TILE_SIZE, (index / ChunkSelectorMap.TILES_GUI) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-			chunkPos = new ChunkCoordIntPair(gui.startX + (i % ChunkSelectorMap.TILES_GUI), gui.startZ + (i / ChunkSelectorMap.TILES_GUI));
-		}
+    public static class MapButton extends Button {
 
-		@Override
-		public void onClicked(MouseButton button) {
-			GuiHelper.playClickSound();
-			gui.currentSelectionMode = gui.getSelectionMode(button);
+        public final GuiChunkSelectorBase gui;
+        public final ChunkCoordIntPair chunkPos;
+        public final int index;
+        private boolean isSelected = false;
 
-			if (gui.blockMode) {
-				gui.anchorIndex = index;
-				gui.mouseIndex = index;
-			}
+        private MapButton(GuiChunkSelectorBase g, int i) {
+            super(g);
+            gui = g;
+            index = i;
+            setPosAndSize(
+                    (index % ChunkSelectorMap.TILES_GUI) * TILE_SIZE,
+                    (index / ChunkSelectorMap.TILES_GUI) * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE);
+            chunkPos = new ChunkCoordIntPair(
+                    gui.startX + (i % ChunkSelectorMap.TILES_GUI),
+                    gui.startZ + (i / ChunkSelectorMap.TILES_GUI));
+        }
 
-			if (gui.currentSelectionMode == -1) {
-				gui.onChunksSelected(Collections.singleton(chunkPos));
-			}
-		}
+        @Override
+        public void onClicked(MouseButton button) {
+            GuiHelper.playClickSound();
+            gui.currentSelectionMode = gui.getSelectionMode(button);
 
-		@Override
-		public void addMouseOverText(List<String> list) {
-			gui.addButtonText(this, list);
-		}
+            if (gui.blockMode) {
+                gui.anchorIndex = index;
+                gui.mouseIndex = index;
+            }
 
-		@Override
-		public void draw(Theme theme, int x, int y, int w, int h) {
-			if (gui.currentSelectionMode != -1) {
-				if (gui.blockMode && gui.anchorIndex >= 0 && gui.mouseIndex >= 0) {
-					if (gui.isMouseOver(this)) {
-						gui.mouseIndex = index;
-					}
-					ChunkCoordIntPair anchorChunk = gui.mapButtons[gui.anchorIndex].chunkPos;
-					ChunkCoordIntPair mouseChunk = gui.mapButtons[gui.mouseIndex].chunkPos;
-					if (MathUtils.isNumberBetween(this.chunkPos.chunkXPos, anchorChunk.chunkXPos, mouseChunk.chunkXPos)
-							&& MathUtils.isNumberBetween(this.chunkPos.chunkZPos, anchorChunk.chunkZPos, mouseChunk.chunkZPos)) {
-						isSelected = true;
-					} else {
-						isSelected = false;
-					}
-				} else {
-					if (!isSelected && gui.isMouseOver(this)) {
-						isSelected = true;
-					}
-				}
-			}
-			if (isSelected || gui.isMouseOver(this)) {
-				Color4I.WHITE.withAlpha(33).draw(x, y, TILE_SIZE, TILE_SIZE);
-			}
-		}
-	}
+            if (gui.currentSelectionMode == -1) {
+                gui.onChunksSelected(Collections.singleton(chunkPos));
+            }
+        }
 
-	public int startX, startZ;
-	private final MapButton[] mapButtons;
-	private final Panel panelButtons;
-	public int currentSelectionMode = -1;
-	public boolean blockMode = false;
-	public int anchorIndex = -1;
-	public int mouseIndex = -1;
+        @Override
+        public void addMouseOverText(List<String> list) {
+            gui.addButtonText(this, list);
+        }
 
-	public GuiChunkSelectorBase() {
-		startX = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posX) - ChunkSelectorMap.TILES_GUI2;
-		startZ = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posZ) - ChunkSelectorMap.TILES_GUI2;
+        @Override
+        public void draw(Theme theme, int x, int y, int w, int h) {
+            if (gui.currentSelectionMode != -1) {
+                if (gui.blockMode && gui.anchorIndex >= 0 && gui.mouseIndex >= 0) {
+                    if (gui.isMouseOver(this)) {
+                        gui.mouseIndex = index;
+                    }
+                    ChunkCoordIntPair anchorChunk = gui.mapButtons[gui.anchorIndex].chunkPos;
+                    ChunkCoordIntPair mouseChunk = gui.mapButtons[gui.mouseIndex].chunkPos;
+                    if (MathUtils.isNumberBetween(this.chunkPos.chunkXPos, anchorChunk.chunkXPos, mouseChunk.chunkXPos)
+                            && MathUtils.isNumberBetween(
+                                    this.chunkPos.chunkZPos,
+                                    anchorChunk.chunkZPos,
+                                    mouseChunk.chunkZPos)) {
+                        isSelected = true;
+                    } else {
+                        isSelected = false;
+                    }
+                } else {
+                    if (!isSelected && gui.isMouseOver(this)) {
+                        isSelected = true;
+                    }
+                }
+            }
+            if (isSelected || gui.isMouseOver(this)) {
+                Color4I.WHITE.withAlpha(33).draw(x, y, TILE_SIZE, TILE_SIZE);
+            }
+        }
+    }
 
-		panelButtons = new Panel(this) {
-			@Override
-			public void addWidgets() {
-				addCornerButtons(panelButtons);
-			}
+    public int startX, startZ;
+    private final MapButton[] mapButtons;
+    private final Panel panelButtons;
+    public int currentSelectionMode = -1;
+    public boolean blockMode = false;
+    public int anchorIndex = -1;
+    public int mouseIndex = -1;
 
-			@Override
-			public void alignWidgets() {
-				int h = align(WidgetLayout.VERTICAL);
-				int w = 0;
+    public GuiChunkSelectorBase() {
+        startX = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posX) - ChunkSelectorMap.TILES_GUI2;
+        startZ = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-				for (Widget widget : widgets) {
-					w = Math.max(w, widget.width);
-				}
+        panelButtons = new Panel(this) {
 
-				panelButtons.setPosAndSize(getGui().width + 2, -2, w, h);
-			}
-		};
+            @Override
+            public void addWidgets() {
+                addCornerButtons(panelButtons);
+            }
 
-		mapButtons = new MapButton[ChunkSelectorMap.TILES_GUI * ChunkSelectorMap.TILES_GUI];
+            @Override
+            public void alignWidgets() {
+                int h = align(WidgetLayout.VERTICAL);
+                int w = 0;
 
-		for (int i = 0; i < mapButtons.length; i++) {
-			mapButtons[i] = new MapButton(this, i);
-		}
-	}
+                for (Widget widget : widgets) {
+                    w = Math.max(w, widget.width);
+                }
 
-	@Override
-	public boolean onInit() {
-		ChunkSelectorMap.getMap().resetMap(startX, startZ);
-		return true;
-	}
+                panelButtons.setPosAndSize(getGui().width + 2, -2, w, h);
+            }
+        };
 
-	@Override
-	public void addWidgets() {
-		for (MapButton b : mapButtons) {
-			add(b);
-		}
+        mapButtons = new MapButton[ChunkSelectorMap.TILES_GUI * ChunkSelectorMap.TILES_GUI];
 
-		add(panelButtons);
-	}
+        for (int i = 0; i < mapButtons.length; i++) {
+            mapButtons[i] = new MapButton(this, i);
+        }
+    }
 
-	@Override
-	public void alignWidgets() {
-		setSize(ChunkSelectorMap.TILES_GUI * TILE_SIZE, ChunkSelectorMap.TILES_GUI * TILE_SIZE);
-		panelButtons.alignWidgets();
-	}
+    @Override
+    public boolean onInit() {
+        ChunkSelectorMap.getMap().resetMap(startX, startZ);
+        return true;
+    }
 
-	@Override
-	public void drawBackground(Theme theme, int x, int y, int w, int h) {
-		int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posX) - ChunkSelectorMap.TILES_GUI2;
-		int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posZ) - ChunkSelectorMap.TILES_GUI2;
+    @Override
+    public void addWidgets() {
+        for (MapButton b : mapButtons) {
+            add(b);
+        }
 
-		if (currentStartX != startX || currentStartZ != startZ) {
-			startX = currentStartX;
-			startZ = currentStartZ;
+        add(panelButtons);
+    }
 
-			for (int i = 0; i < mapButtons.length; i++) {
-				mapButtons[i] = new MapButton(this, i);
-			}
+    @Override
+    public void alignWidgets() {
+        setSize(ChunkSelectorMap.TILES_GUI * TILE_SIZE, ChunkSelectorMap.TILES_GUI * TILE_SIZE);
+        panelButtons.alignWidgets();
+    }
 
-			ChunkSelectorMap.getMap().resetMap(startX, startZ);
-		}
+    @Override
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {
+        int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posX) - ChunkSelectorMap.TILES_GUI2;
+        int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().thePlayer.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-		GlStateManager.color(1F, 1F, 1F, 1F);
-		Color4I.BLACK.draw(x - 2, y - 2, w + 4, h + 4);
+        if (currentStartX != startX || currentStartZ != startZ) {
+            startX = currentStartX;
+            startZ = currentStartZ;
 
-		ChunkSelectorMap.getMap().drawMap(this, x, y, startX, startZ);
+            for (int i = 0; i < mapButtons.length; i++) {
+                mapButtons[i] = new MapButton(this, i);
+            }
 
-		GlStateManager.color(1F, 1F, 1F, 1F);
+            ChunkSelectorMap.getMap().resetMap(startX, startZ);
+        }
 
-		for (MapButton mapButton : mapButtons) {
-			mapButton.draw(theme, mapButton.getX(), mapButton.getY(), mapButton.width, mapButton.height);
-		}
+        GlStateManager.color(1F, 1F, 1F, 1F);
+        Color4I.BLACK.draw(x - 2, y - 2, w + 4, h + 4);
 
-		GlStateManager.disableTexture2D();
-		GlStateManager.glLineWidth(1F);
+        ChunkSelectorMap.getMap().drawMap(this, x, y, startX, startZ);
 
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.setTranslation(mapButtons[0].getX(), mapButtons[0].getY(), 0D);
-		//GlStateManager.color(1F, 1F, 1F, GuiScreen.isCtrlKeyDown() ? 0.2F : 0.7F);
-		GlStateManager.color(1F, 1F, 1F, 1F);
+        GlStateManager.color(1F, 1F, 1F, 1F);
 
-		if (!isKeyDown(Keyboard.KEY_TAB)) {
-			drawArea(tessellator);
-		}
+        for (MapButton mapButton : mapButtons) {
+            mapButton.draw(theme, mapButton.getX(), mapButton.getY(), mapButton.width, mapButton.height);
+        }
 
-		GRID.draw(tessellator);
-		tessellator.setTranslation(0D, 0D, 0D);
-		GlStateManager.enableTexture2D();
-		GlStateManager.color(1F, 1F, 1F, 1F);
-	}
+        GlStateManager.disableTexture2D();
+        GlStateManager.glLineWidth(1F);
 
-	@Override
-	public void mouseReleased(MouseButton button) {
-		super.mouseReleased(button);
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.setTranslation(mapButtons[0].getX(), mapButtons[0].getY(), 0D);
+        // GlStateManager.color(1F, 1F, 1F, GuiScreen.isCtrlKeyDown() ? 0.2F : 0.7F);
+        GlStateManager.color(1F, 1F, 1F, 1F);
 
-		if (currentSelectionMode != -1) {
-			Collection<ChunkCoordIntPair> c = new ArrayList<>();
+        if (!isKeyDown(Keyboard.KEY_TAB)) {
+            drawArea(tessellator);
+        }
 
-			for (MapButton b : mapButtons) {
-				if (b.isSelected) {
-					c.add(b.chunkPos);
-					b.isSelected = false;
-				}
-			}
+        GRID.draw(tessellator);
+        tessellator.setTranslation(0D, 0D, 0D);
+        GlStateManager.enableTexture2D();
+        GlStateManager.color(1F, 1F, 1F, 1F);
+    }
 
-			onChunksSelected(c);
-			currentSelectionMode = -1;
-			anchorIndex = -1;
-			mouseIndex = -1;
-			blockMode = false;
-		}
-	}
+    @Override
+    public void mouseReleased(MouseButton button) {
+        super.mouseReleased(button);
 
-	@Override
-	public void drawForeground(Theme theme, int x, int y, int w, int h) {
-		int lineSpacing = theme.getFontHeight() + 1;
-		List<String> tempTextList = new ArrayList<>();
-		addCornerText(tempTextList, Corner.BOTTOM_RIGHT);
+        if (currentSelectionMode != -1) {
+            Collection<ChunkCoordIntPair> c = new ArrayList<>();
 
-		for (int i = 0; i < tempTextList.size(); i++) {
-			String s = tempTextList.get(i);
-			theme.drawString(s, getScreen().getScaledWidth() - theme.getStringWidth(s) - 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
-		}
+            for (MapButton b : mapButtons) {
+                if (b.isSelected) {
+                    c.add(b.chunkPos);
+                    b.isSelected = false;
+                }
+            }
 
-		tempTextList.clear();
+            onChunksSelected(c);
+            currentSelectionMode = -1;
+            anchorIndex = -1;
+            mouseIndex = -1;
+            blockMode = false;
+        }
+    }
 
-		addCornerText(tempTextList, Corner.BOTTOM_LEFT);
+    @Override
+    public void drawForeground(Theme theme, int x, int y, int w, int h) {
+        int lineSpacing = theme.getFontHeight() + 1;
+        List<String> tempTextList = new ArrayList<>();
+        addCornerText(tempTextList, Corner.BOTTOM_RIGHT);
 
-		for (int i = 0; i < tempTextList.size(); i++) {
-			theme.drawString(tempTextList.get(i), 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
-		}
+        for (int i = 0; i < tempTextList.size(); i++) {
+            String s = tempTextList.get(i);
+            theme.drawString(
+                    s,
+                    getScreen().getScaledWidth() - theme.getStringWidth(s) - 2,
+                    getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing,
+                    Theme.SHADOW);
+        }
 
-		tempTextList.clear();
+        tempTextList.clear();
 
-		addCornerText(tempTextList, Corner.TOP_LEFT);
+        addCornerText(tempTextList, Corner.BOTTOM_LEFT);
 
-		for (int i = 0; i < tempTextList.size(); i++) {
-			theme.drawString(tempTextList.get(i), 2, 2 + i * lineSpacing, Theme.SHADOW);
-		}
+        for (int i = 0; i < tempTextList.size(); i++) {
+            theme.drawString(
+                    tempTextList.get(i),
+                    2,
+                    getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing,
+                    Theme.SHADOW);
+        }
 
-		super.drawForeground(theme, x, y, w, h);
-	}
+        tempTextList.clear();
 
-	public int getSelectionMode(MouseButton button) {
-		return -1;
-	}
+        addCornerText(tempTextList, Corner.TOP_LEFT);
 
-	public void onChunksSelected(Collection<ChunkCoordIntPair> chunks) {
-	}
+        for (int i = 0; i < tempTextList.size(); i++) {
+            theme.drawString(tempTextList.get(i), 2, 2 + i * lineSpacing, Theme.SHADOW);
+        }
 
-	public void drawArea(Tessellator tessellator) {
-	}
+        super.drawForeground(theme, x, y, w, h);
+    }
 
-	public void addCornerButtons(Panel panel) {
-	}
+    public int getSelectionMode(MouseButton button) {
+        return -1;
+    }
 
-	public void addCornerText(List<String> list, Corner corner) {
-	}
+    public void onChunksSelected(Collection<ChunkCoordIntPair> chunks) {}
 
-	public void addButtonText(MapButton button, List<String> list) {
-	}
+    public void drawArea(Tessellator tessellator) {}
+
+    public void addCornerButtons(Panel panel) {}
+
+    public void addCornerText(List<String> list, Corner corner) {}
+
+    public void addButtonText(MapButton button, List<String> list) {}
 }

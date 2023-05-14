@@ -1,52 +1,46 @@
 package com.feed_the_beast.ftblib.lib.command;
 
-import net.minecraft.command.CommandHelp;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.command.CommandHelp;
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
+
 /**
  * @author LatvianModder
  */
-public class CmdTreeHelp extends CommandHelp
-{
-	private final CommandTreeBase parent;
+public class CmdTreeHelp extends CommandHelp {
 
-	public CmdTreeHelp(CommandTreeBase parent)
-	{
-		this.parent = parent;
-	}
+    private final CommandTreeBase parent;
 
-	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender sender)
-	{
-		return true;
-	}
+    public CmdTreeHelp(CommandTreeBase parent) {
+        this.parent = parent;
+    }
 
-	@Override
-	protected List<ICommand> getSortedPossibleCommands(ICommandSender sender)
-	{
-		List<ICommand> list = new ArrayList<>();
+    @Override
+    public boolean canCommandSenderUseCommand(ICommandSender sender) {
+        return true;
+    }
 
-		for (ICommand command : parent.getSubCommands())
-		{
-			if (command.canCommandSenderUseCommand(sender))
-			{
-				list.add(command);
-			}
-		}
+    @Override
+    protected List<ICommand> getSortedPossibleCommands(ICommandSender sender) {
+        List<ICommand> list = new ArrayList<>();
 
-		Collections.sort(list);
-		return list;
-	}
+        for (ICommand command : parent.getSubCommands()) {
+            if (command.canCommandSenderUseCommand(sender)) {
+                list.add(command);
+            }
+        }
 
-	@Override
-	protected Map<String, ICommand> getCommands()
-	{
-		return parent.getCommandMap();
-	}
+        Collections.sort(list);
+        return list;
+    }
+
+    @Override
+    protected Map<String, ICommand> getCommands() {
+        return parent.getCommandMap();
+    }
 }

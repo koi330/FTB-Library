@@ -5,18 +5,17 @@ import net.minecraft.world.World;
 /**
  * @author LatvianModder
  */
-public interface FTBLibGameRules
-{
-	String DISABLE_TEAM_CREATION = "ftblib:disable_team_creation";
-	String DISABLE_TEAM_JOINING = "ftblib:disable_team_joining";
+public interface FTBLibGameRules {
 
-	static boolean canCreateTeam(World world)
-	{
-		return !FTBLibConfig.teams.disable_teams && !world.getGameRules().getGameRuleBooleanValue(DISABLE_TEAM_CREATION);
-	}
+    String DISABLE_TEAM_CREATION = "ftblib:disable_team_creation";
+    String DISABLE_TEAM_JOINING = "ftblib:disable_team_joining";
 
-	static boolean canJoinTeam(World world)
-	{
-		return !FTBLibConfig.teams.disable_teams && !world.getGameRules().getGameRuleBooleanValue(DISABLE_TEAM_JOINING);
-	}
+    static boolean canCreateTeam(World world) {
+        return !FTBLibConfig.teams.disable_teams
+                && !world.getGameRules().getGameRuleBooleanValue(DISABLE_TEAM_CREATION);
+    }
+
+    static boolean canJoinTeam(World world) {
+        return !FTBLibConfig.teams.disable_teams && !world.getGameRules().getGameRuleBooleanValue(DISABLE_TEAM_JOINING);
+    }
 }

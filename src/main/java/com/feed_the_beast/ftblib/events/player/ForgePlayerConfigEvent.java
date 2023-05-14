@@ -6,18 +6,16 @@ import com.feed_the_beast.ftblib.lib.data.ForgePlayer;
 /**
  * @author LatvianModder
  */
-public class ForgePlayerConfigEvent extends ForgePlayerEvent
-{
-	private final ConfigGroup config;
+public class ForgePlayerConfigEvent extends ForgePlayerEvent {
 
-	public ForgePlayerConfigEvent(ForgePlayer player, ConfigGroup s)
-	{
-		super(player);
-		config = s;
-	}
+    private final ConfigGroup config;
 
-	public ConfigGroup getConfig()
-	{
-		return config;
-	}
+    public ForgePlayerConfigEvent(ForgePlayer player, ConfigGroup s) {
+        super(player);
+        config = s;
+    }
+
+    public ConfigGroup getConfig() {
+        return config;
+    }
 }

@@ -1,5 +1,12 @@
 package com.feed_the_beast.ftblib.client.teamsgui;
 
+import java.util.Collection;
+import java.util.List;
+
+import net.minecraft.client.resources.I18n;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
+
 import com.feed_the_beast.ftblib.lib.EnumTeamStatus;
 import com.feed_the_beast.ftblib.lib.data.FTBLibTeamGuiActions;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
@@ -8,55 +15,53 @@ import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import com.feed_the_beast.ftblib.net.MessageMyTeamAction;
 import com.feed_the_beast.ftblib.net.MessageMyTeamPlayerList;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumChatFormatting;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author LatvianModder
  */
 public class GuiManageAllies extends GuiManagePlayersBase {
-	private static class ButtonPlayer extends ButtonPlayerBase {
-		private ButtonPlayer(Panel panel, MessageMyTeamPlayerList.Entry m) {
-			super(panel, m);
-		}
 
-		@Override
-		Color4I getPlayerColor() {
-			return entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY)
-					? Color4I.getChatFormattingColor(EnumChatFormatting.DARK_AQUA)
-					: getDefaultPlayerColor();
-		}
+    private static class ButtonPlayer extends ButtonPlayerBase {
 
-		@Override
-		public void addMouseOverText(List<String> list) {
-			list.add(I18n.format((entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY) ? EnumTeamStatus.ALLY
-					: EnumTeamStatus.MEMBER).getLangKey()));
-		}
+        private ButtonPlayer(Panel panel, MessageMyTeamPlayerList.Entry m) {
+            super(panel, m);
+        }
 
-		@Override
-		public void onClicked(MouseButton button) {
-			GuiHelper.playClickSound();
-			NBTTagCompound data = new NBTTagCompound();
-			data.setString("player", entry.name);
+        @Override
+        Color4I getPlayerColor() {
+            return entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY)
+                    ? Color4I.getChatFormattingColor(EnumChatFormatting.DARK_AQUA)
+                    : getDefaultPlayerColor();
+        }
 
-			if (entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY)) {
-				data.setBoolean("add", false);
-				entry.status = EnumTeamStatus.NONE;
-			} else {
-				data.setBoolean("add", true);
-				entry.status = EnumTeamStatus.ALLY;
-			}
+        @Override
+        public void addMouseOverText(List<String> list) {
+            list.add(
+                    I18n.format(
+                            (entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY) ? EnumTeamStatus.ALLY
+                                    : EnumTeamStatus.MEMBER).getLangKey()));
+        }
 
-			new MessageMyTeamAction(FTBLibTeamGuiActions.ALLIES.getId(), data).sendToServer();
-			updateIcon();
-		}
-	}
+        @Override
+        public void onClicked(MouseButton button) {
+            GuiHelper.playClickSound();
+            NBTTagCompound data = new NBTTagCompound();
+            data.setString("player", entry.name);
 
-	public GuiManageAllies(Collection<MessageMyTeamPlayerList.Entry> m) {
-		super(I18n.format("team_action.ftblib.allies"), m, ButtonPlayer::new);
-	}
+            if (entry.status.isEqualOrGreaterThan(EnumTeamStatus.ALLY)) {
+                data.setBoolean("add", false);
+                entry.status = EnumTeamStatus.NONE;
+            } else {
+                data.setBoolean("add", true);
+                entry.status = EnumTeamStatus.ALLY;
+            }
+
+            new MessageMyTeamAction(FTBLibTeamGuiActions.ALLIES.getId(), data).sendToServer();
+            updateIcon();
+        }
+    }
+
+    public GuiManageAllies(Collection<MessageMyTeamPlayerList.Entry> m) {
+        super(I18n.format("team_action.ftblib.allies"), m, ButtonPlayer::new);
+    }
 }

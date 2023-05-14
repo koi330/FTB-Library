@@ -1,57 +1,53 @@
 package com.feed_the_beast.ftblib.lib.io;
 
-import com.feed_the_beast.ftblib.lib.util.JsonUtils;
-import com.google.gson.JsonElement;
-import net.minecraft.client.resources.IResource;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import net.minecraft.client.resources.IResource;
+
+import com.feed_the_beast.ftblib.lib.util.JsonUtils;
+import com.google.gson.JsonElement;
+
 /**
  * @author LatvianModder
  */
-public class ResourceDataReader extends DataReader
-{
-	public final IResource resource;
+public class ResourceDataReader extends DataReader {
 
-	ResourceDataReader(IResource r)
-	{
-		resource = r;
-	}
+    public final IResource resource;
 
-	// public String toString()
-	// {
-	// 	return resource.getResourceLocation().toString();
-	// }
+    ResourceDataReader(IResource r) {
+        resource = r;
+    }
 
-	@Override
-	public String string(int bufferSize) throws Exception
-	{
-		return readStringFromStream(resource.getInputStream(), bufferSize);
-	}
+    // public String toString()
+    // {
+    // return resource.getResourceLocation().toString();
+    // }
 
-	@Override
-	public List<String> stringList() throws Exception
-	{
-		return readStringListFromStream(resource.getInputStream());
-	}
+    @Override
+    public String string(int bufferSize) throws Exception {
+        return readStringFromStream(resource.getInputStream(), bufferSize);
+    }
 
-	@Override
-	public JsonElement json() throws Exception
-	{
-		try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))
-		{
-			return JsonUtils.parse(reader);
-		}
-	}
+    @Override
+    public List<String> stringList() throws Exception {
+        return readStringListFromStream(resource.getInputStream());
+    }
 
-	@Override
-	public BufferedImage image() throws Exception
-	{
-		return ImageIO.read(resource.getInputStream());
-	}
+    @Override
+    public JsonElement json() throws Exception {
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+            return JsonUtils.parse(reader);
+        }
+    }
+
+    @Override
+    public BufferedImage image() throws Exception {
+        return ImageIO.read(resource.getInputStream());
+    }
 }

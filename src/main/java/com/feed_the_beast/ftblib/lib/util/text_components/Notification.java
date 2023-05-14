@@ -4,10 +4,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.feed_the_beast.ftblib.lib.math.Ticks;
-import com.feed_the_beast.ftblib.lib.util.ServerUtils;
-import com.feed_the_beast.ftblib.lib.util.StringJoiner;
-
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -16,127 +12,136 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 
+import com.feed_the_beast.ftblib.lib.math.Ticks;
+import com.feed_the_beast.ftblib.lib.util.ServerUtils;
+import com.feed_the_beast.ftblib.lib.util.StringJoiner;
+
 /**
  * @author LatvianModder
  */
 public class Notification extends ChatComponentText {
-	public static final ResourceLocation VANILLA_STATUS = new ResourceLocation("minecraft", "status");
 
-	public static Notification of(ResourceLocation id, String text, IChatComponent... lines) {
-		Notification n = new Notification(id, text);
+    public static final ResourceLocation VANILLA_STATUS = new ResourceLocation("minecraft", "status");
 
-		for (IChatComponent line : lines) {
-			n.addLine(line);
-		}
+    public static Notification of(ResourceLocation id, String text, IChatComponent... lines) {
+        Notification n = new Notification(id, text);
 
-		return n;
-	}
+        for (IChatComponent line : lines) {
+            n.addLine(line);
+        }
 
-	public static Notification of(ResourceLocation id, IChatComponent... lines) {
-		return of(id, "", lines);
-	}
+        return n;
+    }
 
-	private final ResourceLocation id;
-	private Ticks timer;
-	private boolean important;
+    public static Notification of(ResourceLocation id, IChatComponent... lines) {
+        return of(id, "", lines);
+    }
 
-	private Notification(ResourceLocation i, String text) {
-		super(text);
-		id = i;
-		timer = Ticks.SECOND.x(3);
-		important = false;
-	}
+    private final ResourceLocation id;
+    private Ticks timer;
+    private boolean important;
 
-	public Notification(Notification n) {
-		this(n.getId(), n.getUnformattedTextForChat());
+    private Notification(ResourceLocation i, String text) {
+        super(text);
+        id = i;
+        timer = Ticks.SECOND.x(3);
+        important = false;
+    }
 
-		setChatStyle(n.getChatStyle().createShallowCopy());
+    public Notification(Notification n) {
+        this(n.getId(), n.getUnformattedTextForChat());
 
-		for (IChatComponent line : (List<IChatComponent>) n.getSiblings()) {
-			getSiblings().add(line.createCopy());
-		}
+        setChatStyle(n.getChatStyle().createShallowCopy());
 
-		setTimer(n.getTimer());
-		setImportant(n.isImportant());
-	}
+        for (IChatComponent line : (List<IChatComponent>) n.getSiblings()) {
+            getSiblings().add(line.createCopy());
+        }
 
-	public Notification addLine(IChatComponent line) {
-		if (!getSiblings().isEmpty()) {
-			appendText("\n");
-		}
+        setTimer(n.getTimer());
+        setImportant(n.isImportant());
+    }
 
-		appendSibling(line);
-		return this;
-	}
+    public Notification addLine(IChatComponent line) {
+        if (!getSiblings().isEmpty()) {
+            appendText("\n");
+        }
 
-	public Notification setError() {
-		getChatStyle().setColor(EnumChatFormatting.DARK_RED);
-		important = true;
-		return this;
-	}
+        appendSibling(line);
+        return this;
+    }
 
-	@Override
-	public Notification appendText(String text) {
-		return appendSibling(new ChatComponentText(text));
-	}
+    public Notification setError() {
+        getChatStyle().setColor(EnumChatFormatting.DARK_RED);
+        important = true;
+        return this;
+    }
 
-	@Override
-	public Notification appendSibling(IChatComponent component) {
-		super.appendSibling(component);
-		return this;
-	}
+    @Override
+    public Notification appendText(String text) {
+        return appendSibling(new ChatComponentText(text));
+    }
 
-	public int hashCode() {
-		return id.hashCode();
-	}
+    @Override
+    public Notification appendSibling(IChatComponent component) {
+        super.appendSibling(component);
+        return this;
+    }
 
-	public boolean equals(Object o) {
-		return o == this || (o instanceof Notification && ((Notification) o).getId().equals(getId()));
-	}
+    public int hashCode() {
+        return id.hashCode();
+    }
 
-	public String toString() {
-		return "Notification{" + StringJoiner.with(", ").joinObjects("id=" + id, "siblings=" + siblings,
-				"style=" + getChatStyle(), "timer=" + timer, "important=" + important) + '}';
-	}
+    public boolean equals(Object o) {
+        return o == this || (o instanceof Notification && ((Notification) o).getId().equals(getId()));
+    }
 
-	public ResourceLocation getId() {
-		return id;
-	}
+    public String toString() {
+        return "Notification{" + StringJoiner.with(", ").joinObjects(
+                "id=" + id,
+                "siblings=" + siblings,
+                "style=" + getChatStyle(),
+                "timer=" + timer,
+                "important=" + important) + '}';
+    }
 
-	public Ticks getTimer() {
-		return timer;
-	}
+    public ResourceLocation getId() {
+        return id;
+    }
 
-	public Notification setTimer(Ticks t) {
-		timer = t;
-		return this;
-	}
+    public Ticks getTimer() {
+        return timer;
+    }
 
-	public boolean isImportant() {
-		return important;
-	}
+    public Notification setTimer(Ticks t) {
+        timer = t;
+        return this;
+    }
 
-	public Notification setImportant(boolean v) {
-		important = v;
-		return this;
-	}
+    public boolean isImportant() {
+        return important;
+    }
 
-	@Override
-	public Notification createCopy() {
-		return new Notification(this);
-	}
+    public Notification setImportant(boolean v) {
+        important = v;
+        return this;
+    }
 
-	public void send(MinecraftServer server, @Nullable EntityPlayer player) {
-		ServerUtils.notify(server, player, this);
-	}
+    @Override
+    public Notification createCopy() {
+        return new Notification(this);
+    }
 
-	public void send(MinecraftServer server, @Nullable ICommandSender sender) {
-		if (sender == null) {
-			ServerUtils.notify(server, null, this);
-		} else if (sender instanceof EntityPlayer) {
-			ServerUtils.notify(server, (EntityPlayer) sender, this);
-		} else {
-			sender.addChatMessage(this);
-		}
-	}
+    public void send(MinecraftServer server, @Nullable EntityPlayer player) {
+        ServerUtils.notify(server, player, this);
+    }
+
+    public void send(MinecraftServer server, @Nullable ICommandSender sender) {
+        if (sender == null) {
+            ServerUtils.notify(server, null, this);
+        } else if (sender instanceof EntityPlayer) {
+            ServerUtils.notify(server, (EntityPlayer) sender, this);
+        } else {
+            sender.addChatMessage(this);
+        }
+    }
 }

@@ -1,172 +1,144 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
+import java.util.List;
+
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 
-import java.util.List;
-
 /**
  * @author LatvianModder
  */
-public class ContextMenu extends Panel
-{
-	public static class CButton extends Button
-	{
-		public final ContextMenu contextMenu;
-		public final ContextMenuItem item;
+public class ContextMenu extends Panel {
 
-		public CButton(ContextMenu panel, ContextMenuItem i)
-		{
-			super(panel, i.title, i.icon);
-			contextMenu = panel;
-			item = i;
-			setSize(panel.getGui().getTheme().getStringWidth(item.title) + (contextMenu.hasIcons ? 14 : 4), 12);
-		}
+    public static class CButton extends Button {
 
-		@Override
-		public void addMouseOverText(List<String> list)
-		{
-			item.addMouseOverText(list);
-		}
+        public final ContextMenu contextMenu;
+        public final ContextMenuItem item;
 
-		@Override
-		public WidgetType getWidgetType()
-		{
-			return item.enabled.getAsBoolean() ? super.getWidgetType() : WidgetType.DISABLED;
-		}
+        public CButton(ContextMenu panel, ContextMenuItem i) {
+            super(panel, i.title, i.icon);
+            contextMenu = panel;
+            item = i;
+            setSize(panel.getGui().getTheme().getStringWidth(item.title) + (contextMenu.hasIcons ? 14 : 4), 12);
+        }
 
-		@Override
-		public void drawIcon(Theme theme, int x, int y, int w, int h)
-		{
-			item.drawIcon(theme, x, y, w, h);
-		}
+        @Override
+        public void addMouseOverText(List<String> list) {
+            item.addMouseOverText(list);
+        }
 
-		@Override
-		public void draw(Theme theme, int x, int y, int w, int h)
-		{
-			if (contextMenu.hasIcons)
-			{
-				drawIcon(theme, x + 1, y + 2, 8, 8);
-				theme.drawString(getTitle(), x + 11, y + 2, theme.getContentColor(getWidgetType()), Theme.SHADOW);
-			}
-			else
-			{
-				theme.drawString(getTitle(), x + 2, y + 2, theme.getContentColor(getWidgetType()), Theme.SHADOW);
-			}
-		}
+        @Override
+        public WidgetType getWidgetType() {
+            return item.enabled.getAsBoolean() ? super.getWidgetType() : WidgetType.DISABLED;
+        }
 
-		@Override
-		public void onClicked(MouseButton button)
-		{
-			GuiHelper.playClickSound();
+        @Override
+        public void drawIcon(Theme theme, int x, int y, int w, int h) {
+            item.drawIcon(theme, x, y, w, h);
+        }
 
-			if (item.yesNoText.isEmpty())
-			{
-				item.onClicked(contextMenu, button);
-			}
-			else
-			{
-				getGui().openYesNo(item.yesNoText, "", () -> item.onClicked(contextMenu, button));
-			}
-		}
-	}
+        @Override
+        public void draw(Theme theme, int x, int y, int w, int h) {
+            if (contextMenu.hasIcons) {
+                drawIcon(theme, x + 1, y + 2, 8, 8);
+                theme.drawString(getTitle(), x + 11, y + 2, theme.getContentColor(getWidgetType()), Theme.SHADOW);
+            } else {
+                theme.drawString(getTitle(), x + 2, y + 2, theme.getContentColor(getWidgetType()), Theme.SHADOW);
+            }
+        }
 
-	public static class CSeperator extends Button
-	{
-		public CSeperator(Panel panel)
-		{
-			super(panel);
-			setHeight(5);
-		}
+        @Override
+        public void onClicked(MouseButton button) {
+            GuiHelper.playClickSound();
 
-		@Override
-		public void draw(Theme theme, int x, int y, int w, int h)
-		{
-			Color4I.WHITE.withAlpha(130).draw(x + 2, y + 2, parent.width - 10, 1);
-		}
+            if (item.yesNoText.isEmpty()) {
+                item.onClicked(contextMenu, button);
+            } else {
+                getGui().openYesNo(item.yesNoText, "", () -> item.onClicked(contextMenu, button));
+            }
+        }
+    }
 
-		@Override
-		public void onClicked(MouseButton button)
-		{
-		}
-	}
+    public static class CSeperator extends Button {
 
-	public final List<ContextMenuItem> items;
-	public boolean hasIcons;
+        public CSeperator(Panel panel) {
+            super(panel);
+            setHeight(5);
+        }
 
-	public ContextMenu(Panel panel, List<ContextMenuItem> i)
-	{
-		super(panel);
-		items = i;
-		hasIcons = false;
+        @Override
+        public void draw(Theme theme, int x, int y, int w, int h) {
+            Color4I.WHITE.withAlpha(130).draw(x + 2, y + 2, parent.width - 10, 1);
+        }
 
-		for (ContextMenuItem item : items)
-		{
-			if (!item.icon.isEmpty())
-			{
-				hasIcons = true;
-				break;
-			}
-		}
-	}
+        @Override
+        public void onClicked(MouseButton button) {}
+    }
 
-	@Override
-	public void addWidgets()
-	{
-		for (ContextMenuItem item : items)
-		{
-			add(item.createWidget(this));
-		}
-	}
+    public final List<ContextMenuItem> items;
+    public boolean hasIcons;
 
-	@Override
-	public boolean mousePressed(MouseButton button)
-	{
-		boolean b = super.mousePressed(button);
+    public ContextMenu(Panel panel, List<ContextMenuItem> i) {
+        super(panel);
+        items = i;
+        hasIcons = false;
 
-		if (!b && !isMouseOver())
-		{
-			closeContextMenu();
-			return true;
-		}
+        for (ContextMenuItem item : items) {
+            if (!item.icon.isEmpty()) {
+                hasIcons = true;
+                break;
+            }
+        }
+    }
 
-		return b;
-	}
+    @Override
+    public void addWidgets() {
+        for (ContextMenuItem item : items) {
+            add(item.createWidget(this));
+        }
+    }
 
-	@Override
-	public void alignWidgets()
-	{
-		setWidth(0);
+    @Override
+    public boolean mousePressed(MouseButton button) {
+        boolean b = super.mousePressed(button);
 
-		for (Widget widget : widgets)
-		{
-			setWidth(Math.max(width, widget.width));
-		}
+        if (!b && !isMouseOver()) {
+            closeContextMenu();
+            return true;
+        }
 
-		for (Widget widget : widgets)
-		{
-			widget.setX(3);
-			widget.setWidth(width);
-		}
+        return b;
+    }
 
-		setWidth(width + 6);
+    @Override
+    public void alignWidgets() {
+        setWidth(0);
 
-		setHeight(align(new WidgetLayout.Vertical(3, 1, 3)));
-	}
+        for (Widget widget : widgets) {
+            setWidth(Math.max(width, widget.width));
+        }
 
-	@Override
-	public void drawBackground(Theme theme, int x, int y, int w, int h)
-	{
-		theme.drawContextMenuBackground(x, y, w, h);
-	}
+        for (Widget widget : widgets) {
+            widget.setX(3);
+            widget.setWidth(width);
+        }
 
-	@Override
-	public void draw(Theme theme, int x, int y, int w, int h)
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0F, 0F, 900F);
-		super.draw(theme, x, y, w, h);
-		GlStateManager.popMatrix();
-	}
+        setWidth(width + 6);
+
+        setHeight(align(new WidgetLayout.Vertical(3, 1, 3)));
+    }
+
+    @Override
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {
+        theme.drawContextMenuBackground(x, y, w, h);
+    }
+
+    @Override
+    public void draw(Theme theme, int x, int y, int w, int h) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0F, 0F, 900F);
+        super.draw(theme, x, y, w, h);
+        GlStateManager.popMatrix();
+    }
 }

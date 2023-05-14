@@ -9,14 +9,13 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 /**
  * @author LatvianModder
  */
-enum MessageToClientHandler implements IMessageHandler<MessageToClient, IMessage>
-{
-	INSTANCE;
+enum MessageToClientHandler implements IMessageHandler<MessageToClient, IMessage> {
 
-	@Override
-	public IMessage onMessage(MessageToClient message, MessageContext context)
-	{
-		FTBLib.PROXY.handleClientMessage(message);
-		return null;
-	}
+    INSTANCE;
+
+    @Override
+    public IMessage onMessage(MessageToClient message, MessageContext context) {
+        FTBLib.PROXY.handleClientMessage(message);
+        return null;
+    }
 }

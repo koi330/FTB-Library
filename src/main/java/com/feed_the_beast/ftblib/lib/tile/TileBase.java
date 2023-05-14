@@ -1,218 +1,206 @@
 package com.feed_the_beast.ftblib.lib.tile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.feed_the_beast.ftblib.lib.math.BlockDimPos;
-import com.feed_the_beast.ftblib.lib.util.BlockUtils;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.audio.SoundCategory;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.sound.SoundEvent;
+
+import com.feed_the_beast.ftblib.lib.util.BlockUtils;
 
 public abstract class TileBase extends TileEntity implements IChangeCallback {
-	public boolean brokenByCreative = false;
-	private boolean isDirty = true;
 
-	protected abstract void writeData(NBTTagCompound nbt, EnumSaveType type);
+    public boolean brokenByCreative = false;
+    private boolean isDirty = true;
 
-	protected abstract void readData(NBTTagCompound nbt, EnumSaveType type);
+    protected abstract void writeData(NBTTagCompound nbt, EnumSaveType type);
 
-	// public String getName() {
-	// 	return getDisplayName().getFormattedText();
-	// }
+    protected abstract void readData(NBTTagCompound nbt, EnumSaveType type);
 
-	public boolean hasCustomName() {
-		return false;
-	}
+    // public String getName() {
+    // return getDisplayName().getFormattedText();
+    // }
 
-	// public IChatComponent getDisplayName() {
-	// 	return new ChatComponentTranslation(getBlockType().getTranslationKey() + ".name");
-	// }
+    public boolean hasCustomName() {
+        return false;
+    }
 
-	@Override
-	public final void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-		writeData(nbt, EnumSaveType.SAVE);
-	}
+    // public IChatComponent getDisplayName() {
+    // return new ChatComponentTranslation(getBlockType().getTranslationKey() + ".name");
+    // }
 
-	@Override
-	public final void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
-		readData(nbt, EnumSaveType.SAVE);
-	}
+    @Override
+    public final void writeToNBT(NBTTagCompound nbt) {
+        super.writeToNBT(nbt);
+        writeData(nbt, EnumSaveType.SAVE);
+    }
 
-	public final S35PacketUpdateTileEntity getUpdatePacket() {
-		NBTTagCompound nbt = new NBTTagCompound();
-		super.writeToNBT(nbt);
-		writeData(nbt, EnumSaveType.NET_UPDATE);
-		nbt.removeTag("id");
-		nbt.removeTag("x");
-		nbt.removeTag("y");
-		nbt.removeTag("z");
-		return nbt.hasNoTags() ? null : new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
-	}
+    @Override
+    public final void readFromNBT(NBTTagCompound nbt) {
+        super.readFromNBT(nbt);
+        readData(nbt, EnumSaveType.SAVE);
+    }
 
-	@Override
-	public final void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-		readData(pkt.func_148857_g(), EnumSaveType.NET_UPDATE);
-		onUpdatePacket(EnumSaveType.NET_UPDATE);
-	}
+    public final S35PacketUpdateTileEntity getUpdatePacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        super.writeToNBT(nbt);
+        writeData(nbt, EnumSaveType.NET_UPDATE);
+        nbt.removeTag("id");
+        nbt.removeTag("x");
+        nbt.removeTag("y");
+        nbt.removeTag("z");
+        return nbt.hasNoTags() ? null : new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+    }
 
-	public final NBTTagCompound getUpdateTag() {
-		NBTTagCompound nbt = new NBTTagCompound();
-		super.writeToNBT(nbt);
-		writeData(nbt, EnumSaveType.NET_FULL);
-		nbt.removeTag("id");
-		return nbt;
-	}
+    @Override
+    public final void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+        readData(pkt.func_148857_g(), EnumSaveType.NET_UPDATE);
+        onUpdatePacket(EnumSaveType.NET_UPDATE);
+    }
 
-	public final void handleUpdateTag(NBTTagCompound tag) {
-		readData(tag, EnumSaveType.NET_FULL);
-		onUpdatePacket(EnumSaveType.NET_FULL);
-	}
+    public final NBTTagCompound getUpdateTag() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        super.writeToNBT(nbt);
+        writeData(nbt, EnumSaveType.NET_FULL);
+        nbt.removeTag("id");
+        return nbt;
+    }
 
-	public void onUpdatePacket(EnumSaveType type) {
-		markDirty();
-	}
+    public final void handleUpdateTag(NBTTagCompound tag) {
+        readData(tag, EnumSaveType.NET_FULL);
+        onUpdatePacket(EnumSaveType.NET_FULL);
+    }
 
-	protected boolean notifyBlock() {
-		return true;
-	}
+    public void onUpdatePacket(EnumSaveType type) {
+        markDirty();
+    }
 
-	public boolean updateComparator() {
-		return false;
-	}
+    protected boolean notifyBlock() {
+        return true;
+    }
 
-	public void onLoad() {
-		isDirty = true;
-	}
+    public boolean updateComparator() {
+        return false;
+    }
 
-	@Override
-	public void markDirty() {
-		isDirty = true;
-	}
+    public void onLoad() {
+        isDirty = true;
+    }
 
-	@Override
-	public void onContentsChanged(boolean majorChange) {
-		markDirty();
-	}
+    @Override
+    public void markDirty() {
+        isDirty = true;
+    }
 
-	// public final void checkIfDirty() {
-	// 	if (isDirty) {
-	// 		sendDirtyUpdate();
-	// 		isDirty = false;
-	// 	}
-	// }
+    @Override
+    public void onContentsChanged(boolean majorChange) {
+        markDirty();
+    }
 
-	// @Override
-	// public final Block getBlockType() {
-	// 	return getBlockState().getBlock();
-	// }
+    // public final void checkIfDirty() {
+    // if (isDirty) {
+    // sendDirtyUpdate();
+    // isDirty = false;
+    // }
+    // }
 
-	// @Override
-	// public final int getBlockMetadata() {
-	// 	return getBlockState().getBlock().getMetaFromState(getBlockState());
-	// }
+    // @Override
+    // public final Block getBlockType() {
+    // return getBlockState().getBlock();
+    // }
 
-	// protected void sendDirtyUpdate() {
-	// 	updateContainingBlockInfo();
+    // @Override
+    // public final int getBlockMetadata() {
+    // return getBlockState().getBlock().getMetaFromState(getBlockState());
+    // }
 
-	// 	if (worldObj != null) {
-	// 		worldObj.markChunkDirty(pos, this);
+    // protected void sendDirtyUpdate() {
+    // updateContainingBlockInfo();
 
-	// 		if (notifyBlock()) {
-	// 			BlockUtils.notifyBlockUpdate(worldObj, xCoord, yCoord, zCoord);
-	// 		}
+    // if (worldObj != null) {
+    // worldObj.markChunkDirty(pos, this);
 
-	// 		if (updateComparator() && getBlockType() != null) {
-	// 			worldObj.updateComparatorOutputLevel(xCoord, yCoord, zCoord, getBlockType());
-	// 		}
-	// 	}
-	// }
+    // if (notifyBlock()) {
+    // BlockUtils.notifyBlockUpdate(worldObj, xCoord, yCoord, zCoord);
+    // }
 
-	// @Override
-	// public void updateContainingBlockInfo() {
-	// 	super.updateContainingBlockInfo();
-	// 	currentState = null;
-	// }
+    // if (updateComparator() && getBlockType() != null) {
+    // worldObj.updateComparatorOutputLevel(xCoord, yCoord, zCoord, getBlockType());
+    // }
+    // }
+    // }
 
-	// @Override
-	// public boolean shouldRefresh(World world, int posx, int posy, int posz, IBlockState oldState, IBlockState newSate) {
-	// 	updateContainingBlockInfo();
-	// 	return oldState.getBlock() != newSate.getBlock();
-	// }
+    // @Override
+    // public void updateContainingBlockInfo() {
+    // super.updateContainingBlockInfo();
+    // currentState = null;
+    // }
 
-	// public IBlockState createState(IBlockState state) {
-	// 	return state;
-	// }
+    // @Override
+    // public boolean shouldRefresh(World world, int posx, int posy, int posz, IBlockState oldState, IBlockState
+    // newSate) {
+    // updateContainingBlockInfo();
+    // return oldState.getBlock() != newSate.getBlock();
+    // }
 
-	// public IBlockState getBlockState() {
-	// 	if (currentState == null) {
-	// 		if (world == null) {
-	// 			return BlockUtils.AIR_STATE;
-	// 		}
+    // public IBlockState createState(IBlockState state) {
+    // return state;
+    // }
 
-	// 		currentState = createState(world.getBlockState(getPos()));
-	// 	}
+    // public IBlockState getBlockState() {
+    // if (currentState == null) {
+    // if (world == null) {
+    // return BlockUtils.AIR_STATE;
+    // }
 
-	// 	return currentState;
-	// }
+    // currentState = createState(world.getBlockState(getPos()));
+    // }
 
-	// public void notifyNeighbors() {
-	// 	world.notifyNeighborsOfStateChange(getPos(), getBlockType(), false);
-	// }
+    // return currentState;
+    // }
 
-	// public void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
-	// 	world.playSound(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, event, category, volume, pitch);
-	// }
+    // public void notifyNeighbors() {
+    // world.notifyNeighborsOfStateChange(getPos(), getBlockType(), false);
+    // }
 
-	// public BlockDimPos getDimPos() {
-	// 	return new BlockDimPos(pos, hasWorld() ? world.provider.getDimension() : 0);
-	// }
+    // public void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
+    // world.playSound(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, event, category, volume, pitch);
+    // }
 
-	// public void writeToPickBlock(ItemStack stack) {
-	// 	writeToItem(stack);
-	// }
+    // public BlockDimPos getDimPos() {
+    // return new BlockDimPos(pos, hasWorld() ? world.provider.getDimension() : 0);
+    // }
 
-	// public void writeToItem(ItemStack stack) {
-	// 	NBTTagCompound nbt = new NBTTagCompound();
-	// 	writeData(nbt, EnumSaveType.ITEM);
+    // public void writeToPickBlock(ItemStack stack) {
+    // writeToItem(stack);
+    // }
 
-	// 	if (!nbt.hasNoTags()) {
-	// 		TileEntity.addMapping(getClass(), getName());
-	// 		ResourceLocation id = getKey(getClass());
+    // public void writeToItem(ItemStack stack) {
+    // NBTTagCompound nbt = new NBTTagCompound();
+    // writeData(nbt, EnumSaveType.ITEM);
 
-	// 		if (id != null) {
-	// 			nbt.setString("id", id.toString());
-	// 		}
+    // if (!nbt.hasNoTags()) {
+    // TileEntity.addMapping(getClass(), getName());
+    // ResourceLocation id = getKey(getClass());
 
-	// 		NBTTagList lore = new NBTTagList();
-	// 		lore.appendTag(new NBTTagString("(+NBT)"));
-	// 		NBTTagCompound display = new NBTTagCompound();
-	// 		display.setTag("Lore", lore);
-	// 		stack.setTagInfo("display", display);
-	// 		stack.setTagInfo(BlockUtils.DATA_TAG, nbt);
-	// 	}
-	// }
+    // if (id != null) {
+    // nbt.setString("id", id.toString());
+    // }
 
-	public void readFromItem(ItemStack stack) {
-		NBTTagCompound nbt = BlockUtils.getData(stack);
+    // NBTTagList lore = new NBTTagList();
+    // lore.appendTag(new NBTTagString("(+NBT)"));
+    // NBTTagCompound display = new NBTTagCompound();
+    // display.setTag("Lore", lore);
+    // stack.setTagInfo("display", display);
+    // stack.setTagInfo(BlockUtils.DATA_TAG, nbt);
+    // }
+    // }
 
-		if (!nbt.hasNoTags()) {
-			readData(nbt, EnumSaveType.ITEM);
-		}
-	}
+    public void readFromItem(ItemStack stack) {
+        NBTTagCompound nbt = BlockUtils.getData(stack);
+
+        if (!nbt.hasNoTags()) {
+            readData(nbt, EnumSaveType.ITEM);
+        }
+    }
 }

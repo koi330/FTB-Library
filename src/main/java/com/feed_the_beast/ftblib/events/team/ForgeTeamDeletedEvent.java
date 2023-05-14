@@ -1,24 +1,22 @@
 package com.feed_the_beast.ftblib.events.team;
 
-import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
-
 import java.io.File;
+
+import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 
 /**
  * @author LatvianModder
  */
-public class ForgeTeamDeletedEvent extends ForgeTeamEvent
-{
-	private final File folder;
+public class ForgeTeamDeletedEvent extends ForgeTeamEvent {
 
-	public ForgeTeamDeletedEvent(ForgeTeam team, File f)
-	{
-		super(team);
-		folder = f;
-	}
+    private final File folder;
 
-	public File getDataFolder()
-	{
-		return folder;
-	}
+    public ForgeTeamDeletedEvent(ForgeTeam team, File f) {
+        super(team);
+        folder = f;
+    }
+
+    public File getDataFolder() {
+        return folder;
+    }
 }

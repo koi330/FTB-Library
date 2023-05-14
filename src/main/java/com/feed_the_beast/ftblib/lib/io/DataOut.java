@@ -1,16 +1,11 @@
 package com.feed_the_beast.ftblib.lib.io;
 
-import com.feed_the_beast.ftblib.lib.icon.Icon;
-import com.feed_the_beast.ftblib.lib.math.BlockDimPos;
-import com.feed_the_beast.ftblib.lib.util.JsonUtils;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
-import cpw.mods.fml.common.registry.GameData;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.handler.codec.EncoderException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
@@ -20,358 +15,368 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraftforge.common.util.Constants;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import com.feed_the_beast.ftblib.lib.icon.Icon;
+import com.feed_the_beast.ftblib.lib.math.BlockDimPos;
+import com.feed_the_beast.ftblib.lib.util.JsonUtils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonPrimitive;
+
+import cpw.mods.fml.common.registry.GameData;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.handler.codec.EncoderException;
 
 /**
  * @author LatvianModder
  */
 public class DataOut {
-	@FunctionalInterface
-	public interface Serializer<T> {
-		void write(DataOut data, T object);
-	}
 
-	public static final Serializer<String> STRING = DataOut::writeString;
-	public static final Serializer<Integer> INT = DataOut::writeInt;
-	public static final Serializer<Boolean> BOOLEAN = DataOut::writeBoolean;
-	public static final Serializer<UUID> UUID = DataOut::writeUUID;
-	public static final Serializer<Vec3> BLOCK_POS = DataOut::writePos;
-	public static final Serializer<BlockDimPos> BLOCK_DIM_POS = DataOut::writeDimPos;
-	public static final Serializer<JsonElement> JSON = DataOut::writeJson;
-	public static final Serializer<IChatComponent> TEXT_COMPONENT = DataOut::writeTextComponent;
-	public static final Serializer<ResourceLocation> RESOURCE_LOCATION = DataOut::writeResourceLocation;
-	public static final Serializer<ItemStack> ITEM_STACK = DataOut::writeItemStack;
+    @FunctionalInterface
+    public interface Serializer<T> {
 
-	public static final DataOut.Serializer<ChunkCoordIntPair> CHUNK_POS = (data, pos) -> {
-		data.writeVarInt(pos.chunkXPos);
-		data.writeVarInt(pos.chunkZPos);
-	};
+        void write(DataOut data, T object);
+    }
 
-	private final ByteBuf byteBuf;
+    public static final Serializer<String> STRING = DataOut::writeString;
+    public static final Serializer<Integer> INT = DataOut::writeInt;
+    public static final Serializer<Boolean> BOOLEAN = DataOut::writeBoolean;
+    public static final Serializer<UUID> UUID = DataOut::writeUUID;
+    public static final Serializer<Vec3> BLOCK_POS = DataOut::writePos;
+    public static final Serializer<BlockDimPos> BLOCK_DIM_POS = DataOut::writeDimPos;
+    public static final Serializer<JsonElement> JSON = DataOut::writeJson;
+    public static final Serializer<IChatComponent> TEXT_COMPONENT = DataOut::writeTextComponent;
+    public static final Serializer<ResourceLocation> RESOURCE_LOCATION = DataOut::writeResourceLocation;
+    public static final Serializer<ItemStack> ITEM_STACK = DataOut::writeItemStack;
 
-	public DataOut(ByteBuf io) {
-		byteBuf = io;
-	}
+    public static final DataOut.Serializer<ChunkCoordIntPair> CHUNK_POS = (data, pos) -> {
+        data.writeVarInt(pos.chunkXPos);
+        data.writeVarInt(pos.chunkZPos);
+    };
 
-	public int getPosition() {
-		return byteBuf.writerIndex();
-	}
+    private final ByteBuf byteBuf;
 
-	public void writeBoolean(boolean value) {
-		byteBuf.writeBoolean(value);
-	}
+    public DataOut(ByteBuf io) {
+        byteBuf = io;
+    }
 
-	public void writeByte(int value) {
-		byteBuf.writeByte(value);
-	}
+    public int getPosition() {
+        return byteBuf.writerIndex();
+    }
 
-	public void writeBytes(byte[] bytes, int off, int len) {
-		byteBuf.writeBytes(bytes, off, len);
-	}
+    public void writeBoolean(boolean value) {
+        byteBuf.writeBoolean(value);
+    }
 
-	public void writeBytes(byte[] bytes) {
-		writeBytes(bytes, 0, bytes.length);
-	}
+    public void writeByte(int value) {
+        byteBuf.writeByte(value);
+    }
 
-	public void writeShort(int value) {
-		byteBuf.writeShort(value);
-	}
+    public void writeBytes(byte[] bytes, int off, int len) {
+        byteBuf.writeBytes(bytes, off, len);
+    }
 
-	public void writeInt(int value) {
-		byteBuf.writeInt(value);
-	}
+    public void writeBytes(byte[] bytes) {
+        writeBytes(bytes, 0, bytes.length);
+    }
 
-	public void writeLong(long value) {
-		byteBuf.writeLong(value);
-	}
+    public void writeShort(int value) {
+        byteBuf.writeShort(value);
+    }
 
-	public void writeFloat(float value) {
-		byteBuf.writeFloat(value);
-	}
+    public void writeInt(int value) {
+        byteBuf.writeInt(value);
+    }
 
-	public void writeDouble(double value) {
-		byteBuf.writeDouble(value);
-	}
+    public void writeLong(long value) {
+        byteBuf.writeLong(value);
+    }
 
-	public void writePos(Vec3 pos) {
-		writeVarInt((int) pos.xCoord);
-		writeVarInt((int) pos.yCoord);
-		writeVarInt((int) pos.zCoord);
-	}
+    public void writeFloat(float value) {
+        byteBuf.writeFloat(value);
+    }
 
-	public void writeDimPos(BlockDimPos pos) {
-		writeVarInt(pos.dim);
-		writeVarInt(pos.posX);
-		writeVarInt(pos.posY);
-		writeVarInt(pos.posZ);
-	}
+    public void writeDouble(double value) {
+        byteBuf.writeDouble(value);
+    }
 
-	public void writeUUID(UUID id) {
-		writeLong(id.getMostSignificantBits());
-		writeLong(id.getLeastSignificantBits());
-	}
+    public void writePos(Vec3 pos) {
+        writeVarInt((int) pos.xCoord);
+        writeVarInt((int) pos.yCoord);
+        writeVarInt((int) pos.zCoord);
+    }
 
-	public void writeString(String string) {
-		if (string.isEmpty()) {
-			writeVarInt(0);
-			return;
-		}
+    public void writeDimPos(BlockDimPos pos) {
+        writeVarInt(pos.dim);
+        writeVarInt(pos.posX);
+        writeVarInt(pos.posY);
+        writeVarInt(pos.posZ);
+    }
 
-		byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-		writeVarInt(bytes.length);
-		writeBytes(bytes);
-	}
+    public void writeUUID(UUID id) {
+        writeLong(id.getMostSignificantBits());
+        writeLong(id.getLeastSignificantBits());
+    }
 
-	public <T> void writeCollection(Collection<T> collection, Serializer<T> serializer) {
-		int size = collection.size();
+    public void writeString(String string) {
+        if (string.isEmpty()) {
+            writeVarInt(0);
+            return;
+        }
 
-		if (size == 0) {
-			writeVarInt(0);
-			return;
-		}
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+        writeVarInt(bytes.length);
+        writeBytes(bytes);
+    }
 
-		if (collection instanceof Set) {
-			writeVarInt(-size);
-		} else {
-			writeVarInt(size);
-		}
+    public <T> void writeCollection(Collection<T> collection, Serializer<T> serializer) {
+        int size = collection.size();
 
-		for (T object : collection) {
-			serializer.write(this, object);
-		}
-	}
+        if (size == 0) {
+            writeVarInt(0);
+            return;
+        }
 
-	public <K, V> void writeMap(Map<K, V> map, Serializer<K> keySerializer, Serializer<V> valueSerializer) {
-		int size = map.size();
+        if (collection instanceof Set) {
+            writeVarInt(-size);
+        } else {
+            writeVarInt(size);
+        }
 
-		if (size == 0) {
-			writeVarInt(0);
-			return;
-		}
+        for (T object : collection) {
+            serializer.write(this, object);
+        }
+    }
 
-		if (map instanceof LinkedHashMap || map instanceof SortedMap) {
-			writeVarInt(-size);
-		} else {
-			writeVarInt(size);
-		}
+    public <K, V> void writeMap(Map<K, V> map, Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+        int size = map.size();
 
-		for (Map.Entry<K, V> entry : map.entrySet()) {
-			keySerializer.write(this, entry.getKey());
-			valueSerializer.write(this, entry.getValue());
-		}
-	}
+        if (size == 0) {
+            writeVarInt(0);
+            return;
+        }
 
-	public void writeItemStack(ItemStack stack) {
-		if (stack == null || GameData.getItemRegistry().getNameForObject(stack.getItem()) == null) {
-			writeVarInt(0);
-			return;
-		}
+        if (map instanceof LinkedHashMap || map instanceof SortedMap) {
+            writeVarInt(-size);
+        } else {
+            writeVarInt(size);
+        }
 
-		writeVarInt(Item.getIdFromItem(stack.getItem()));
-		writeVarInt(stack.stackSize);
-		writeVarInt(stack.getItemDamage());
-		writeNBT(stack.getItem().isDamageable() || stack.getItem().getShareTag() ? stack.getTagCompound() : null);
-	}
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            keySerializer.write(this, entry.getKey());
+            valueSerializer.write(this, entry.getValue());
+        }
+    }
 
-	public void writeNBT(@Nullable NBTTagCompound nbt) {
-		if (nbt == null) {
-			writeByte(0);
-		} else {
-			try {
-				CompressedStreamTools.write(nbt, new ByteBufOutputStream(byteBuf));
-			} catch (IOException ex) {
-				throw new EncoderException(ex);
-			}
-		}
-	}
+    public void writeItemStack(ItemStack stack) {
+        if (stack == null || GameData.getItemRegistry().getNameForObject(stack.getItem()) == null) {
+            writeVarInt(0);
+            return;
+        }
 
-	public void writeNBTBase(@Nullable NBTBase nbt) {
-		if (nbt == null || nbt.getId() == Constants.NBT.TAG_END) {
-			writeByte(Constants.NBT.TAG_END);
-			return;
-		}
+        writeVarInt(Item.getIdFromItem(stack.getItem()));
+        writeVarInt(stack.stackSize);
+        writeVarInt(stack.getItemDamage());
+        writeNBT(stack.getItem().isDamageable() || stack.getItem().getShareTag() ? stack.getTagCompound() : null);
+    }
 
-		writeByte(nbt.getId());
+    public void writeNBT(@Nullable NBTTagCompound nbt) {
+        if (nbt == null) {
+            writeByte(0);
+        } else {
+            try {
+                CompressedStreamTools.write(nbt, new ByteBufOutputStream(byteBuf));
+            } catch (IOException ex) {
+                throw new EncoderException(ex);
+            }
+        }
+    }
 
-		switch (nbt.getId()) {
-			case Constants.NBT.TAG_BYTE:
-				writeByte(((NBTTagByte) nbt).func_150290_f());
-				return;
-			case Constants.NBT.TAG_SHORT:
-				writeShort(((NBTTagShort) nbt).func_150289_e());
-				return;
-			case Constants.NBT.TAG_INT:
-				writeInt(((NBTTagInt) nbt).func_150287_d());
-				return;
-			case Constants.NBT.TAG_LONG:
-				writeLong(((NBTTagLong) nbt).func_150291_c());
-				return;
-			case Constants.NBT.TAG_FLOAT:
-				writeFloat(((NBTTagFloat) nbt).func_150288_h());
-				return;
-			case Constants.NBT.TAG_DOUBLE:
-				writeDouble(((NBTTagDouble) nbt).func_150286_g());
-				return;
-			// TAG_BYTE_ARRAY
-			case Constants.NBT.TAG_STRING:
-				writeString(((NBTTagString) nbt).func_150285_a_());
-				return;
-			// TAG_LIST
-			case Constants.NBT.TAG_COMPOUND:
-				writeNBT((NBTTagCompound) nbt);
-				return;
-			// TAG_INT_ARRAY
-			// TAG_LONG_ARRAY
-			default:
-				NBTTagCompound nbt1 = new NBTTagCompound();
-				nbt1.setTag("_", nbt);
-				writeNBT(nbt1);
-		}
-	}
+    public void writeNBTBase(@Nullable NBTBase nbt) {
+        if (nbt == null || nbt.getId() == Constants.NBT.TAG_END) {
+            writeByte(Constants.NBT.TAG_END);
+            return;
+        }
 
-	public void writeResourceLocation(ResourceLocation r) {
-		writeString(r.toString());
-	}
+        writeByte(nbt.getId());
 
-	public int writeJson(@Nullable JsonElement element) {
-		if (JsonUtils.isNull(element)) {
-			writeByte(0);
-			return 0;
-		} else if (element.isJsonObject()) {
-			writeByte(1);
+        switch (nbt.getId()) {
+            case Constants.NBT.TAG_BYTE:
+                writeByte(((NBTTagByte) nbt).func_150290_f());
+                return;
+            case Constants.NBT.TAG_SHORT:
+                writeShort(((NBTTagShort) nbt).func_150289_e());
+                return;
+            case Constants.NBT.TAG_INT:
+                writeInt(((NBTTagInt) nbt).func_150287_d());
+                return;
+            case Constants.NBT.TAG_LONG:
+                writeLong(((NBTTagLong) nbt).func_150291_c());
+                return;
+            case Constants.NBT.TAG_FLOAT:
+                writeFloat(((NBTTagFloat) nbt).func_150288_h());
+                return;
+            case Constants.NBT.TAG_DOUBLE:
+                writeDouble(((NBTTagDouble) nbt).func_150286_g());
+                return;
+            // TAG_BYTE_ARRAY
+            case Constants.NBT.TAG_STRING:
+                writeString(((NBTTagString) nbt).func_150285_a_());
+                return;
+            // TAG_LIST
+            case Constants.NBT.TAG_COMPOUND:
+                writeNBT((NBTTagCompound) nbt);
+                return;
+            // TAG_INT_ARRAY
+            // TAG_LONG_ARRAY
+            default:
+                NBTTagCompound nbt1 = new NBTTagCompound();
+                nbt1.setTag("_", nbt);
+                writeNBT(nbt1);
+        }
+    }
 
-			Set<Map.Entry<String, JsonElement>> set = element.getAsJsonObject().entrySet();
-			Map<String, JsonElement> map = new LinkedHashMap<>(set.size());
+    public void writeResourceLocation(ResourceLocation r) {
+        writeString(r.toString());
+    }
 
-			for (Map.Entry<String, JsonElement> entry : set) {
-				map.put(entry.getKey(), entry.getValue());
-			}
+    public int writeJson(@Nullable JsonElement element) {
+        if (JsonUtils.isNull(element)) {
+            writeByte(0);
+            return 0;
+        } else if (element.isJsonObject()) {
+            writeByte(1);
 
-			writeMap(map, STRING, JSON);
-			return 1;
-		} else if (element.isJsonArray()) {
-			writeByte(2);
+            Set<Map.Entry<String, JsonElement>> set = element.getAsJsonObject().entrySet();
+            Map<String, JsonElement> map = new LinkedHashMap<>(set.size());
 
-			JsonArray json = element.getAsJsonArray();
-			Collection<JsonElement> collection = new ArrayList<>(json.size());
+            for (Map.Entry<String, JsonElement> entry : set) {
+                map.put(entry.getKey(), entry.getValue());
+            }
 
-			for (JsonElement json1 : json) {
-				collection.add(json1);
-			}
+            writeMap(map, STRING, JSON);
+            return 1;
+        } else if (element.isJsonArray()) {
+            writeByte(2);
 
-			writeCollection(collection, JSON);
-			return 2;
-		}
+            JsonArray json = element.getAsJsonArray();
+            Collection<JsonElement> collection = new ArrayList<>(json.size());
 
-		JsonPrimitive primitive = element.getAsJsonPrimitive();
+            for (JsonElement json1 : json) {
+                collection.add(json1);
+            }
 
-		if (primitive.isBoolean()) {
-			if (primitive.getAsBoolean()) {
-				writeByte(5);
-				return 5;
-			} else {
-				writeByte(6);
-				return 6;
-			}
-		} else if (primitive.isNumber()) {
-			if (primitive == JsonUtils.JSON_ZERO) {
-				writeByte(4);
-				return 4;
-			}
+            writeCollection(collection, JSON);
+            return 2;
+        }
 
-			Number number = primitive.getAsNumber();
+        JsonPrimitive primitive = element.getAsJsonPrimitive();
 
-			if (number.doubleValue() == 0D) {
-				writeByte(4);
-				return 4;
-			}
+        if (primitive.isBoolean()) {
+            if (primitive.getAsBoolean()) {
+                writeByte(5);
+                return 5;
+            } else {
+                writeByte(6);
+                return 6;
+            }
+        } else if (primitive.isNumber()) {
+            if (primitive == JsonUtils.JSON_ZERO) {
+                writeByte(4);
+                return 4;
+            }
 
-			Class<? extends Number> n = number.getClass();
+            Number number = primitive.getAsNumber();
 
-			if (n == Float.class) {
-				writeByte(8);
-				writeFloat(primitive.getAsFloat());
-				return 8;
-			} else if (n == Double.class) {
-				writeByte(9);
-				writeDouble(primitive.getAsDouble());
-				return 9;
-			} else {
-				writeByte(7);
-				writeVarLong(primitive.getAsLong());
-				return 7;
-			}
-		}
+            if (number.doubleValue() == 0D) {
+                writeByte(4);
+                return 4;
+            }
 
-		String string = primitive.getAsString();
+            Class<? extends Number> n = number.getClass();
 
-		if (string.isEmpty()) {
-			writeByte(10);
-			return 10;
-		}
+            if (n == Float.class) {
+                writeByte(8);
+                writeFloat(primitive.getAsFloat());
+                return 8;
+            } else if (n == Double.class) {
+                writeByte(9);
+                writeDouble(primitive.getAsDouble());
+                return 9;
+            } else {
+                writeByte(7);
+                writeVarLong(primitive.getAsLong());
+                return 7;
+            }
+        }
 
-		writeByte(3);
-		writeString(string);
-		return 3;
-	}
+        String string = primitive.getAsString();
 
-	public void writeTextComponent(@Nullable IChatComponent component) {
-		writeJson(JsonUtils.serializeTextComponent(component));
-	}
+        if (string.isEmpty()) {
+            writeByte(10);
+            return 10;
+        }
 
-	// public void writeBlockState(IBlockState state) {
-	// 	writeInt(state == BlockUtils.AIR_STATE ? 0 : Block.getStateId(state));
-	// }
+        writeByte(3);
+        writeString(string);
+        return 3;
+    }
 
-	public void writeIcon(@Nullable Icon icon) {
-		writeJson(icon == null || icon.isEmpty() ? JsonNull.INSTANCE : icon.getJson());
-	}
+    public void writeTextComponent(@Nullable IChatComponent component) {
+        writeJson(JsonUtils.serializeTextComponent(component));
+    }
 
-	public void writeIntList(Collection<Integer> collection) {
-		writeVarInt(collection.size());
+    // public void writeBlockState(IBlockState state) {
+    // writeInt(state == BlockUtils.AIR_STATE ? 0 : Block.getStateId(state));
+    // }
 
-		if (!collection.isEmpty()) {
-			Iterator<Integer> iterator = collection.iterator();
+    public void writeIcon(@Nullable Icon icon) {
+        writeJson(icon == null || icon.isEmpty() ? JsonNull.INSTANCE : icon.getJson());
+    }
 
-			while (iterator.hasNext()) {
-				writeInt(iterator.next());
-			}
-		}
-	}
+    public void writeIntList(Collection<Integer> collection) {
+        writeVarInt(collection.size());
 
-	public void writeVarInt(int value) {
-		if (value > Short.MAX_VALUE || value < Short.MIN_VALUE) {
-			writeByte(123);
-			writeInt(value);
-		} else if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
-			writeByte(122);
-			writeShort(value);
-		} else if (value >= 121 && value <= 123) {
-			writeByte(121);
-			writeByte(value);
-		} else {
-			writeByte(value);
-		}
-	}
+        if (!collection.isEmpty()) {
+            Iterator<Integer> iterator = collection.iterator();
 
-	public void writeVarLong(long value) {
-		if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
-			writeByte(124);
-			writeLong(value);
-		} else if (value > Short.MAX_VALUE || value < Short.MIN_VALUE) {
-			writeByte(123);
-			writeInt((int) value);
-		} else if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
-			writeByte(122);
-			writeShort((int) value);
-		} else if (value >= 121 && value <= 124) {
-			writeByte(121);
-			writeByte((int) value);
-		} else {
-			writeByte((int) value);
-		}
-	}
+            while (iterator.hasNext()) {
+                writeInt(iterator.next());
+            }
+        }
+    }
+
+    public void writeVarInt(int value) {
+        if (value > Short.MAX_VALUE || value < Short.MIN_VALUE) {
+            writeByte(123);
+            writeInt(value);
+        } else if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
+            writeByte(122);
+            writeShort(value);
+        } else if (value >= 121 && value <= 123) {
+            writeByte(121);
+            writeByte(value);
+        } else {
+            writeByte(value);
+        }
+    }
+
+    public void writeVarLong(long value) {
+        if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
+            writeByte(124);
+            writeLong(value);
+        } else if (value > Short.MAX_VALUE || value < Short.MIN_VALUE) {
+            writeByte(123);
+            writeInt((int) value);
+        } else if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
+            writeByte(122);
+            writeShort((int) value);
+        } else if (value >= 121 && value <= 124) {
+            writeByte(121);
+            writeByte((int) value);
+        } else {
+            writeByte((int) value);
+        }
+    }
 }

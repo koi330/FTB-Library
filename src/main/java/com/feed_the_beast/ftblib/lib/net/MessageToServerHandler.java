@@ -10,20 +10,18 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 /**
  * @author LatvianModder
  */
-enum MessageToServerHandler implements IMessageHandler<MessageToServer, IMessage>
-{
-	INSTANCE;
+enum MessageToServerHandler implements IMessageHandler<MessageToServer, IMessage> {
 
-	@Override
-	public IMessage onMessage(MessageToServer message, MessageContext context)
-	{
-			if (FTBLibConfig.debugging.log_network)
-			{
-				FTBLib.LOGGER.info("Net TX: " + message.getClass().getName());
-			}
+    INSTANCE;
 
-			message.onMessage(context.getServerHandler().playerEntity);
+    @Override
+    public IMessage onMessage(MessageToServer message, MessageContext context) {
+        if (FTBLibConfig.debugging.log_network) {
+            FTBLib.LOGGER.info("Net TX: " + message.getClass().getName());
+        }
 
-		return null;
-	}
+        message.onMessage(context.getServerHandler().playerEntity);
+
+        return null;
+    }
 }

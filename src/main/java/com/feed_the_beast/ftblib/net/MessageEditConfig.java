@@ -7,6 +7,7 @@ import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.net.MessageToClient;
 import com.feed_the_beast.ftblib.lib.net.NetworkWrapper;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -14,37 +15,37 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author LatvianModder
  */
 public class MessageEditConfig extends MessageToClient {
-	private static final IConfigCallback RX_CONFIG_TREE = (group,
-			sender) -> new MessageEditConfigResponse(group.serializeNBT()).sendToServer();
 
-	private ConfigGroup group;
+    private static final IConfigCallback RX_CONFIG_TREE = (group,
+            sender) -> new MessageEditConfigResponse(group.serializeNBT()).sendToServer();
 
-	public MessageEditConfig() {
-	}
+    private ConfigGroup group;
 
-	public MessageEditConfig(ConfigGroup _group) {
-		group = _group;
-		// TODO: Logger
-	}
+    public MessageEditConfig() {}
 
-	@Override
-	public NetworkWrapper getWrapper() {
-		return FTBLibNetHandler.EDIT_CONFIG;
-	}
+    public MessageEditConfig(ConfigGroup _group) {
+        group = _group;
+        // TODO: Logger
+    }
 
-	@Override
-	public void writeData(DataOut data) {
-		ConfigGroup.SERIALIZER.write(data, group);
-	}
+    @Override
+    public NetworkWrapper getWrapper() {
+        return FTBLibNetHandler.EDIT_CONFIG;
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		group = ConfigGroup.DESERIALIZER.read(data);
-	}
+    @Override
+    public void writeData(DataOut data) {
+        ConfigGroup.SERIALIZER.write(data, group);
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void onMessage() {
-		new GuiEditConfig(group, RX_CONFIG_TREE).openGui();
-	}
+    @Override
+    public void readData(DataIn data) {
+        group = ConfigGroup.DESERIALIZER.read(data);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void onMessage() {
+        new GuiEditConfig(group, RX_CONFIG_TREE).openGui();
+    }
 }

@@ -3,9 +3,9 @@ package com.feed_the_beast.ftblib.lib.gui.misc;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.sound.SoundEvent;
 
 public interface IToast {
+
     ResourceLocation TEXTURE_TOASTS = new ResourceLocation("textures/gui/toasts.png");
     Object NO_TOKEN = new Object();
 
@@ -16,6 +16,7 @@ public interface IToast {
     }
 
     public static enum Visibility {
+
         SHOW(new ResourceLocation("ui.toast.in")),
         HIDE(new ResourceLocation("ui.toast.out"));
 

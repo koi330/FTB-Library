@@ -1,5 +1,9 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
+
 import com.feed_the_beast.ftblib.lib.config.ConfigGroup;
 import com.feed_the_beast.ftblib.lib.config.ConfigValue;
 import com.feed_the_beast.ftblib.lib.config.ConfigValueInstance;
@@ -11,144 +15,123 @@ import com.feed_the_beast.ftblib.lib.gui.TextBox;
 import com.feed_the_beast.ftblib.lib.gui.WidgetType;
 import com.feed_the_beast.ftblib.lib.icon.Icon;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 
-public class GuiEditConfigValue extends GuiBase
-{
-	private final ConfigValueInstance inst;
-	private final ConfigValue value;
-	private final IConfigValueEditCallback callback;
+public class GuiEditConfigValue extends GuiBase {
 
-	private final Button buttonCancel, buttonAccept;
-	private final TextBox textBox;
+    private final ConfigValueInstance inst;
+    private final ConfigValue value;
+    private final IConfigValueEditCallback callback;
 
-	public GuiEditConfigValue(ConfigValueInstance val, IConfigValueEditCallback c)
-	{
-		setSize(230, 54);
-		inst = val;
-		value = inst.getValue().copy();
-		callback = c;
+    private final Button buttonCancel, buttonAccept;
+    private final TextBox textBox;
 
-		int bsize = width / 2 - 10;
+    public GuiEditConfigValue(ConfigValueInstance val, IConfigValueEditCallback c) {
+        setSize(230, 54);
+        inst = val;
+        value = inst.getValue().copy();
+        callback = c;
 
-		buttonCancel = new SimpleTextButton(this, I18n.format("gui.cancel"), Icon.EMPTY)
-		{
-			@Override
-			public void onClicked(MouseButton button)
-			{
-				GuiHelper.playClickSound();
-				callback.onCallback(inst.getValue(), false);
-			}
+        int bsize = width / 2 - 10;
 
-			@Override
-			public boolean renderTitleInCenter()
-			{
-				return true;
-			}
-		};
+        buttonCancel = new SimpleTextButton(this, I18n.format("gui.cancel"), Icon.EMPTY) {
 
-		buttonCancel.setPosAndSize(8, height - 24, bsize, 16);
+            @Override
+            public void onClicked(MouseButton button) {
+                GuiHelper.playClickSound();
+                callback.onCallback(inst.getValue(), false);
+            }
 
-		buttonAccept = new SimpleTextButton(this, I18n.format("gui.accept"), Icon.EMPTY)
-		{
-			@Override
-			public void onClicked(MouseButton button)
-			{
-				GuiHelper.playClickSound();
+            @Override
+            public boolean renderTitleInCenter() {
+                return true;
+            }
+        };
 
-				if (value.setValueFromString(Minecraft.getMinecraft().thePlayer, textBox.getText(), false))
-				{
-					callback.onCallback(value, true);
-				}
+        buttonCancel.setPosAndSize(8, height - 24, bsize, 16);
 
-				if (getGui().parent instanceof GuiBase)
-				{
-					getGui().parent.closeContextMenu();
-				}
-			}
+        buttonAccept = new SimpleTextButton(this, I18n.format("gui.accept"), Icon.EMPTY) {
 
-			@Override
-			public WidgetType getWidgetType()
-			{
-				return inst.getCanEdit() && textBox.isTextValid() ? super.getWidgetType() : WidgetType.DISABLED;
-			}
+            @Override
+            public void onClicked(MouseButton button) {
+                GuiHelper.playClickSound();
 
-			@Override
-			public boolean renderTitleInCenter()
-			{
-				return true;
-			}
-		};
+                if (value.setValueFromString(Minecraft.getMinecraft().thePlayer, textBox.getText(), false)) {
+                    callback.onCallback(value, true);
+                }
 
-		buttonAccept.setPosAndSize(width - bsize - 8, height - 24, bsize, 16);
+                if (getGui().parent instanceof GuiBase) {
+                    getGui().parent.closeContextMenu();
+                }
+            }
 
-		textBox = new TextBox(this)
-		{
-			@Override
-			public boolean allowInput()
-			{
-				return inst.getCanEdit();
-			}
+            @Override
+            public WidgetType getWidgetType() {
+                return inst.getCanEdit() && textBox.isTextValid() ? super.getWidgetType() : WidgetType.DISABLED;
+            }
 
-			@Override
-			public boolean isValid(String txt)
-			{
-				return value.setValueFromString(Minecraft.getMinecraft().thePlayer, txt, true);
-			}
+            @Override
+            public boolean renderTitleInCenter() {
+                return true;
+            }
+        };
 
-			@Override
-			public void onTextChanged()
-			{
-				textBox.textColor = value.getColor();
-			}
+        buttonAccept.setPosAndSize(width - bsize - 8, height - 24, bsize, 16);
 
-			@Override
-			public void onEnterPressed()
-			{
-				if (inst.getCanEdit())
-				{
-					buttonAccept.onClicked(MouseButton.LEFT);
-				}
-			}
-		};
+        textBox = new TextBox(this) {
 
-		textBox.setPosAndSize(8, 8, width - 16, 16);
-		textBox.setText(value.getString());
-		textBox.setCursorPosition(textBox.getText().length());
-		textBox.setFocused(true);
-	}
+            @Override
+            public boolean allowInput() {
+                return inst.getCanEdit();
+            }
 
-	public GuiEditConfigValue(String name, ConfigValue val, IConfigValueEditCallback c)
-	{
-		this(new ConfigValueInstance(name, ConfigGroup.DEFAULT, val), c);
-	}
+            @Override
+            public boolean isValid(String txt) {
+                return value.setValueFromString(Minecraft.getMinecraft().thePlayer, txt, true);
+            }
 
-	@Override
-	public boolean onClosedByKey(int key)
-	{
-		if (super.onClosedByKey(key))
-		{
-			callback.onCallback(inst.getValue(), false);
-			return false;
-		}
+            @Override
+            public void onTextChanged() {
+                textBox.textColor = value.getColor();
+            }
 
-		return false;
-	}
+            @Override
+            public void onEnterPressed() {
+                if (inst.getCanEdit()) {
+                    buttonAccept.onClicked(MouseButton.LEFT);
+                }
+            }
+        };
 
-	@Override
-	public void addWidgets()
-	{
-		add(buttonCancel);
-		add(buttonAccept);
-		add(textBox);
-	}
+        textBox.setPosAndSize(8, 8, width - 16, 16);
+        textBox.setText(value.getString());
+        textBox.setCursorPosition(textBox.getText().length());
+        textBox.setFocused(true);
+    }
 
-	@Override
-	public boolean doesGuiPauseGame()
-	{
-		GuiScreen screen = getPrevScreen();
-		return screen != null && screen.doesGuiPauseGame();
-	}
+    public GuiEditConfigValue(String name, ConfigValue val, IConfigValueEditCallback c) {
+        this(new ConfigValueInstance(name, ConfigGroup.DEFAULT, val), c);
+    }
+
+    @Override
+    public boolean onClosedByKey(int key) {
+        if (super.onClosedByKey(key)) {
+            callback.onCallback(inst.getValue(), false);
+            return false;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void addWidgets() {
+        add(buttonCancel);
+        add(buttonAccept);
+        add(textBox);
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        GuiScreen screen = getPrevScreen();
+        return screen != null && screen.doesGuiPauseGame();
+    }
 }

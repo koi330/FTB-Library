@@ -3,11 +3,11 @@ package com.feed_the_beast.ftblib.lib.util.text_components;
 import java.util.List;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentStyle;
 import net.minecraft.util.IChatComponent;
 
 public class ChatComponentScore extends ChatComponentStyle {
+
     public final String name;
     public final String objective;
 
@@ -65,6 +65,15 @@ public class ChatComponentScore extends ChatComponentStyle {
 
     @Override
     public String toString() {
-        return "ScoreComponent{name='" + this.name + '\'' + "objective='" + this.objective + '\'' + ", siblings=" + this.siblings + ", style=" + this.getChatStyle() + '}';
+        return "ScoreComponent{name='" + this.name
+                + '\''
+                + "objective='"
+                + this.objective
+                + '\''
+                + ", siblings="
+                + this.siblings
+                + ", style="
+                + this.getChatStyle()
+                + '}';
     }
 }

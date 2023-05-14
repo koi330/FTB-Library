@@ -1,94 +1,96 @@
 package com.feed_the_beast.ftblib.lib.icon;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author LatvianModder
  */
 public class CombinedIcon extends Icon {
-	public static Icon getCombined(Collection<Icon> icons) {
-		List<Icon> list = new ArrayList<>(icons.size());
 
-		for (Icon icon : icons) {
-			if (!icon.isEmpty()) {
-				list.add(icon);
-			}
-		}
+    public static Icon getCombined(Collection<Icon> icons) {
+        List<Icon> list = new ArrayList<>(icons.size());
 
-		if (list.isEmpty()) {
-			return EMPTY;
-		} else if (list.size() == 1) {
-			return list.get(0);
-		}
+        for (Icon icon : icons) {
+            if (!icon.isEmpty()) {
+                list.add(icon);
+            }
+        }
 
-		return new CombinedIcon(list);
-	}
+        if (list.isEmpty()) {
+            return EMPTY;
+        } else if (list.size() == 1) {
+            return list.get(0);
+        }
 
-	public final List<Icon> list;
+        return new CombinedIcon(list);
+    }
 
-	CombinedIcon(Collection<Icon> icons) {
-		list = new ArrayList<>(icons.size());
+    public final List<Icon> list;
 
-		for (Icon icon : icons) {
-			if (!icon.isEmpty()) {
-				list.add(icon);
-			}
-		}
-	}
+    CombinedIcon(Collection<Icon> icons) {
+        list = new ArrayList<>(icons.size());
 
-	CombinedIcon(Icon o1, Icon o2) {
-		list = new ArrayList<>(2);
-		list.add(o1);
-		list.add(o2);
-	}
+        for (Icon icon : icons) {
+            if (!icon.isEmpty()) {
+                list.add(icon);
+            }
+        }
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void draw(int x, int y, int w, int h) {
-		for (Icon icon : list) {
-			icon.draw(x, y, w, h);
-		}
-	}
+    CombinedIcon(Icon o1, Icon o2) {
+        list = new ArrayList<>(2);
+        list.add(o1);
+        list.add(o2);
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void drawStatic(int x, int y, int w, int h) {
-		for (Icon icon : list) {
-			icon.drawStatic(x, y, w, h);
-		}
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void draw(int x, int y, int w, int h) {
+        for (Icon icon : list) {
+            icon.draw(x, y, w, h);
+        }
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void draw3D() {
-		for (Icon icon : list) {
-			icon.draw3D();
-		}
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void drawStatic(int x, int y, int w, int h) {
+        for (Icon icon : list) {
+            icon.drawStatic(x, y, w, h);
+        }
+    }
 
-	@Override
-	public JsonElement getJson() {
-		JsonArray json = new JsonArray();
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void draw3D() {
+        for (Icon icon : list) {
+            icon.draw3D();
+        }
+    }
 
-		for (Icon o : list) {
-			json.add(o.getJson());
-		}
+    @Override
+    public JsonElement getJson() {
+        JsonArray json = new JsonArray();
 
-		return json;
-	}
+        for (Icon o : list) {
+            json.add(o.getJson());
+        }
 
-	public int hashCode() {
-		return list.hashCode();
-	}
+        return json;
+    }
 
-	public boolean equals(Object o) {
-		return o == this || o instanceof CombinedIcon && list.equals(((CombinedIcon) o).list);
-	}
+    public int hashCode() {
+        return list.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        return o == this || o instanceof CombinedIcon && list.equals(((CombinedIcon) o).list);
+    }
 }

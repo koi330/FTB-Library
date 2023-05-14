@@ -1,71 +1,64 @@
 package com.feed_the_beast.ftblib.events.universe;
 
-import com.feed_the_beast.ftblib.lib.data.Universe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
+
+import com.feed_the_beast.ftblib.lib.data.Universe;
 
 /**
  * @author LatvianModder
  */
-public abstract class UniverseLoadedEvent extends UniverseEvent
-{
-	public UniverseLoadedEvent(Universe universe)
-	{
-		super(universe);
-	}
+public abstract class UniverseLoadedEvent extends UniverseEvent {
 
-	public WorldServer getWorld()
-	{
-		return getUniverse().world;
-	}
+    public UniverseLoadedEvent(Universe universe) {
+        super(universe);
+    }
 
-	public static class Pre extends UniverseLoadedEvent
-	{
-		private final NBTTagCompound data;
+    public WorldServer getWorld() {
+        return getUniverse().world;
+    }
 
-		public Pre(Universe universe, NBTTagCompound nbt)
-		{
-			super(universe);
-			data = nbt;
-		}
+    public static class Pre extends UniverseLoadedEvent {
 
-		public NBTTagCompound getData(String id)
-		{
-			NBTTagCompound tag = data.getCompoundTag(id);
-			return tag.hasNoTags() ? data.getCompoundTag(id + ":data") : tag;
-		}
-	}
+        private final NBTTagCompound data;
 
-	public static class CreateServerTeams extends UniverseLoadedEvent
-	{
-		public CreateServerTeams(Universe universe)
-		{
-			super(universe);
-		}
-	}
+        public Pre(Universe universe, NBTTagCompound nbt) {
+            super(universe);
+            data = nbt;
+        }
 
-	public static class Post extends UniverseLoadedEvent
-	{
-		private final NBTTagCompound data;
+        public NBTTagCompound getData(String id) {
+            NBTTagCompound tag = data.getCompoundTag(id);
+            return tag.hasNoTags() ? data.getCompoundTag(id + ":data") : tag;
+        }
+    }
 
-		public Post(Universe universe, NBTTagCompound nbt)
-		{
-			super(universe);
-			data = nbt;
-		}
+    public static class CreateServerTeams extends UniverseLoadedEvent {
 
-		public NBTTagCompound getData(String id)
-		{
-			NBTTagCompound tag = data.getCompoundTag(id);
-			return tag.hasNoTags() ? data.getCompoundTag(id + ":data") : tag;
-		}
-	}
+        public CreateServerTeams(Universe universe) {
+            super(universe);
+        }
+    }
 
-	public static class Finished extends UniverseLoadedEvent
-	{
-		public Finished(Universe universe)
-		{
-			super(universe);
-		}
-	}
+    public static class Post extends UniverseLoadedEvent {
+
+        private final NBTTagCompound data;
+
+        public Post(Universe universe, NBTTagCompound nbt) {
+            super(universe);
+            data = nbt;
+        }
+
+        public NBTTagCompound getData(String id) {
+            NBTTagCompound tag = data.getCompoundTag(id);
+            return tag.hasNoTags() ? data.getCompoundTag(id + ":data") : tag;
+        }
+    }
+
+    public static class Finished extends UniverseLoadedEvent {
+
+        public Finished(Universe universe) {
+            super(universe);
+        }
+    }
 }

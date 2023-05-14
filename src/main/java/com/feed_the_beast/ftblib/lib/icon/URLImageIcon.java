@@ -3,6 +3,12 @@ package com.feed_the_beast.ftblib.lib.icon;
 import java.io.File;
 import java.net.URI;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.util.ResourceLocation;
+
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
 import com.feed_the_beast.ftblib.lib.client.IPixelBuffer;
 import com.feed_the_beast.ftblib.lib.client.PixelBuffer;
@@ -10,83 +16,79 @@ import com.feed_the_beast.ftblib.lib.io.DataReader;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ThreadDownloadImageData;
-import net.minecraft.client.renderer.texture.ITextureObject;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.util.ResourceLocation;
 
 /**
  * @author LatvianModder
  */
 public class URLImageIcon extends ImageIcon {
-	public final URI uri;
-	private final String url;
 
-	public URLImageIcon(ResourceLocation tex, URI _uri) {
-		super(tex);
-		uri = _uri;
-		url = uri.toString();
-	}
+    public final URI uri;
+    private final String url;
 
-	public URLImageIcon(URI uri) {
-		this(new ResourceLocation(uri.toString()), uri);
-	}
+    public URLImageIcon(ResourceLocation tex, URI _uri) {
+        super(tex);
+        uri = _uri;
+        url = uri.toString();
+    }
 
-	@Override
-	public URLImageIcon copy() {
-		URLImageIcon icon = new URLImageIcon(texture, uri);
-		icon.minU = minU;
-		icon.minV = minV;
-		icon.maxU = maxU;
-		icon.maxV = maxV;
-		icon.tileSize = tileSize;
-		return icon;
-	}
+    public URLImageIcon(URI uri) {
+        this(new ResourceLocation(uri.toString()), uri);
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void bindTexture() {
-		TextureManager manager = Minecraft.getMinecraft().getTextureManager();
-		ITextureObject img = manager.getTexture(texture);
+    @Override
+    public URLImageIcon copy() {
+        URLImageIcon icon = new URLImageIcon(texture, uri);
+        icon.minU = minU;
+        icon.minV = minV;
+        icon.maxU = maxU;
+        icon.maxV = maxV;
+        icon.tileSize = tileSize;
+        return icon;
+    }
 
-		if (img == null) {
-			if (uri.getScheme().equals("http") || uri.getScheme().equals("https")) {
-				img = new ThreadDownloadImageData(null, url, MISSING_IMAGE, null);
-			} else {
-				File file = null;
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void bindTexture() {
+        TextureManager manager = Minecraft.getMinecraft().getTextureManager();
+        ITextureObject img = manager.getTexture(texture);
 
-				if (uri.getScheme().equals("file")) {
-					try {
-						file = new File(uri.getPath());
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
+        if (img == null) {
+            if (uri.getScheme().equals("http") || uri.getScheme().equals("https")) {
+                img = new ThreadDownloadImageData(null, url, MISSING_IMAGE, null);
+            } else {
+                File file = null;
 
-				if (file == null) {
-					file = new File(uri);
-				}
+                if (uri.getScheme().equals("file")) {
+                    try {
+                        file = new File(uri.getPath());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
 
-				img = new ThreadDownloadImageData(file, url, MISSING_IMAGE, null);
-			}
+                if (file == null) {
+                    file = new File(uri);
+                }
 
-			manager.loadTexture(texture, img);
-		}
+                img = new ThreadDownloadImageData(file, url, MISSING_IMAGE, null);
+            }
 
-		GlStateManager.bindTexture(img.getGlTextureId());
-	}
+            manager.loadTexture(texture, img);
+        }
 
-	public String toString() {
-		return url;
-	}
+        GlStateManager.bindTexture(img.getGlTextureId());
+    }
 
-	@Override
-	public IPixelBuffer createPixelBuffer() {
-		try {
-			return PixelBuffer.from(DataReader.get(uri, Minecraft.getMinecraft().getProxy()).image());
-		} catch (Exception ex) {
-			return null;
-		}
-	}
+    public String toString() {
+        return url;
+    }
+
+    @Override
+    public IPixelBuffer createPixelBuffer() {
+        try {
+            return PixelBuffer.from(DataReader.get(uri, Minecraft.getMinecraft().getProxy()).image());
+        } catch (Exception ex) {
+            return null;
+        }
+    }
 }

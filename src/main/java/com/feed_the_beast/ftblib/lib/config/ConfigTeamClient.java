@@ -1,5 +1,16 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTBase.NBTPrimitive;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
 import com.feed_the_beast.ftblib.lib.gui.misc.GuiSelectTeamValue;
@@ -9,133 +20,124 @@ import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.FinalIDObject;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.nbt.NBTBase.NBTPrimitive;
-import net.minecraft.util.IChatComponent;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author LatvianModder
  */
 public class ConfigTeamClient extends ConfigString {
-	public static class TeamInst extends FinalIDObject {
-		public final short uid;
-		public IChatComponent title;
-		public Icon icon;
 
-		public TeamInst(short u, String id) {
-			super(id);
-			uid = u;
-		}
-	}
+    public static class TeamInst extends FinalIDObject {
 
-	public final Map<String, TeamInst> map;
+        public final short uid;
+        public IChatComponent title;
+        public Icon icon;
 
-	public ConfigTeamClient(String v) {
-		super(v, ForgeTeam.TEAM_ID_PATTERN);
-		map = new HashMap<>();
-	}
+        public TeamInst(short u, String id) {
+            super(id);
+            uid = u;
+        }
+    }
 
-	@Override
-	public String getId() {
-		return ConfigTeam.TEAM_ID;
-	}
+    public final Map<String, TeamInst> map;
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		TeamInst inst = map.get(getString());
+    public ConfigTeamClient(String v) {
+        super(v, ForgeTeam.TEAM_ID_PATTERN);
+        map = new HashMap<>();
+    }
 
-		if (inst != null) {
-			return inst.title.createCopy();
-		}
+    @Override
+    public String getId() {
+        return ConfigTeam.TEAM_ID;
+    }
 
-		return super.getStringForGUI();
-	}
+    @Override
+    public IChatComponent getStringForGUI() {
+        TeamInst inst = map.get(getString());
 
-	@Override
-	public ConfigTeamClient copy() {
-		ConfigTeamClient config = new ConfigTeamClient(getString());
+        if (inst != null) {
+            return inst.title.createCopy();
+        }
 
-		for (TeamInst inst : map.values()) {
-			TeamInst inst1 = new TeamInst(inst.uid, inst.getId());
-			inst1.title = inst.title.createCopy();
-			inst1.icon = inst.icon.copy();
-			config.map.put(inst1.getId(), inst1);
-		}
+        return super.getStringForGUI();
+    }
 
-		return config;
-	}
+    @Override
+    public ConfigTeamClient copy() {
+        ConfigTeamClient config = new ConfigTeamClient(getString());
 
-	@Override
-	public Color4I getColor() {
-		return Color4I.LIGHT_GREEN;
-	}
+        for (TeamInst inst : map.values()) {
+            TeamInst inst1 = new TeamInst(inst.uid, inst.getId());
+            inst1.title = inst.title.createCopy();
+            inst1.icon = inst.icon.copy();
+            config.map.put(inst1.getId(), inst1);
+        }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-	}
+        return config;
+    }
 
-	@Override
-	public List<String> getVariants() {
-		return new ArrayList<>(map.keySet());
-	}
+    @Override
+    public Color4I getColor() {
+        return Color4I.LIGHT_GREEN;
+    }
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		if (inst.getCanEdit()) {
-			new GuiSelectTeamValue(this, gui, callback).openGui();
-		}
-	}
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {}
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		nbt.setString(key, getString());
-	}
+    @Override
+    public List<String> getVariants() {
+        return new ArrayList<>(map.keySet());
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		NBTBase id = nbt.getTag(key);
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        if (inst.getCanEdit()) {
+            new GuiSelectTeamValue(this, gui, callback).openGui();
+        }
+    }
 
-		if (id instanceof NBTTagString) {
-			setString(((NBTTagString) id).func_150285_a_());
-		} else if (id instanceof NBTPrimitive) {
-			ForgeTeam team = null;
-			short ids = ((NBTPrimitive) id).func_150289_e();
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        nbt.setString(key, getString());
+    }
 
-			for (TeamInst inst : map.values()) {
-				if (inst.uid == ids) {
-					setString(inst.getId());
-					return;
-				}
-			}
-		}
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        NBTBase id = nbt.getTag(key);
 
-	@Override
-	public void writeData(DataOut data) {
-		throw new IllegalStateException("Can't write Team client property!");
-	}
+        if (id instanceof NBTTagString) {
+            setString(((NBTTagString) id).func_150285_a_());
+        } else if (id instanceof NBTPrimitive) {
+            ForgeTeam team = null;
+            short ids = ((NBTPrimitive) id).func_150289_e();
 
-	@Override
-	public void readData(DataIn data) {
-		int s = data.readVarInt();
-		map.clear();
+            for (TeamInst inst : map.values()) {
+                if (inst.uid == ids) {
+                    setString(inst.getId());
+                    return;
+                }
+            }
+        }
+    }
 
-		for (int i = 0; i < s; i++) {
-			short uid = data.readShort();
-			String id = data.readString();
-			TeamInst inst = new TeamInst(uid, id);
-			inst.title = data.readTextComponent();
-			inst.icon = data.readIcon();
-			map.put(inst.getId(), inst);
-		}
+    @Override
+    public void writeData(DataOut data) {
+        throw new IllegalStateException("Can't write Team client property!");
+    }
 
-		setString(data.readString());
-	}
+    @Override
+    public void readData(DataIn data) {
+        int s = data.readVarInt();
+        map.clear();
+
+        for (int i = 0; i < s; i++) {
+            short uid = data.readShort();
+            String id = data.readString();
+            TeamInst inst = new TeamInst(uid, id);
+            inst.title = data.readTextComponent();
+            inst.icon = data.readIcon();
+            map.put(inst.getId(), inst);
+        }
+
+        setString(data.readString());
+    }
 }

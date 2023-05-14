@@ -1,28 +1,28 @@
 package com.feed_the_beast.ftblib.lib.command;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-
-import javax.annotation.Nullable;
 
 /**
  * @author LatvianModder
  */
-public interface ICommandWithParent extends ICommand
-{
-	@Nullable
-	ICommand getParent();
+public interface ICommandWithParent extends ICommand {
 
-	void setParent(@Nullable ICommand p);
+    @Nullable
+    ICommand getParent();
 
-	@Override
-	default String getCommandUsage(ICommandSender sender)
-	{
-		return "commands." + getCommandPath(this) + ".usage";
-	}
+    void setParent(@Nullable ICommand p);
 
-	static String getCommandPath(ICommand command)
-	{
-		return (command instanceof ICommandWithParent && ((ICommandWithParent) command).getParent() != null ? (getCommandPath(((ICommandWithParent) command).getParent()) + ".") : "") + command.getCommandName();
-	}
+    @Override
+    default String getCommandUsage(ICommandSender sender) {
+        return "commands." + getCommandPath(this) + ".usage";
+    }
+
+    static String getCommandPath(ICommand command) {
+        return (command instanceof ICommandWithParent && ((ICommandWithParent) command).getParent() != null
+                ? (getCommandPath(((ICommandWithParent) command).getParent()) + ".")
+                : "") + command.getCommandName();
+    }
 }

@@ -1,89 +1,91 @@
 package com.feed_the_beast.ftblib.lib;
 
-import com.feed_the_beast.ftblib.FTBLib;
-import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
-import com.feed_the_beast.ftblib.lib.util.StringUtils;
-import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.function.BiFunction;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.function.BiFunction;
+import com.feed_the_beast.ftblib.FTBLib;
+import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
+import com.feed_the_beast.ftblib.lib.util.StringUtils;
+import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
 
 /**
  * @author LatvianModder
  */
 public enum EnumTeamStatus implements IStringSerializable {
-	ENEMY(-10, "enemy", EnumChatFormatting.RED, true),
-	NONE(0, "none", EnumChatFormatting.WHITE, true),
-	INVITED(10, "invited", EnumChatFormatting.DARK_AQUA, true),
-	ALLY(30, "ally", EnumChatFormatting.DARK_GREEN, true),
-	MEMBER(50, "member", EnumChatFormatting.BLUE, false),
-	MOD(80, "mod", EnumChatFormatting.BLUE, true),
-	OWNER(100, "owner", EnumChatFormatting.GOLD, false);
 
-	public static final EnumTeamStatus[] VALUES = values();
-	public static final BiFunction<ICommandSender, EnumTeamStatus, IChatComponent> NAME_GETTER = (sender,
-			value) -> StringUtils.color(FTBLib.lang(sender, value.getLangKey()), value.getColor());
-	public static final NameMap<EnumTeamStatus> NAME_MAP = NameMap.createWithName(NONE, NAME_GETTER, VALUES);
-	public static final NameMap<EnumTeamStatus> NAME_MAP_PERMS = NameMap.createWithName(ALLY, NAME_GETTER, NONE, ALLY,
-			MEMBER);
-	public static final Collection<EnumTeamStatus> VALID_VALUES = new LinkedHashSet<>();
+    ENEMY(-10, "enemy", EnumChatFormatting.RED, true),
+    NONE(0, "none", EnumChatFormatting.WHITE, true),
+    INVITED(10, "invited", EnumChatFormatting.DARK_AQUA, true),
+    ALLY(30, "ally", EnumChatFormatting.DARK_GREEN, true),
+    MEMBER(50, "member", EnumChatFormatting.BLUE, false),
+    MOD(80, "mod", EnumChatFormatting.BLUE, true),
+    OWNER(100, "owner", EnumChatFormatting.GOLD, false);
 
-	static {
-		for (EnumTeamStatus s : VALUES) {
-			if (s.canBeSet) {
-				VALID_VALUES.add(s);
-			}
-		}
-	}
+    public static final EnumTeamStatus[] VALUES = values();
+    public static final BiFunction<ICommandSender, EnumTeamStatus, IChatComponent> NAME_GETTER = (sender,
+            value) -> StringUtils.color(FTBLib.lang(sender, value.getLangKey()), value.getColor());
+    public static final NameMap<EnumTeamStatus> NAME_MAP = NameMap.createWithName(NONE, NAME_GETTER, VALUES);
+    public static final NameMap<EnumTeamStatus> NAME_MAP_PERMS = NameMap
+            .createWithName(ALLY, NAME_GETTER, NONE, ALLY, MEMBER);
+    public static final Collection<EnumTeamStatus> VALID_VALUES = new LinkedHashSet<>();
 
-	private final String name;
-	private final int status;
-	private final EnumChatFormatting color;
-	private final String langKey;
-	private final boolean canBeSet;
+    static {
+        for (EnumTeamStatus s : VALUES) {
+            if (s.canBeSet) {
+                VALID_VALUES.add(s);
+            }
+        }
+    }
 
-	EnumTeamStatus(int s, String n, EnumChatFormatting c, boolean cs) {
-		name = n;
-		status = s;
-		color = c;
-		langKey = "ftblib.lang.team_status." + name;
-		canBeSet = cs;
-	}
+    private final String name;
+    private final int status;
+    private final EnumChatFormatting color;
+    private final String langKey;
+    private final boolean canBeSet;
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    EnumTeamStatus(int s, String n, EnumChatFormatting c, boolean cs) {
+        name = n;
+        status = s;
+        color = c;
+        langKey = "ftblib.lang.team_status." + name;
+        canBeSet = cs;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	public EnumChatFormatting getColor() {
-		return color;
-	}
+    public int getStatus() {
+        return status;
+    }
 
-	public String getLangKey() {
-		return langKey;
-	}
+    public EnumChatFormatting getColor() {
+        return color;
+    }
 
-	public boolean canBeSet() {
-		return canBeSet;
-	}
+    public String getLangKey() {
+        return langKey;
+    }
 
-	public boolean isNone() {
-		return this == NONE;
-	}
+    public boolean canBeSet() {
+        return canBeSet;
+    }
 
-	public boolean isEqualOrGreaterThan(EnumTeamStatus s) {
-		return status >= s.status;
-	}
+    public boolean isNone() {
+        return this == NONE;
+    }
 
-	public String toString() {
-		return getName();
-	}
+    public boolean isEqualOrGreaterThan(EnumTeamStatus s) {
+        return status >= s.status;
+    }
+
+    public String toString() {
+        return getName();
+    }
 }

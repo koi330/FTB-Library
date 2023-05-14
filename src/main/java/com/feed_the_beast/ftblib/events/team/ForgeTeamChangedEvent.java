@@ -5,18 +5,16 @@ import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 /**
  * @author LatvianModder
  */
-public class ForgeTeamChangedEvent extends ForgeTeamEvent
-{
-	private final ForgeTeam oldTeam;
+public class ForgeTeamChangedEvent extends ForgeTeamEvent {
 
-	public ForgeTeamChangedEvent(ForgeTeam team, ForgeTeam o)
-	{
-		super(team);
-		oldTeam = o;
-	}
+    private final ForgeTeam oldTeam;
 
-	public ForgeTeam getOldTeam()
-	{
-		return oldTeam;
-	}
+    public ForgeTeamChangedEvent(ForgeTeam team, ForgeTeam o) {
+        super(team);
+        oldTeam = o;
+    }
+
+    public ForgeTeam getOldTeam() {
+        return oldTeam;
+    }
 }

@@ -1,90 +1,80 @@
 package com.feed_the_beast.ftblib.lib.client;
 
-import org.lwjgl.BufferUtils;
-
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+
+import javax.annotation.Nullable;
+
+import org.lwjgl.BufferUtils;
 
 /**
  * @author LatvianModder
  */
-public interface IPixelBuffer
-{
-	int getWidth();
+public interface IPixelBuffer {
 
-	int getHeight();
+    int getWidth();
 
-	int[] getPixels();
+    int getHeight();
 
-	void setPixels(int[] p);
+    int[] getPixels();
 
-	void setRGB(int x, int y, int col);
+    void setPixels(int[] p);
 
-	int getRGB(int x, int y);
+    void setRGB(int x, int y, int col);
 
-	default void setRGB(int startX, int startY, int w, int h, int[] rgbArray)
-	{
-		if (startX == 0 && startY == 0 && w == getWidth() && h == getHeight())
-		{
-			setPixels(rgbArray);
-			return;
-		}
+    int getRGB(int x, int y);
 
-		int off = -1;
-		for (int y = startY; y < startY + h; y++)
-		{
-			for (int x = startX; x < startX + w; x++)
-			{
-				setRGB(x, y, rgbArray[++off]);
-			}
-		}
-	}
+    default void setRGB(int startX, int startY, int w, int h, int[] rgbArray) {
+        if (startX == 0 && startY == 0 && w == getWidth() && h == getHeight()) {
+            setPixels(rgbArray);
+            return;
+        }
 
-	default void setRGB(int startX, int startY, IPixelBuffer buffer)
-	{
-		setRGB(startX, startY, buffer.getWidth(), buffer.getHeight(), buffer.getPixels());
-	}
+        int off = -1;
+        for (int y = startY; y < startY + h; y++) {
+            for (int x = startX; x < startX + w; x++) {
+                setRGB(x, y, rgbArray[++off]);
+            }
+        }
+    }
 
-	int[] getRGB(int startX, int startY, int w, int h, @Nullable int[] p);
+    default void setRGB(int startX, int startY, IPixelBuffer buffer) {
+        setRGB(startX, startY, buffer.getWidth(), buffer.getHeight(), buffer.getPixels());
+    }
 
-	default void fill(int col)
-	{
-		int[] pixels = getPixels();
-		Arrays.fill(pixels, col);
-		setPixels(pixels);
-	}
+    int[] getRGB(int startX, int startY, int w, int h, @Nullable int[] p);
 
-	default void fill(int startX, int startY, int w, int h, int col)
-	{
-		for (int y = startY; y < startY + h; y++)
-		{
-			for (int x = startX; x < startX + w; x++)
-			{
-				setRGB(x, y, col);
-			}
-		}
-	}
+    default void fill(int col) {
+        int[] pixels = getPixels();
+        Arrays.fill(pixels, col);
+        setPixels(pixels);
+    }
 
-	IPixelBuffer copy();
+    default void fill(int startX, int startY, int w, int h, int col) {
+        for (int y = startY; y < startY + h; y++) {
+            for (int x = startX; x < startX + w; x++) {
+                setRGB(x, y, col);
+            }
+        }
+    }
 
-	IPixelBuffer getSubimage(int x, int y, int w, int h);
+    IPixelBuffer copy();
 
-	default ByteBuffer toByteBuffer(boolean alpha)
-	{
-		int[] pixels = getPixels();
-		ByteBuffer bb = BufferUtils.createByteBuffer(pixels.length * 4);
-		byte alpha255 = (byte) 255;
+    IPixelBuffer getSubimage(int x, int y, int w, int h);
 
-		for (int c : pixels)
-		{
-			bb.put((byte) (c >> 16));
-			bb.put((byte) (c >> 8));
-			bb.put((byte) c);
-			bb.put(alpha ? (byte) (c >> 24) : alpha255);
-		}
+    default ByteBuffer toByteBuffer(boolean alpha) {
+        int[] pixels = getPixels();
+        ByteBuffer bb = BufferUtils.createByteBuffer(pixels.length * 4);
+        byte alpha255 = (byte) 255;
 
-		bb.flip();
-		return bb;
-	}
+        for (int c : pixels) {
+            bb.put((byte) (c >> 16));
+            bb.put((byte) (c >> 8));
+            bb.put((byte) c);
+            bb.put(alpha ? (byte) (c >> 24) : alpha255);
+        }
+
+        bb.flip();
+        return bb;
+    }
 }

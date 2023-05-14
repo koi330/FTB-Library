@@ -1,132 +1,111 @@
 package com.feed_the_beast.ftblib.lib.data;
 
-import com.feed_the_beast.ftblib.lib.util.CommonUtils;
-import com.feed_the_beast.ftblib.lib.util.INBTSerializable;
-import com.feed_the_beast.ftblib.lib.util.IWithID;
-import net.minecraft.nbt.NBTTagCompound;
-
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.nbt.NBTTagCompound;
+
+import com.feed_the_beast.ftblib.lib.util.CommonUtils;
+import com.feed_the_beast.ftblib.lib.util.INBTSerializable;
+import com.feed_the_beast.ftblib.lib.util.IWithID;
+
 /**
  * @author LatvianModder
  */
-public class NBTDataStorage implements INBTSerializable<NBTTagCompound>, Consumer<NBTDataStorage.Data>
-{
-	public interface Data extends IWithID, INBTSerializable<NBTTagCompound>
-	{
-		@Override
-		default NBTTagCompound serializeNBT()
-		{
-			return new NBTTagCompound();
-		}
+public class NBTDataStorage implements INBTSerializable<NBTTagCompound>, Consumer<NBTDataStorage.Data> {
 
-		@Override
-		default void deserializeNBT(NBTTagCompound nbt)
-		{
-		}
+    public interface Data extends IWithID, INBTSerializable<NBTTagCompound> {
 
-		default void clearCache()
-		{
-		}
-	}
+        @Override
+        default NBTTagCompound serializeNBT() {
+            return new NBTTagCompound();
+        }
 
-	public static final NBTDataStorage EMPTY = new NBTDataStorage()
-	{
-		@Override
-		@Nullable
-		public Data getRaw(String id)
-		{
-			return null;
-		}
+        @Override
+        default void deserializeNBT(NBTTagCompound nbt) {}
 
-		@Override
-		public boolean isEmpty()
-		{
-			return true;
-		}
+        default void clearCache() {}
+    }
 
-		@Override
-		public NBTTagCompound serializeNBT()
-		{
-			return new NBTTagCompound();
-		}
+    public static final NBTDataStorage EMPTY = new NBTDataStorage() {
 
-		@Override
-		public void deserializeNBT(NBTTagCompound nbt)
-		{
-		}
-	};
+        @Override
+        @Nullable
+        public Data getRaw(String id) {
+            return null;
+        }
 
-	private final Map<String, Data> map;
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
 
-	public NBTDataStorage()
-	{
-		map = new HashMap<>();
-	}
+        @Override
+        public NBTTagCompound serializeNBT() {
+            return new NBTTagCompound();
+        }
 
-	public void add(Data data)
-	{
-		map.put(data.getId(), data);
-	}
+        @Override
+        public void deserializeNBT(NBTTagCompound nbt) {}
+    };
 
-	@Nullable
-	public Data getRaw(String id)
-	{
-		return map.get(id);
-	}
+    private final Map<String, Data> map;
 
-	public <T extends Data> T get(String id)
-	{
-		return CommonUtils.cast(Objects.requireNonNull(getRaw(id)));
-	}
+    public NBTDataStorage() {
+        map = new HashMap<>();
+    }
 
-	public boolean isEmpty()
-	{
-		return map.isEmpty();
-	}
+    public void add(Data data) {
+        map.put(data.getId(), data);
+    }
 
-	@Override
-	public NBTTagCompound serializeNBT()
-	{
-		NBTTagCompound nbt = new NBTTagCompound();
+    @Nullable
+    public Data getRaw(String id) {
+        return map.get(id);
+    }
 
-		for (Data data : map.values())
-		{
-			NBTTagCompound nbt1 = data.serializeNBT();
+    public <T extends Data> T get(String id) {
+        return CommonUtils.cast(Objects.requireNonNull(getRaw(id)));
+    }
 
-			if (!nbt1.hasNoTags())
-			{
-				nbt.setTag(data.getId(), nbt1);
-			}
-		}
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 
-		return nbt;
-	}
+    @Override
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound nbt = new NBTTagCompound();
 
-	@Override
-	public void deserializeNBT(NBTTagCompound nbt)
-	{
-		for (Data data : map.values())
-		{
-			data.deserializeNBT(nbt.getCompoundTag(data.getId()));
-		}
-	}
+        for (Data data : map.values()) {
+            NBTTagCompound nbt1 = data.serializeNBT();
 
-	public void clearCache()
-	{
-		for (Data data : map.values())
-		{
-			data.clearCache();
-		}
-	}
+            if (!nbt1.hasNoTags()) {
+                nbt.setTag(data.getId(), nbt1);
+            }
+        }
 
-	@Override
-	public void accept(Data data)
-	{
-		add(data);
-	}
+        return nbt;
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        for (Data data : map.values()) {
+            data.deserializeNBT(nbt.getCompoundTag(data.getId()));
+        }
+    }
+
+    public void clearCache() {
+        for (Data data : map.values()) {
+            data.clearCache();
+        }
+    }
+
+    @Override
+    public void accept(Data data) {
+        add(data);
+    }
 }

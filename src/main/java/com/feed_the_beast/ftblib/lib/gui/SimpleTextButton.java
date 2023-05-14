@@ -1,88 +1,75 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
-import com.feed_the_beast.ftblib.lib.icon.Icon;
-
 import java.util.List;
+
+import com.feed_the_beast.ftblib.lib.icon.Icon;
 
 /**
  * @author LatvianModder
  */
-public abstract class SimpleTextButton extends Button
-{
-	public SimpleTextButton(Panel panel, String txt, Icon icon)
-	{
-		super(panel, txt, icon);
-		setWidth(panel.getGui().getTheme().getStringWidth(txt) + (hasIcon() ? 28 : 8));
-		setHeight(20);
-	}
+public abstract class SimpleTextButton extends Button {
 
-	@Override
-	public SimpleTextButton setTitle(String txt)
-	{
-		super.setTitle(txt);
-		setWidth(getGui().getTheme().getStringWidth(getTitle()) + (hasIcon() ? 28 : 8));
-		return this;
-	}
+    public SimpleTextButton(Panel panel, String txt, Icon icon) {
+        super(panel, txt, icon);
+        setWidth(panel.getGui().getTheme().getStringWidth(txt) + (hasIcon() ? 28 : 8));
+        setHeight(20);
+    }
 
-	public boolean renderTitleInCenter()
-	{
-		return false;
-	}
+    @Override
+    public SimpleTextButton setTitle(String txt) {
+        super.setTitle(txt);
+        setWidth(getGui().getTheme().getStringWidth(getTitle()) + (hasIcon() ? 28 : 8));
+        return this;
+    }
 
-	@Override
-	public Object getIngredientUnderMouse()
-	{
-		return icon.getIngredient();
-	}
+    public boolean renderTitleInCenter() {
+        return false;
+    }
 
-	public boolean hasIcon()
-	{
-		return !icon.isEmpty();
-	}
+    @Override
+    public Object getIngredientUnderMouse() {
+        return icon.getIngredient();
+    }
 
-	@Override
-	public void addMouseOverText(List<String> list)
-	{
-		if (getGui().getTheme().getStringWidth(getTitle()) + (hasIcon() ? 28 : 8) > width)
-		{
-			list.add(getTitle());
-		}
-	}
+    public boolean hasIcon() {
+        return !icon.isEmpty();
+    }
 
-	@Override
-	public void draw(Theme theme, int x, int y, int w, int h)
-	{
-		drawBackground(theme, x, y, w, h);
-		int s = h >= 16 ? 16 : 8;
-		int off = (h - s) / 2;
-		String title = getTitle();
-		int textX = x;
-		int textY = y + (h - theme.getFontHeight() + 1) / 2;
+    @Override
+    public void addMouseOverText(List<String> list) {
+        if (getGui().getTheme().getStringWidth(getTitle()) + (hasIcon() ? 28 : 8) > width) {
+            list.add(getTitle());
+        }
+    }
 
-		int sw = theme.getStringWidth(title);
-		int mw = w - (hasIcon() ? off + s : 0) - 6;
+    @Override
+    public void draw(Theme theme, int x, int y, int w, int h) {
+        drawBackground(theme, x, y, w, h);
+        int s = h >= 16 ? 16 : 8;
+        int off = (h - s) / 2;
+        String title = getTitle();
+        int textX = x;
+        int textY = y + (h - theme.getFontHeight() + 1) / 2;
 
-		if (sw > mw)
-		{
-			sw = mw;
-			title = theme.trimStringToWidth(title, mw);
-		}
+        int sw = theme.getStringWidth(title);
+        int mw = w - (hasIcon() ? off + s : 0) - 6;
 
-		if (renderTitleInCenter())
-		{
-			textX += (mw - sw + 6) / 2;
-		}
-		else
-		{
-			textX += 4;
-		}
+        if (sw > mw) {
+            sw = mw;
+            title = theme.trimStringToWidth(title, mw);
+        }
 
-		if (hasIcon())
-		{
-			drawIcon(theme, x + off, y + off, s, s);
-			textX += off + s;
-		}
+        if (renderTitleInCenter()) {
+            textX += (mw - sw + 6) / 2;
+        } else {
+            textX += 4;
+        }
 
-		theme.drawString(title, textX, textY, theme.getContentColor(getWidgetType()), Theme.SHADOW);
-	}
+        if (hasIcon()) {
+            drawIcon(theme, x + off, y + off, s, s);
+            textX += off + s;
+        }
+
+        theme.drawString(title, textX, textY, theme.getContentColor(getWidgetType()), Theme.SHADOW);
+    }
 }

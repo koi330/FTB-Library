@@ -1,156 +1,157 @@
 package com.feed_the_beast.ftblib.lib.config;
 
-import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
-import com.feed_the_beast.ftblib.lib.gui.misc.GuiSelectFluid;
-import com.feed_the_beast.ftblib.lib.io.DataIn;
-import com.feed_the_beast.ftblib.lib.io.DataOut;
-import com.feed_the_beast.ftblib.lib.util.BlockUtils;
-import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+import javax.annotation.Nullable;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
-import javax.annotation.Nullable;
+import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
+import com.feed_the_beast.ftblib.lib.gui.misc.GuiSelectFluid;
+import com.feed_the_beast.ftblib.lib.io.DataIn;
+import com.feed_the_beast.ftblib.lib.io.DataOut;
+import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 
 /**
  * @author LatvianModder
  */
 public class ConfigFluid extends ConfigValue {
-	public static final String ID = "fluid";
 
-	private Fluid value;
-	private Fluid defaultFluid;
+    public static final String ID = "fluid";
 
-	public ConfigFluid(@Nullable Fluid fluid, @Nullable Fluid def) {
-		defaultFluid = def;
-		value = fluid == null ? getDefaultFluid() : fluid;
-	}
+    private Fluid value;
+    private Fluid defaultFluid;
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    public ConfigFluid(@Nullable Fluid fluid, @Nullable Fluid def) {
+        defaultFluid = def;
+        value = fluid == null ? getDefaultFluid() : fluid;
+    }
 
-	@Override
-	public String getString() {
-		value = getFluid();
-		return value == null ? "null" : value.getName();
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	@Nullable
-	public Fluid getFluid() {
-		return value;
-	}
+    @Override
+    public String getString() {
+        value = getFluid();
+        return value == null ? "null" : value.getName();
+    }
 
-	public void setFluid(@Nullable Fluid fluid) {
-		value = fluid == null ? getDefaultFluid() : fluid;
-	}
+    @Nullable
+    public Fluid getFluid() {
+        return value;
+    }
 
-	@Nullable
-	public Fluid getDefaultFluid() {
-		return defaultFluid;
-	}
+    public void setFluid(@Nullable Fluid fluid) {
+        value = fluid == null ? getDefaultFluid() : fluid;
+    }
 
-	public void setDefaultFluid(@Nullable Fluid fluid) {
-		defaultFluid = fluid;
-	}
+    @Nullable
+    public Fluid getDefaultFluid() {
+        return defaultFluid;
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return value != null;
-	}
+    public void setDefaultFluid(@Nullable Fluid fluid) {
+        defaultFluid = fluid;
+    }
 
-	@Override
-	public int getInt() {
-		return 0;
-	}
+    @Override
+    public boolean getBoolean() {
+        return value != null;
+    }
 
-	@Override
-	public ConfigFluid copy() {
-		return new ConfigFluid(getFluid(), getDefaultFluid());
-	}
+    @Override
+    public int getInt() {
+        return 0;
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		value = getFluid();
+    @Override
+    public ConfigFluid copy() {
+        return new ConfigFluid(getFluid(), getDefaultFluid());
+    }
 
-		if (value == null) {
-			return new ChatComponentText("null");
-		}
+    @Override
+    public IChatComponent getStringForGUI() {
+        value = getFluid();
 
-		return new ChatComponentText(value.getLocalizedName(new FluidStack(value, 1000))); 
-		// return new ChatComponentText(value.getLocalizedName(new FluidStack(value, Fluid.BUCKET_VOLUME))); // TODO: PR
-																											// Forge to
-																											// fix this
-																											// for WATER
-																											// and LAVA
-	}
+        if (value == null) {
+            return new ChatComponentText("null");
+        }
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		if (string.equals("null")) {
-			if (!simulate) {
-				setFluid(null);
-			}
+        return new ChatComponentText(value.getLocalizedName(new FluidStack(value, 1000)));
+        // return new ChatComponentText(value.getLocalizedName(new FluidStack(value, Fluid.BUCKET_VOLUME))); // TODO: PR
+        // Forge to
+        // fix this
+        // for WATER
+        // and LAVA
+    }
 
-			return true;
-		}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        if (string.equals("null")) {
+            if (!simulate) {
+                setFluid(null);
+            }
 
-		value = FluidRegistry.getFluid(string);
+            return true;
+        }
 
-		if (value != null) {
-			if (!simulate) {
-				setFluid(value);
-			}
+        value = FluidRegistry.getFluid(string);
 
-			return true;
-		}
+        if (value != null) {
+            if (!simulate) {
+                setFluid(value);
+            }
 
-		return false;
-	}
+            return true;
+        }
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		new GuiSelectFluid(gui, this::getDefaultFluid, fluid -> {
-			setFluid(fluid);
-			callback.run();
-		}).openGui();
-	}
+        return false;
+    }
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		value = getFluid();
-		nbt.setString(key, value == null ? "" : value.getName());
-	}
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        new GuiSelectFluid(gui, this::getDefaultFluid, fluid -> {
+            setFluid(fluid);
+            callback.run();
+        }).openGui();
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		String s = nbt.getString(key);
-		setFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
-	}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        value = getFluid();
+        nbt.setString(key, value == null ? "" : value.getName());
+    }
 
-	@Override
-	public void writeData(DataOut data) {
-		defaultFluid = getDefaultFluid();
-		data.writeString(defaultFluid == null ? "" : defaultFluid.getName());
-		value = getFluid();
-		data.writeString(value == null ? "" : value.getName());
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        String s = nbt.getString(key);
+        setFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		String s = data.readString();
-		setDefaultFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
-		s = data.readString();
-		setFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
-	}
+    @Override
+    public void writeData(DataOut data) {
+        defaultFluid = getDefaultFluid();
+        data.writeString(defaultFluid == null ? "" : defaultFluid.getName());
+        value = getFluid();
+        data.writeString(value == null ? "" : value.getName());
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return getFluid() == null;
-	}
+    @Override
+    public void readData(DataIn data) {
+        String s = data.readString();
+        setDefaultFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
+        s = data.readString();
+        setFluid(s.isEmpty() ? null : FluidRegistry.getFluid(s));
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getFluid() == null;
+    }
 }

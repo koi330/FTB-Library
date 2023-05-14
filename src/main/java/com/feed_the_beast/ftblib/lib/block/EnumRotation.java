@@ -1,50 +1,49 @@
 package com.feed_the_beast.ftblib.lib.block;
 
-import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
-
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 
+import com.feed_the_beast.ftblib.lib.util.IStringSerializable;
 
 /**
  * @author LatvianModder
  */
 public enum EnumRotation implements IStringSerializable {
-	NORMAL("normal"),
-	FACING_DOWN("down"),
-	UPSIDE_DOWN("upside_down"),
-	FACING_UP("up");
 
-	public static final EnumRotation[] VALUES = values();
+    NORMAL("normal"),
+    FACING_DOWN("down"),
+    UPSIDE_DOWN("upside_down"),
+    FACING_UP("up");
 
-	private final String name;
+    public static final EnumRotation[] VALUES = values();
 
-	EnumRotation(String n) {
-		name = n;
-	}
+    private final String name;
 
-	public int getModelRotationIndexFromFacing(EnumFacing facing) {
-		return ordinal() << 2 | facing.order_b;
-	}
+    EnumRotation(String n) {
+        name = n;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    public int getModelRotationIndexFromFacing(EnumFacing facing) {
+        return ordinal() << 2 | facing.order_b;
+    }
 
-	public static EnumRotation getRotationFromEntity(int posx, int posy, int posz, EntityLivingBase placer) {
-		if (MathHelper.abs((float) (placer.posX - posx)) < 2F
-				&& MathHelper.abs((float) (placer.posZ - posz)) < 2F) {
-			double d = placer.posY + placer.getEyeHeight();
+    @Override
+    public String getName() {
+        return name;
+    }
 
-			if (d - posy > 2D) {
-				return FACING_UP;
-			} else if (posy - d > 0D) {
-				return FACING_DOWN;
-			}
-		}
+    public static EnumRotation getRotationFromEntity(int posx, int posy, int posz, EntityLivingBase placer) {
+        if (MathHelper.abs((float) (placer.posX - posx)) < 2F && MathHelper.abs((float) (placer.posZ - posz)) < 2F) {
+            double d = placer.posY + placer.getEyeHeight();
 
-		return NORMAL;
-	}
+            if (d - posy > 2D) {
+                return FACING_UP;
+            } else if (posy - d > 0D) {
+                return FACING_DOWN;
+            }
+        }
+
+        return NORMAL;
+    }
 }

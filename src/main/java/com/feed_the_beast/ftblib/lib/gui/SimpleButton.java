@@ -6,30 +6,26 @@ import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 /**
  * @author LatvianModder
  */
-public class SimpleButton extends Button
-{
-	public interface Callback
-	{
-		void onClicked(SimpleButton widget, MouseButton button);
-	}
+public class SimpleButton extends Button {
 
-	private final Callback consumer;
+    public interface Callback {
 
-	public SimpleButton(Panel panel, String text, Icon icon, Callback c)
-	{
-		super(panel, text, icon);
-		consumer = c;
-	}
+        void onClicked(SimpleButton widget, MouseButton button);
+    }
 
-	@Override
-	public void drawBackground(Theme theme, int x, int y, int w, int h)
-	{
-	}
+    private final Callback consumer;
 
-	@Override
-	public void onClicked(MouseButton button)
-	{
-		GuiHelper.playClickSound();
-		consumer.onClicked(this, button);
-	}
+    public SimpleButton(Panel panel, String text, Icon icon, Callback c) {
+        super(panel, text, icon);
+        consumer = c;
+    }
+
+    @Override
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {}
+
+    @Override
+    public void onClicked(MouseButton button) {
+        GuiHelper.playClickSound();
+        consumer.onClicked(this, button);
+    }
 }

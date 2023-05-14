@@ -1,5 +1,9 @@
 package com.feed_the_beast.ftblib.command.team;
 
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import com.feed_the_beast.ftblib.FTBLib;
 import com.feed_the_beast.ftblib.FTBLibGameRules;
 import com.feed_the_beast.ftblib.events.team.ForgeTeamCreatedEvent;
@@ -12,85 +16,85 @@ import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 import com.feed_the_beast.ftblib.lib.data.TeamType;
 import com.feed_the_beast.ftblib.net.MessageMyTeamGuiResponse;
 
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
-
 /**
  * @author LatvianModder
  */
 public class CmdCreate extends CmdBase {
-	public CmdCreate() {
-		super("create", Level.ALL);
-	}
 
-	public static boolean isValidTeamID(String s) {
-		if (!s.isEmpty()) {
-			for (int i = 0; i < s.length(); i++) {
-				if (!isValidChar(s.charAt(i))) {
-					return false;
-				}
-			}
+    public CmdCreate() {
+        super("create", Level.ALL);
+    }
 
-			return true;
-		}
+    public static boolean isValidTeamID(String s) {
+        if (!s.isEmpty()) {
+            for (int i = 0; i < s.length(); i++) {
+                if (!isValidChar(s.charAt(i))) {
+                    return false;
+                }
+            }
 
-		return false;
-	}
+            return true;
+        }
 
-	private static boolean isValidChar(char c) {
-		return c == '_' || c == '|' || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
-	}
+        return false;
+    }
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-		if (!FTBLibGameRules.canCreateTeam(sender.getEntityWorld())) {
-			throw FTBLib.error(sender, "feature_disabled_server");
-		}
+    private static boolean isValidChar(char c) {
+        return c == '_' || c == '|' || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
+    }
 
-		EntityPlayerMP player = getCommandSenderAsPlayer(sender);
-		ForgePlayer p = CommandUtils.getForgePlayer(player);
+    @Override
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (!FTBLibGameRules.canCreateTeam(sender.getEntityWorld())) {
+            throw FTBLib.error(sender, "feature_disabled_server");
+        }
 
-		if (p.hasTeam()) {
-			throw FTBLib.error(sender, "ftblib.lang.team.error.must_leave");
-		}
+        EntityPlayerMP player = getCommandSenderAsPlayer(sender);
+        ForgePlayer p = CommandUtils.getForgePlayer(player);
 
-		checkArgs(sender, args, 1);
+        if (p.hasTeam()) {
+            throw FTBLib.error(sender, "ftblib.lang.team.error.must_leave");
+        }
 
-		if (!isValidTeamID(args[0])) {
-			throw FTBLib.error(sender, "ftblib.lang.team.id_invalid");
-		}
+        checkArgs(sender, args, 1);
 
-		if (p.team.universe.getTeam(args[0]).isValid()) {
-			throw FTBLib.error(sender, "ftblib.lang.team.id_already_exists");
-		}
+        if (!isValidTeamID(args[0])) {
+            throw FTBLib.error(sender, "ftblib.lang.team.id_invalid");
+        }
 
-		p.team.universe.clearCache();
+        if (p.team.universe.getTeam(args[0]).isValid()) {
+            throw FTBLib.error(sender, "ftblib.lang.team.id_already_exists");
+        }
 
-		ForgeTeam team = new ForgeTeam(p.team.universe, p.team.universe.generateTeamUID((short) 0), args[0],
-				TeamType.PLAYER);
+        p.team.universe.clearCache();
 
-		if (args.length > 1) {
-			team.setColor(EnumTeamColor.NAME_MAP.get(args[1]));
-		} else {
-			team.setColor(EnumTeamColor.NAME_MAP.getRandom(sender.getEntityWorld().rand));
-		}
+        ForgeTeam team = new ForgeTeam(
+                p.team.universe,
+                p.team.universe.generateTeamUID((short) 0),
+                args[0],
+                TeamType.PLAYER);
 
-		p.team = team;
-		team.owner = p;
-		team.universe.addTeam(team);
-		new ForgeTeamCreatedEvent(team).post();
-		ForgeTeamPlayerJoinedEvent event = new ForgeTeamPlayerJoinedEvent(p);
-		event.post();
-		sender.addChatMessage(FTBLib.lang(sender, "ftblib.lang.team.created", team.getId()));
+        if (args.length > 1) {
+            team.setColor(EnumTeamColor.NAME_MAP.get(args[1]));
+        } else {
+            team.setColor(EnumTeamColor.NAME_MAP.getRandom(sender.getEntityWorld().rand));
+        }
 
-		if (event.getDisplayGui() != null) {
-			event.getDisplayGui().run();
-		} else {
-			new MessageMyTeamGuiResponse(p).sendTo(player);
-		}
+        p.team = team;
+        team.owner = p;
+        team.universe.addTeam(team);
+        new ForgeTeamCreatedEvent(team).post();
+        ForgeTeamPlayerJoinedEvent event = new ForgeTeamPlayerJoinedEvent(p);
+        event.post();
+        sender.addChatMessage(FTBLib.lang(sender, "ftblib.lang.team.created", team.getId()));
 
-		team.markDirty();
-		p.markDirty();
-	}
+        if (event.getDisplayGui() != null) {
+            event.getDisplayGui().run();
+        } else {
+            new MessageMyTeamGuiResponse(p).sendTo(player);
+        }
+
+        team.markDirty();
+        p.markDirty();
+    }
 }

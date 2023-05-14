@@ -7,72 +7,60 @@ import net.minecraft.command.ICommandSender;
 /**
  * @author LatvianModder
  */
-public class CmdTreeBase extends CommandTreeBase implements ICommandWithParent
-{
-	private final String name;
-	private ICommand parent;
+public class CmdTreeBase extends CommandTreeBase implements ICommandWithParent {
 
-	public CmdTreeBase(String n)
-	{
-		name = n;
-	}
+    private final String name;
+    private ICommand parent;
 
-	@Override
-	public void addSubcommand(ICommand command)
-	{
-		super.addSubcommand(command);
+    public CmdTreeBase(String n) {
+        name = n;
+    }
 
-		if (command instanceof ICommandWithParent)
-		{
-			((ICommandWithParent) command).setParent(this);
-		}
-	}
+    @Override
+    public void addSubcommand(ICommand command) {
+        super.addSubcommand(command);
 
-	@Override
-	public final String getCommandName()
-	{
-		return name;
-	}
+        if (command instanceof ICommandWithParent) {
+            ((ICommandWithParent) command).setParent(this);
+        }
+    }
 
-	@Override
-	public int getRequiredPermissionLevel()
-	{
-		int level = 4;
+    @Override
+    public final String getCommandName() {
+        return name;
+    }
 
-		for (ICommand command : getSubCommands())
-		{
-			if (command instanceof CommandBase)
-			{
-				level = Math.min(level, ((CommandBase) command).getRequiredPermissionLevel());
-			}
-		}
+    @Override
+    public int getRequiredPermissionLevel() {
+        int level = 4;
 
-		return level;
-	}
+        for (ICommand command : getSubCommands()) {
+            if (command instanceof CommandBase) {
+                level = Math.min(level, ((CommandBase) command).getRequiredPermissionLevel());
+            }
+        }
 
-	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender sender)
-	{
-		for (ICommand command : getSubCommands())
-		{
-			if (command.canCommandSenderUseCommand(sender))
-			{
-				return true;
-			}
-		}
+        return level;
+    }
 
-		return false;
-	}
+    @Override
+    public boolean canCommandSenderUseCommand(ICommandSender sender) {
+        for (ICommand command : getSubCommands()) {
+            if (command.canCommandSenderUseCommand(sender)) {
+                return true;
+            }
+        }
 
-	@Override
-	public ICommand getParent()
-	{
-		return parent;
-	}
+        return false;
+    }
 
-	@Override
-	public void setParent(ICommand c)
-	{
-		parent = c;
-	}
+    @Override
+    public ICommand getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(ICommand c) {
+        parent = c;
+    }
 }

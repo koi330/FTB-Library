@@ -5,17 +5,15 @@ import java.util.function.Consumer;
 /**
  * @author LatvianModder
  */
-public class SyncGamerulesEvent extends FTBLibEvent
-{
-	private final Consumer<String> callback;
+public class SyncGamerulesEvent extends FTBLibEvent {
 
-	public SyncGamerulesEvent(Consumer<String> c)
-	{
-		callback = c;
-	}
+    private final Consumer<String> callback;
 
-	public void sync(String gamerule)
-	{
-		callback.accept(gamerule);
-	}
+    public SyncGamerulesEvent(Consumer<String> c) {
+        callback = c;
+    }
+
+    public void sync(String gamerule) {
+        callback.accept(gamerule);
+    }
 }

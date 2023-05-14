@@ -1,17 +1,21 @@
 package com.feed_the_beast.ftblib.lib.gui.misc;
 
-import com.feed_the_beast.ftblib.lib.client.GlStateManager;
-import com.google.common.collect.Queues;
 import java.util.Arrays;
 import java.util.Deque;
+
 import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.MathHelper;
 
+import com.feed_the_beast.ftblib.lib.client.GlStateManager;
+import com.google.common.collect.Queues;
+
 public class GuiToast extends Gui {
+
     private final Minecraft mc;
     private final GuiToast.ToastInstance<?>[] visible = new GuiToast.ToastInstance[5];
     private final Deque<IToast> toastsQueue = Queues.<IToast>newArrayDeque();
@@ -70,6 +74,7 @@ public class GuiToast extends Gui {
     }
 
     class ToastInstance<T extends IToast> {
+
         private final T toast;
         private long animationTime;
         private long visibleTime;
@@ -105,7 +110,9 @@ public class GuiToast extends Gui {
             }
 
             GlStateManager.pushMatrix();
-            GlStateManager.translate((float) p_193684_1_ - 160.0F * this.getVisibility(i), (float) (p_193684_2_ * 32),
+            GlStateManager.translate(
+                    (float) p_193684_1_ - 160.0F * this.getVisibility(i),
+                    (float) (p_193684_2_ * 32),
                     (float) (500 + p_193684_2_));
             IToast.Visibility itoast$visibility = this.toast.draw(GuiToast.this, i - this.visibleTime);
             GlStateManager.popMatrix();

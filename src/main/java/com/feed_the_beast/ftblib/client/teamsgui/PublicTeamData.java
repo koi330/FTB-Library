@@ -1,5 +1,7 @@
 package com.feed_the_beast.ftblib.client.teamsgui;
 
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.EnumTeamColor;
 import com.feed_the_beast.ftblib.lib.data.ForgeTeam;
 import com.feed_the_beast.ftblib.lib.icon.Icon;
@@ -7,62 +9,61 @@ import com.feed_the_beast.ftblib.lib.io.DataIn;
 import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.FinalIDObject;
 
-import net.minecraft.util.IChatComponent;
-
 /**
  * @author LatvianModder
  */
 public class PublicTeamData extends FinalIDObject implements Comparable<PublicTeamData> {
-	public enum Type {
-		CAN_JOIN,
-		REQUESTING_INVITE,
-		NEEDS_INVITE,
-		ENEMY
-	}
 
-	public static final DataOut.Serializer<PublicTeamData> SERIALIZER = (data, d) -> {
-		data.writeString(d.getId());
-		data.writeTextComponent(d.displayName);
-		data.writeString(d.description);
-		EnumTeamColor.NAME_MAP.write(data, d.color);
-		data.writeIcon(d.icon);
-		data.writeByte(d.type.ordinal());
-	};
+    public enum Type {
+        CAN_JOIN,
+        REQUESTING_INVITE,
+        NEEDS_INVITE,
+        ENEMY
+    }
 
-	public static final DataIn.Deserializer<PublicTeamData> DESERIALIZER = PublicTeamData::new;
+    public static final DataOut.Serializer<PublicTeamData> SERIALIZER = (data, d) -> {
+        data.writeString(d.getId());
+        data.writeTextComponent(d.displayName);
+        data.writeString(d.description);
+        EnumTeamColor.NAME_MAP.write(data, d.color);
+        data.writeIcon(d.icon);
+        data.writeByte(d.type.ordinal());
+    };
 
-	public final IChatComponent displayName;
-	public final String description;
-	public final EnumTeamColor color;
-	public final Icon icon;
-	public Type type;
+    public static final DataIn.Deserializer<PublicTeamData> DESERIALIZER = PublicTeamData::new;
 
-	public PublicTeamData(DataIn data) {
-		super(data.readString());
-		displayName = data.readTextComponent();
-		description = data.readString();
-		color = EnumTeamColor.NAME_MAP.read(data);
-		icon = data.readIcon();
-		type = Type.values()[data.readUnsignedByte()];
-	}
+    public final IChatComponent displayName;
+    public final String description;
+    public final EnumTeamColor color;
+    public final Icon icon;
+    public Type type;
 
-	public PublicTeamData(ForgeTeam team, Type c) {
-		super(team.getId());
-		displayName = team.getTitle();
-		description = team.getDesc();
-		color = team.getColor();
-		icon = team.getIcon();
-		type = c;
-	}
+    public PublicTeamData(DataIn data) {
+        super(data.readString());
+        displayName = data.readTextComponent();
+        description = data.readString();
+        color = EnumTeamColor.NAME_MAP.read(data);
+        icon = data.readIcon();
+        type = Type.values()[data.readUnsignedByte()];
+    }
 
-	@Override
-	public int compareTo(PublicTeamData o) {
-		int i = type.compareTo(o.type);
+    public PublicTeamData(ForgeTeam team, Type c) {
+        super(team.getId());
+        displayName = team.getTitle();
+        description = team.getDesc();
+        color = team.getColor();
+        icon = team.getIcon();
+        type = c;
+    }
 
-		if (i == 0) {
-			i = displayName.getUnformattedText().compareToIgnoreCase(o.displayName.getUnformattedText());
-		}
+    @Override
+    public int compareTo(PublicTeamData o) {
+        int i = type.compareTo(o.type);
 
-		return i;
-	}
+        if (i == 0) {
+            i = displayName.getUnformattedText().compareToIgnoreCase(o.displayName.getUnformattedText());
+        }
+
+        return i;
+    }
 }

@@ -2,123 +2,123 @@ package com.feed_the_beast.ftblib.lib.item;
 
 import java.util.Arrays;
 
-import com.feed_the_beast.ftblib.lib.util.InvUtils;
-
 import net.minecraft.item.ItemStack;
+
+import com.feed_the_beast.ftblib.lib.util.InvUtils;
 
 /**
  * @author LatvianModder
  */
 public class ItemStackArrayHandler implements IItemHandlerModifiable {
-	public final ItemStack[] items;
 
-	public ItemStackArrayHandler(int size) {
-		items = new ItemStack[size];
-		Arrays.fill(items, InvUtils.EMPTY_STACK);
-	}
+    public final ItemStack[] items;
 
-	@Override
-	public int getSlots() {
-		return items.length;
-	}
+    public ItemStackArrayHandler(int size) {
+        items = new ItemStack[size];
+        Arrays.fill(items, InvUtils.EMPTY_STACK);
+    }
 
-	@Override
-	public ItemStack getStackInSlot(int slot) {
-		return items[slot];
-	}
+    @Override
+    public int getSlots() {
+        return items.length;
+    }
 
-	@Override
-	public void setStackInSlot(int slot, ItemStack stack) {
-		items[slot] = stack;
-	}
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return items[slot];
+    }
 
-	@Override
-	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-		if (stack == null) {
-			return InvUtils.EMPTY_STACK;
-		}
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        items[slot] = stack;
+    }
 
-		if (!isItemValid(slot, stack)) {
-			return stack;
-		}
+    @Override
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+        if (stack == null) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-		ItemStack existing = items[slot];
+        if (!isItemValid(slot, stack)) {
+            return stack;
+        }
 
-		int limit = getStackLimit(slot, stack);
+        ItemStack existing = items[slot];
 
-		if (existing != null) {
-			if (!ItemHandlerHelper.canItemStacksStack(stack, existing)) {
-				return stack;
-			}
+        int limit = getStackLimit(slot, stack);
 
-			limit -= existing.stackSize;
-		}
+        if (existing != null) {
+            if (!ItemHandlerHelper.canItemStacksStack(stack, existing)) {
+                return stack;
+            }
 
-		if (limit <= 0) {
-			return stack;
-		}
+            limit -= existing.stackSize;
+        }
 
-		boolean reachedLimit = stack.stackSize > limit;
+        if (limit <= 0) {
+            return stack;
+        }
 
-		if (!simulate) {
-			if (existing == null) {
-				items[slot] = reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack;
-			} else {
-				existing.stackSize += reachedLimit ? limit : stack.stackSize;
-			}
+        boolean reachedLimit = stack.stackSize > limit;
 
-			markDirty(slot);
-		}
+        if (!simulate) {
+            if (existing == null) {
+                items[slot] = reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack;
+            } else {
+                existing.stackSize += reachedLimit ? limit : stack.stackSize;
+            }
 
-		return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.stackSize - limit)
-				: InvUtils.EMPTY_STACK;
-	}
+            markDirty(slot);
+        }
 
-	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate) {
-		if (amount == 0) {
-			return InvUtils.EMPTY_STACK;
-		}
+        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.stackSize - limit)
+                : InvUtils.EMPTY_STACK;
+    }
 
-		ItemStack existing = items[slot];
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        if (amount == 0) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-		if (existing == null) {
-			return InvUtils.EMPTY_STACK;
-		}
+        ItemStack existing = items[slot];
 
-		int toExtract = Math.min(amount, existing.getMaxStackSize());
+        if (existing == null) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-		if (existing.stackSize <= toExtract) {
-			if (!simulate) {
-				items[slot] = InvUtils.EMPTY_STACK;
-				markDirty(slot);
-			}
+        int toExtract = Math.min(amount, existing.getMaxStackSize());
 
-			return existing;
-		}
+        if (existing.stackSize <= toExtract) {
+            if (!simulate) {
+                items[slot] = InvUtils.EMPTY_STACK;
+                markDirty(slot);
+            }
 
-		if (!simulate) {
-			items[slot] = ItemHandlerHelper.copyStackWithSize(existing, existing.stackSize - toExtract);
-			markDirty(slot);
-		}
+            return existing;
+        }
 
-		return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
-	}
+        if (!simulate) {
+            items[slot] = ItemHandlerHelper.copyStackWithSize(existing, existing.stackSize - toExtract);
+            markDirty(slot);
+        }
 
-	protected int getStackLimit(int slot, ItemStack stack) {
-		return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
-	}
+        return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
+    }
 
-	@Override
-	public int getSlotLimit(int slot) {
-		return 64;
-	}
+    protected int getStackLimit(int slot, ItemStack stack) {
+        return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
+    }
 
-	@Override
-	public boolean isItemValid(int slot, ItemStack stack) {
-		return true;
-	}
+    @Override
+    public int getSlotLimit(int slot) {
+        return 64;
+    }
 
-	public void markDirty(int slot) {
-	}
+    @Override
+    public boolean isItemValid(int slot, ItemStack stack) {
+        return true;
+    }
+
+    public void markDirty(int slot) {}
 }

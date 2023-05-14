@@ -1,15 +1,5 @@
 package com.feed_the_beast.ftblib.lib.io;
 
-import com.feed_the_beast.ftblib.lib.util.JsonUtils;
-import com.feed_the_beast.ftblib.lib.util.StringJoiner;
-import com.google.gson.JsonElement;
-
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,195 +11,171 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import com.feed_the_beast.ftblib.lib.util.JsonUtils;
+import com.feed_the_beast.ftblib.lib.util.StringJoiner;
+import com.google.gson.JsonElement;
+
 /**
  * @author LatvianModder
  */
-public class HttpDataReader extends DataReader
-{
-	public interface HttpDataOutput
-	{
-		void writeData(OutputStream output) throws Exception;
+public class HttpDataReader extends DataReader {
 
-		class StringOutput implements HttpDataOutput
-		{
-			private final String string;
+    public interface HttpDataOutput {
 
-			public StringOutput(String text)
-			{
-				string = text;
-			}
+        void writeData(OutputStream output) throws Exception;
 
-			public StringOutput(Iterable<String> text)
-			{
-				this(StringJoiner.with('\n').join(text));
-			}
+        class StringOutput implements HttpDataOutput {
 
-			@Override
-			public void writeData(OutputStream output) throws Exception
-			{
-				new OutputStreamWriter(output).write(string);
-			}
-		}
-	}
+            private final String string;
 
-	public static class ConnectionNotOKException extends IllegalStateException
-	{
-		private final int responseCode;
+            public StringOutput(String text) {
+                string = text;
+            }
 
-		public ConnectionNotOKException(int code)
-		{
-			super("Connection not OK! Response code: " + code);
-			responseCode = code;
-		}
+            public StringOutput(Iterable<String> text) {
+                this(StringJoiner.with('\n').join(text));
+            }
 
-		public int getResponseCode()
-		{
-			return responseCode;
-		}
-	}
+            @Override
+            public void writeData(OutputStream output) throws Exception {
+                new OutputStreamWriter(output).write(string);
+            }
+        }
+    }
 
-	public final URL url;
-	public final RequestMethod requestMethod;
-	public final String contentType;
-	public final HttpDataOutput data;
-	public final Proxy proxy;
+    public static class ConnectionNotOKException extends IllegalStateException {
 
-	HttpDataReader(URL u, RequestMethod r, String c, @Nullable HttpDataOutput d, Proxy p)
-	{
-		url = u;
-		requestMethod = r;
-		contentType = c;
-		data = d;
-		proxy = p;
-	}
+        private final int responseCode;
 
-	public String toString()
-	{
-		return url.toString();
-	}
+        public ConnectionNotOKException(int code) {
+            super("Connection not OK! Response code: " + code);
+            responseCode = code;
+        }
 
-	private HttpURLConnection getConnection() throws Exception
-	{
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
+        public int getResponseCode() {
+            return responseCode;
+        }
+    }
 
-		if (connection instanceof HttpsURLConnection)
-		{
-			try
-			{
-				TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager()
-				{
-					@Override
-					public java.security.cert.X509Certificate[] getAcceptedIssuers()
-					{
-						return null;
-					}
+    public final URL url;
+    public final RequestMethod requestMethod;
+    public final String contentType;
+    public final HttpDataOutput data;
+    public final Proxy proxy;
 
-					@Override
-					public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
-					{
-					}
+    HttpDataReader(URL u, RequestMethod r, String c, @Nullable HttpDataOutput d, Proxy p) {
+        url = u;
+        requestMethod = r;
+        contentType = c;
+        data = d;
+        proxy = p;
+    }
 
-					@Override
-					public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
-					{
-					}
-				}};
+    public String toString() {
+        return url.toString();
+    }
 
-				SSLContext sc = SSLContext.getInstance("SSL");
-				sc.init(null, trustAllCerts, new java.security.SecureRandom());
-				((HttpsURLConnection) connection).setSSLSocketFactory(sc.getSocketFactory());
-			}
-			catch (Exception e)
-			{
-			}
-		}
+    private HttpURLConnection getConnection() throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
 
-		connection.setRequestMethod(requestMethod.name());
-		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3");
+        if (connection instanceof HttpsURLConnection) {
+            try {
+                TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 
-		if (!contentType.isEmpty())
-		{
-			connection.setRequestProperty("Content-Type", contentType);
-		}
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
 
-		connection.setDoInput(true);
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 
-		if (data != null)
-		{
-			connection.setDoOutput(true);
-			OutputStream os = connection.getOutputStream();
-			data.writeData(os);
-			os.flush();
-			os.close();
-		}
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                } };
 
-		int responseCode = connection.getResponseCode();
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                ((HttpsURLConnection) connection).setSSLSocketFactory(sc.getSocketFactory());
+            } catch (Exception e) {}
+        }
 
-		if (responseCode / 100 != 2)
-		{
-			throw new ConnectionNotOKException(responseCode);
-		}
+        connection.setRequestMethod(requestMethod.name());
+        connection.setRequestProperty(
+                "User-Agent",
+                "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3");
 
-		return connection;
-	}
+        if (!contentType.isEmpty()) {
+            connection.setRequestProperty("Content-Type", contentType);
+        }
 
-	@Override
-	public String string(int bufferSize) throws Exception
-	{
-		HttpURLConnection connection = getConnection();
+        connection.setDoInput(true);
 
-		try (InputStream stream = connection.getInputStream())
-		{
-			return readStringFromStream(stream, bufferSize);
-		}
-		finally
-		{
-			connection.disconnect();
-		}
-	}
+        if (data != null) {
+            connection.setDoOutput(true);
+            OutputStream os = connection.getOutputStream();
+            data.writeData(os);
+            os.flush();
+            os.close();
+        }
 
-	@Override
-	public List<String> stringList() throws Exception
-	{
-		HttpURLConnection connection = getConnection();
+        int responseCode = connection.getResponseCode();
 
-		try (InputStream stream = connection.getInputStream())
-		{
-			return readStringListFromStream(stream);
-		}
-		finally
-		{
-			connection.disconnect();
-		}
-	}
+        if (responseCode / 100 != 2) {
+            throw new ConnectionNotOKException(responseCode);
+        }
 
-	@Override
-	public JsonElement json() throws Exception
-	{
-		HttpURLConnection connection = getConnection();
+        return connection;
+    }
 
-		try (InputStream stream = connection.getInputStream())
-		{
-			return JsonUtils.parse(new InputStreamReader(stream, StandardCharsets.UTF_8));
-		}
-		finally
-		{
-			connection.disconnect();
-		}
-	}
+    @Override
+    public String string(int bufferSize) throws Exception {
+        HttpURLConnection connection = getConnection();
 
-	@Override
-	public BufferedImage image() throws Exception
-	{
-		HttpURLConnection connection = getConnection();
+        try (InputStream stream = connection.getInputStream()) {
+            return readStringFromStream(stream, bufferSize);
+        } finally {
+            connection.disconnect();
+        }
+    }
 
-		try (InputStream stream = connection.getInputStream())
-		{
-			return ImageIO.read(stream);
-		}
-		finally
-		{
-			connection.disconnect();
-		}
-	}
+    @Override
+    public List<String> stringList() throws Exception {
+        HttpURLConnection connection = getConnection();
+
+        try (InputStream stream = connection.getInputStream()) {
+            return readStringListFromStream(stream);
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    @Override
+    public JsonElement json() throws Exception {
+        HttpURLConnection connection = getConnection();
+
+        try (InputStream stream = connection.getInputStream()) {
+            return JsonUtils.parse(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    @Override
+    public BufferedImage image() throws Exception {
+        HttpURLConnection connection = getConnection();
+
+        try (InputStream stream = connection.getInputStream()) {
+            return ImageIO.read(stream);
+        } finally {
+            connection.disconnect();
+        }
+    }
 }

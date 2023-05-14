@@ -1,88 +1,90 @@
 package com.feed_the_beast.ftblib.lib.gui;
 
-import com.feed_the_beast.ftblib.lib.util.InvUtils;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import com.feed_the_beast.ftblib.lib.util.InvUtils;
+
 /**
  * @author LatvianModder
  */
 public abstract class ContainerBase extends Container {
-	public final EntityPlayer player;
 
-	public ContainerBase(EntityPlayer ep) {
-		player = ep;
-	}
+    public final EntityPlayer player;
 
-	public abstract int getNonPlayerSlots();
+    public ContainerBase(EntityPlayer ep) {
+        player = ep;
+    }
 
-	@Override
-	public boolean canInteractWith(EntityPlayer player) {
-		return true;
-	}
+    public abstract int getNonPlayerSlots();
 
-	public void addPlayerSlots(int posX, int posY, boolean ignoreCurrent) {
-		for (int y = 0; y < 3; y++) {
-			for (int x = 0; x < 9; x++) {
-				addSlotToContainer(new Slot(player.inventory, x + y * 9 + 9, posX + x * 18, posY + y * 18));
-			}
-		}
+    @Override
+    public boolean canInteractWith(EntityPlayer player) {
+        return true;
+    }
 
-		int i = ignoreCurrent ? player.inventory.currentItem : -1;
+    public void addPlayerSlots(int posX, int posY, boolean ignoreCurrent) {
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 9; x++) {
+                addSlotToContainer(new Slot(player.inventory, x + y * 9 + 9, posX + x * 18, posY + y * 18));
+            }
+        }
 
-		for (int x = 0; x < 9; x++) {
-			if (x != i) {
-				addSlotToContainer(new Slot(player.inventory, x, posX + x * 18, posY + 58));
-			} else {
-				addSlotToContainer(new Slot(player.inventory, x, posX + x * 18, posY + 58) {
-					@Override
-					public boolean canTakeStack(EntityPlayer ep) {
-						return false;
-					}
-				});
-			}
-		}
-	}
+        int i = ignoreCurrent ? player.inventory.currentItem : -1;
 
-	public void addPlayerSlots(int posX, int posY) {
-		addPlayerSlots(posX, posY, false);
-	}
+        for (int x = 0; x < 9; x++) {
+            if (x != i) {
+                addSlotToContainer(new Slot(player.inventory, x, posX + x * 18, posY + 58));
+            } else {
+                addSlotToContainer(new Slot(player.inventory, x, posX + x * 18, posY + 58) {
 
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int index) {
-		int nonPlayerSlots = getNonPlayerSlots();
+                    @Override
+                    public boolean canTakeStack(EntityPlayer ep) {
+                        return false;
+                    }
+                });
+            }
+        }
+    }
 
-		if (nonPlayerSlots <= 0) {
-			return InvUtils.EMPTY_STACK;
-		}
+    public void addPlayerSlots(int posX, int posY) {
+        addPlayerSlots(posX, posY, false);
+    }
 
-		ItemStack stack = InvUtils.EMPTY_STACK;
-		Slot slot = (Slot) inventorySlots.get(index);
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        int nonPlayerSlots = getNonPlayerSlots();
 
-		if (slot != null && slot.getHasStack()) {
-			ItemStack stack1 = slot.getStack();
-			if (stack1 != null) {
-				stack = stack1.copy();
-			}
+        if (nonPlayerSlots <= 0) {
+            return InvUtils.EMPTY_STACK;
+        }
 
-			if (index < nonPlayerSlots) {
-				if (!mergeItemStack(stack1, nonPlayerSlots, inventorySlots.size(), true)) {
-					return InvUtils.EMPTY_STACK;
-				}
-			} else if (!mergeItemStack(stack1, 0, nonPlayerSlots, false)) {
-				return InvUtils.EMPTY_STACK;
-			}
+        ItemStack stack = InvUtils.EMPTY_STACK;
+        Slot slot = (Slot) inventorySlots.get(index);
 
-			if (stack1 == null) {
-				slot.putStack(InvUtils.EMPTY_STACK);
-			} else {
-				slot.onSlotChanged();
-			}
-		}
+        if (slot != null && slot.getHasStack()) {
+            ItemStack stack1 = slot.getStack();
+            if (stack1 != null) {
+                stack = stack1.copy();
+            }
 
-		return stack;
-	}
+            if (index < nonPlayerSlots) {
+                if (!mergeItemStack(stack1, nonPlayerSlots, inventorySlots.size(), true)) {
+                    return InvUtils.EMPTY_STACK;
+                }
+            } else if (!mergeItemStack(stack1, 0, nonPlayerSlots, false)) {
+                return InvUtils.EMPTY_STACK;
+            }
+
+            if (stack1 == null) {
+                slot.putStack(InvUtils.EMPTY_STACK);
+            } else {
+                slot.onSlotChanged();
+            }
+        }
+
+        return stack;
+    }
 }

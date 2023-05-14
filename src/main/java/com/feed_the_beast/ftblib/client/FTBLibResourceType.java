@@ -5,8 +5,7 @@ import com.feed_the_beast.ftblib.client.resource.IResourceType;
 /**
  * @author LatvianModder
  */
-public enum FTBLibResourceType implements IResourceType
-{
-	FTB_CONFIG,
-	FTB_SIDEBAR_BUTTONS
+public enum FTBLibResourceType implements IResourceType {
+    FTB_CONFIG,
+    FTB_SIDEBAR_BUTTONS
 }

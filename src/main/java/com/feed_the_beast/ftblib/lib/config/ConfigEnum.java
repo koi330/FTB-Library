@@ -1,5 +1,18 @@
 package com.feed_the_beast.ftblib.lib.config;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+
 import com.feed_the_beast.ftblib.lib.gui.GuiBase;
 import com.feed_the_beast.ftblib.lib.gui.GuiHelper;
 import com.feed_the_beast.ftblib.lib.gui.IOpenableGui;
@@ -13,223 +26,223 @@ import com.feed_the_beast.ftblib.lib.io.DataOut;
 import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
 import com.feed_the_beast.ftblib.lib.util.misc.NameMap;
 import com.google.gson.JsonElement;
-import net.minecraft.client.Minecraft;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * @author LatvianModder
  */
 public class ConfigEnum<E> extends ConfigValue implements IIteratingConfig {
-	public static final String ID = "enum";
-	public static final Color4I COLOR = Color4I.rgb(0x0094FF);
 
-	public static class SimpleEnum<T> extends ConfigEnum<T> {
-		private final Supplier<T> get;
-		private final Consumer<T> set;
+    public static final String ID = "enum";
+    public static final Color4I COLOR = Color4I.rgb(0x0094FF);
 
-		public SimpleEnum(NameMap<T> nm, Supplier<T> g, Consumer<T> s) {
-			super(nm);
-			get = g;
-			set = s;
-		}
+    public static class SimpleEnum<T> extends ConfigEnum<T> {
 
-		@Override
-		public T getValue() {
-			return get.get();
-		}
+        private final Supplier<T> get;
+        private final Consumer<T> set;
 
-		@Override
-		public void setValue(T e) {
-			set.accept(e);
-		}
-	}
+        public SimpleEnum(NameMap<T> nm, Supplier<T> g, Consumer<T> s) {
+            super(nm);
+            get = g;
+            set = s;
+        }
 
-	private final NameMap<E> nameMap;
-	private E value;
+        @Override
+        public T getValue() {
+            return get.get();
+        }
 
-	public ConfigEnum(NameMap<E> nm) {
-		nameMap = nm;
-		value = nm.defaultValue;
-	}
+        @Override
+        public void setValue(T e) {
+            set.accept(e);
+        }
+    }
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    private final NameMap<E> nameMap;
+    private E value;
 
-	public NameMap<E> getNameMap() {
-		return nameMap;
-	}
+    public ConfigEnum(NameMap<E> nm) {
+        nameMap = nm;
+        value = nm.defaultValue;
+    }
 
-	public E getValue() {
-		return value;
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	public void setValue(E e) {
-		value = e;
-	}
+    public NameMap<E> getNameMap() {
+        return nameMap;
+    }
 
-	public void setValue(String value) {
-		setValue(getNameMap().get(value));
-	}
+    public E getValue() {
+        return value;
+    }
 
-	@Override
-	public String getString() {
-		return getNameMap().getName(getValue());
-	}
+    public void setValue(E e) {
+        value = e;
+    }
 
-	@Override
-	public IChatComponent getStringForGUI() {
-		return getNameMap().getDisplayName(null, getValue());
-	}
+    public void setValue(String value) {
+        setValue(getNameMap().get(value));
+    }
 
-	@Override
-	public boolean getBoolean() {
-		return !isDefault();
-	}
+    @Override
+    public String getString() {
+        return getNameMap().getName(getValue());
+    }
 
-	@Override
-	public int getInt() {
-		return getNameMap().getIndex(getValue());
-	}
+    @Override
+    public IChatComponent getStringForGUI() {
+        return getNameMap().getDisplayName(null, getValue());
+    }
 
-	@Override
-	public ConfigEnum<E> copy() {
-		return new ConfigEnum<>(getNameMap().withDefault(getNameMap().get(getInt())));
-	}
+    @Override
+    public boolean getBoolean() {
+        return !isDefault();
+    }
 
-	@Override
-	public Color4I getColor() {
-		Color4I col = getNameMap().getColor(getValue());
-		return col.isEmpty() ? COLOR : col;
-	}
+    @Override
+    public int getInt() {
+        return getNameMap().getIndex(getValue());
+    }
 
-	@Override
-	public void addInfo(ConfigValueInstance inst, List<String> list) {
-		NameMap<E> nameMap = getNameMap();
+    @Override
+    public ConfigEnum<E> copy() {
+        return new ConfigEnum<>(getNameMap().withDefault(getNameMap().get(getInt())));
+    }
 
-		if (inst.getCanEdit() && !inst.getDefaultValue().isNull()) {
-			list.add(EnumChatFormatting.AQUA + "Default: " + EnumChatFormatting.RESET
-					+ nameMap.getDisplayName(null, nameMap.get(inst.getDefaultValue().getString())).getFormattedText());
-		}
+    @Override
+    public Color4I getColor() {
+        Color4I col = getNameMap().getColor(getValue());
+        return col.isEmpty() ? COLOR : col;
+    }
 
-		list.add("");
+    @Override
+    public void addInfo(ConfigValueInstance inst, List<String> list) {
+        NameMap<E> nameMap = getNameMap();
 
-		for (E v : nameMap) {
-			list.add((v == getValue() ? (EnumChatFormatting.AQUA + "+ ") : (EnumChatFormatting.DARK_GRAY + "- "))
-					+ nameMap.getDisplayName(null, v).getUnformattedText());
-		}
-	}
+        if (inst.getCanEdit() && !inst.getDefaultValue().isNull()) {
+            list.add(
+                    EnumChatFormatting.AQUA + "Default: "
+                            + EnumChatFormatting.RESET
+                            + nameMap.getDisplayName(null, nameMap.get(inst.getDefaultValue().getString()))
+                                    .getFormattedText());
+        }
 
-	@Override
-	public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
-		if (getNameMap().values.size() > 16 || GuiBase.isCtrlKeyDown()) {
-			GuiButtonListBase g = new GuiButtonListBase() {
-				@Override
-				public void addButtons(Panel panel) {
-					for (E v : getNameMap()) {
-						panel.add(new SimpleTextButton(panel,
-								getNameMap().getDisplayName(Minecraft.getMinecraft().thePlayer, v).getUnformattedText(),
-								Icon.EMPTY) {
-							@Override
-							public void onClicked(MouseButton button) {
-								GuiHelper.playClickSound();
-								setValue(v);
-								gui.openGui();
-								callback.run();
-							}
-						});
-					}
-				}
-			};
+        list.add("");
 
-			g.setHasSearchBox(true);
-			g.openGui();
-			return;
-		}
+        for (E v : nameMap) {
+            list.add(
+                    (v == getValue() ? (EnumChatFormatting.AQUA + "+ ") : (EnumChatFormatting.DARK_GRAY + "- "))
+                            + nameMap.getDisplayName(null, v).getUnformattedText());
+        }
+    }
 
-		super.onClicked(gui, inst, button, callback);
-	}
+    @Override
+    public void onClicked(IOpenableGui gui, ConfigValueInstance inst, MouseButton button, Runnable callback) {
+        if (getNameMap().values.size() > 16 || GuiBase.isCtrlKeyDown()) {
+            GuiButtonListBase g = new GuiButtonListBase() {
 
-	@Override
-	public List<String> getVariants() {
-		return getNameMap().keys;
-	}
+                @Override
+                public void addButtons(Panel panel) {
+                    for (E v : getNameMap()) {
+                        panel.add(
+                                new SimpleTextButton(
+                                        panel,
+                                        getNameMap().getDisplayName(Minecraft.getMinecraft().thePlayer, v)
+                                                .getUnformattedText(),
+                                        Icon.EMPTY) {
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt, String key) {
-		nbt.setString(key, getString());
-	}
+                                    @Override
+                                    public void onClicked(MouseButton button) {
+                                        GuiHelper.playClickSound();
+                                        setValue(v);
+                                        gui.openGui();
+                                        callback.run();
+                                    }
+                                });
+                    }
+                }
+            };
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt, String key) {
-		setValue(nbt.getString(key));
-	}
+            g.setHasSearchBox(true);
+            g.openGui();
+            return;
+        }
 
-	@Override
-	public void writeData(DataOut data) {
-		NameMap<E> nameMap = getNameMap();
+        super.onClicked(gui, inst, button, callback);
+    }
 
-		data.writeVarInt(nameMap.size());
+    @Override
+    public List<String> getVariants() {
+        return getNameMap().keys;
+    }
 
-		for (Map.Entry<String, E> entry : nameMap.map.entrySet()) {
-			data.writeString(entry.getKey());
-			data.writeTextComponent(nameMap.getDisplayName(null, entry.getValue()));
-			data.writeInt(nameMap.getColor(entry.getValue()).rgba());
-		}
+    @Override
+    public void writeToNBT(NBTTagCompound nbt, String key) {
+        nbt.setString(key, getString());
+    }
 
-		data.writeString(getString());
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound nbt, String key) {
+        setValue(nbt.getString(key));
+    }
 
-	@Override
-	public void readData(DataIn data) {
-		throw new IllegalStateException("Can't read Abstract Enum property!");
-	}
+    @Override
+    public void writeData(DataOut data) {
+        NameMap<E> nameMap = getNameMap();
 
-	@Override
-	public ConfigValue getIteration(boolean next) {
-		ConfigEnum<E> c = copy();
-		c.setValue(next ? getNameMap().getNext(getValue()) : getNameMap().getPrevious(getValue()));
-		return c;
-	}
+        data.writeVarInt(nameMap.size());
 
-	@Override
-	public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
-		E val = getNameMap().getNullable(string);
+        for (Map.Entry<String, E> entry : nameMap.map.entrySet()) {
+            data.writeString(entry.getKey());
+            data.writeTextComponent(nameMap.getDisplayName(null, entry.getValue()));
+            data.writeInt(nameMap.getColor(entry.getValue()).rgba());
+        }
 
-		if (val != null) {
-			if (!simulate) {
-				setValue(val);
-			}
+        data.writeString(getString());
+    }
 
-			return true;
-		}
+    @Override
+    public void readData(DataIn data) {
+        throw new IllegalStateException("Can't read Abstract Enum property!");
+    }
 
-		return false;
-	}
+    @Override
+    public ConfigValue getIteration(boolean next) {
+        ConfigEnum<E> c = copy();
+        c.setValue(next ? getNameMap().getNext(getValue()) : getNameMap().getPrevious(getValue()));
+        return c;
+    }
 
-	@Override
-	public void setValueFromOtherValue(ConfigValue value) {
-		setValue(value.getString());
-	}
+    @Override
+    public boolean setValueFromString(@Nullable ICommandSender sender, String string, boolean simulate) {
+        E val = getNameMap().getNullable(string);
 
-	@Override
-	public void setValueFromJson(JsonElement json) {
-		if (json.isJsonPrimitive()) {
-			setValue(json.getAsString());
-		}
-	}
+        if (val != null) {
+            if (!simulate) {
+                setValue(val);
+            }
 
-	public boolean isDefault() {
-		return getValue() == getNameMap().defaultValue;
-	}
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void setValueFromOtherValue(ConfigValue value) {
+        setValue(value.getString());
+    }
+
+    @Override
+    public void setValueFromJson(JsonElement json) {
+        if (json.isJsonPrimitive()) {
+            setValue(json.getAsString());
+        }
+    }
+
+    public boolean isDefault() {
+        return getValue() == getNameMap().defaultValue;
+    }
 }
