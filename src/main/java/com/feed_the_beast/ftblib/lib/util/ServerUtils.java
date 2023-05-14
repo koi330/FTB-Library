@@ -1,9 +1,13 @@
 package com.feed_the_beast.ftblib.lib.util;
 
+import com.feed_the_beast.ftblib.client.FTBLibClientEventHandler;
+import com.feed_the_beast.ftblib.lib.util.text_components.Notification;
+import com.feed_the_beast.ftblib.net.MessageNotification;
 import com.mojang.authlib.GameProfile;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -66,28 +70,9 @@ public class ServerUtils {
 			case 1:
 				return new ChatComponentTranslation("ftblib.world.dimension.end");
 			default:
-				// for (DimensionType type : DimensionType.values()) {
-				// 	if (type.getId() == dim) {
-				// 		return new ChatComponentText(type.getName());
-				// 	}
-				// }
-
 				return new ChatComponentText("dim_" + dim);
 		}
 	}
-
-	// public static IChatComponent getDimensionName(DimensionType type) {
-	// 	switch (type) {
-	// 		case OVERWORLD:
-	// 			return new ChatComponentTranslation("createWorld.customize.preset.overworld");
-	// 		case NETHER:
-	// 			return new ChatComponentTranslation("advancements.nether.root.title");
-	// 		case THE_END:
-	// 			return new ChatComponentTranslation("advancements.end.root.title");
-	// 		default:
-	// 			return new ChatComponentText(type.getName());
-	// 	}
-	// }
 
 	public static boolean isVanillaClient(ICommandSender sender) {
 		if (sender instanceof EntityPlayerMP) {
@@ -144,7 +129,7 @@ public class ServerUtils {
 
 		boolean grounded_mob_spawn = SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.ambient, world, x, y, z) ||
 				SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.creature, world, x, y, z) ||
-		  SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.monster, world, x, y, z);
+				SpawnerAnimals.canCreatureTypeSpawnAtLocation(EnumCreatureType.monster, world, x, y, z);
 
 		if (!grounded_mob_spawn || chunk.getSavedLightValue(EnumSkyBlock.Block, x, y, z) >= 8) {
 			return SpawnType.CANT_SPAWN;
@@ -170,7 +155,6 @@ public class ServerUtils {
 	}
 
 	public static void notify(MinecraftServer server, @Nullable EntityPlayer player, IChatComponent component) {
-		//todo: add notification stuff, map in Temp
 		if (player == null) {
 			for (EntityPlayer player1 : (List<EntityPlayer>) server.getConfigurationManager().playerEntityList) {
 				player1.addChatComponentMessage(component);
@@ -178,6 +162,16 @@ public class ServerUtils {
 		}
 		else {
 			player.addChatComponentMessage(component);
+		}
+	}
+
+	public static void notify(MinecraftServer server, @Nullable EntityPlayer player, Notification notification) {
+		if (player == null) {
+			new MessageNotification(notification).sendToAll();
+		} else if (player instanceof EntityPlayerMP) {
+			new MessageNotification(notification).sendTo((EntityPlayerMP) player);
+		} else if (player instanceof EntityClientPlayerMP) {
+			FTBLibClientEventHandler.INST.onNotify(notification);
 		}
 	}
 

@@ -1,15 +1,11 @@
 package com.feed_the_beast.ftblib.client;
 
 import com.feed_the_beast.ftblib.FTBLib;
-import com.feed_the_beast.ftblib.FTBLibConfig;
 import com.feed_the_beast.ftblib.events.client.CustomClickEvent;
 import com.feed_the_beast.ftblib.lib.client.ClientUtils;
 import com.feed_the_beast.ftblib.lib.client.GlStateManager;
-import com.feed_the_beast.ftblib.lib.gui.GuiIcons;
 import com.feed_the_beast.ftblib.lib.gui.Widget;
-import com.feed_the_beast.ftblib.lib.icon.AtlasSpriteIcon;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
-import com.feed_the_beast.ftblib.lib.icon.IconPresets;
 import com.feed_the_beast.ftblib.lib.icon.IconRenderer;
 import com.feed_the_beast.ftblib.lib.util.InvUtils;
 import com.feed_the_beast.ftblib.lib.util.NBTUtils;
@@ -28,21 +24,19 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import javax.annotation.Nullable;
 import java.awt.Rectangle;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -56,24 +50,6 @@ public class FTBLibClientEventHandler {
 	private static Temp currentNotification;
 	public static Rectangle lastDrawnArea = new Rectangle();
 	public static boolean shouldRenderIcons = false;
-
-//	private static final IChatListener CHAT_LISTENER = (type, component) -> {
-//		if (type == ChatType.GAME_INFO) {
-//			if (component instanceof Notification || FTBLibClientConfig.replace_vanilla_status_messages) {
-//				ResourceLocation id = component instanceof Notification ? ((Notification) component).getId()
-//						: Notification.VANILLA_STATUS;
-//				Temp.MAP.remove(id);
-//
-//				if (currentNotification != null && currentNotification.widget.id.equals(id)) {
-//					currentNotification = null;
-//				}
-//
-//				Temp.MAP.put(id, component);
-//			} else {
-//				Minecraft.getMinecraft().ingameGUI.setOverlayMessage(component.getFormattedText(), false);
-//			}
-//		}
-//	};
 
 	public static class NotificationWidget {
 		public final IChatComponent notification;
@@ -180,14 +156,24 @@ public class FTBLibClientEventHandler {
 		}
 	}
 
-//	@SubscribeEvent
-//	public static void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-//		SidedUtils.UNIVERSE_UUID_CLIENT = null;
-//		currentNotification = null;
-//		Temp.MAP.clear();
-//		ClientATHelper.getChatListeners().get(ChatType.GAME_INFO).clear();
-//		ClientATHelper.getChatListeners().get(ChatType.GAME_INFO).add(CHAT_LISTENER);
-//	}
+	public void onNotify(Notification notification) {
+		ResourceLocation id = notification.getId();
+		Temp.MAP.remove(id);
+		if (currentNotification != null && currentNotification.widget.id.equals(id)) {
+			currentNotification = null;
+		}
+		Temp.MAP.put(id, notification);
+	}
+
+	@SubscribeEvent
+	public void onClientChatEvent(ClientChatReceivedEvent event) {
+		IChatComponent component = event.message;
+		if (component instanceof Notification) {
+			Notification notification = (Notification) component;
+			onNotify(notification);
+			event.message = null;
+		}
+	}
 
 	@SubscribeEvent
 	public void onTooltip(ItemTooltipEvent event) {

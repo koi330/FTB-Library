@@ -12,6 +12,7 @@ public class FTBLibNetHandler {
 
 	public static void init() {
 		GENERAL.register(new MessageSyncData());
+		GENERAL.register(new MessageNotification());
 		GENERAL.registerBlank();
 		GENERAL.register(new MessageCloseGui());
 		GENERAL.register(new MessageAdminPanelGui());

@@ -227,9 +227,7 @@ public class JsonUtils {
 		if (component instanceof ChatComponentText) {
 			json.addProperty("text", ((ChatComponentText) component).getChatComponentText_TextValue());
 
-			if (component instanceof TextComponentCountdown) {
-				json.addProperty("countdown", ((TextComponentCountdown) component).countdown);
-			} else if (component instanceof Notification) {
+			if (component instanceof Notification) {
 				Notification n = (Notification) component;
 
 				if (!n.getId().equals(Notification.VANILLA_STATUS)) {
@@ -255,24 +253,12 @@ public class JsonUtils {
 					if (object instanceof IChatComponent) {
 						array.add(serializeTextComponent((IChatComponent) object));
 					} else {
-						array.add(JsonPrimitive(String.valueOf(object)));
+						array.add(new JsonPrimitive(String.valueOf(object)));
 					}
 				}
 
 				json.add("with", array);
 			}
-		} else if (component instanceof ChatComponentScore) {
-			ChatComponentScore score = (ChatComponentScore) component;
-			JsonObject json1 = new JsonObject();
-			json1.addProperty("name", score.getName());
-			json1.addProperty("objective", score.getObjective());
-			json1.addProperty("value", score.getUnformattedTextForChat());
-			json.add("score", json1);
-			// } else if (component instanceof TextComponentSelector) {
-			// json.addProperty("selector", ((TextComponentSelector)
-			// component).getSelector());
-			// } else if (component instanceof TextComponentKeybind) {
-			// json.addProperty("keybind", ((TextComponentKeybind) component).getKeybind());
 		}
 
 		if (json.entrySet().isEmpty()) {
@@ -280,10 +266,6 @@ public class JsonUtils {
 		}
 
 		return json;
-	}
-
-	private static JsonElement JsonPrimitive(String valueOf) {
-		return null;
 	}
 
 	@Nullable
